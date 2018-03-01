@@ -34,6 +34,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     //ShowWindow(GetConsoleWindow(), SW_HIDE);
     TimeChecker::enforceTimeStamp();
 
+    // Create a new process, waiting for its full initialization before the
+    // startGame function can return.
     PROCESS_INFORMATION processInformation;
     startGame(&processInformation);
     LibraryInjector::injectLibraries(&processInformation);
