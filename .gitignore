@@ -1,0 +1,9 @@
+*.exe
+*.dll
+*.so
+*.a
+*.def
+
+*.o
+
+*.cbp
