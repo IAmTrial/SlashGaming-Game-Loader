@@ -23,6 +23,11 @@
 #ifndef LIBRARYLOADER_H
 #define LIBRARYLOADER_H
 
+#include <windows.h>
+
+#include <string_view>
+
 bool loadLibraries();
+HMODULE loadLibrarySafely(std::wstring_view libraryPath);
 
 #endif // LIBRARYLOADER_H

@@ -23,13 +23,27 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <unordered_set>
 
 bool loadLibraries() {
     // Define libraries here.
-    static const std::unordered_set<std::string> libraries = {
-        "BH.dll",
-        "D2HD.dll"
+    static const std::unordered_set<std::wstring> libraryPaths = {
+        L"BH.dll",
+        L"D2HD.dll"
     };
+
+    for (auto& libraryPath : libraryPaths) {
+        loadLibrarySafely(libraryPath);
+    }
     return true;
+}
+
+HMODULE loadLibrarySafely(std::wstring_view libraryPath) {
+    HMODULE dllHandle = GetModuleHandleW(libraryPath.data());
+    if (dllHandle == nullptr) {
+        dllHandle = LoadLibraryW(libraryPath.data());
+    }
+
+    return dllHandle;
 }
