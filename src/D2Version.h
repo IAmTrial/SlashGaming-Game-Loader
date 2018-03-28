@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef _D2VERSION_H
-#define _D2VERSION_H
+#ifndef D2VERSION_H
+#define D2VERSION_H
 
 #include <windows.h>
 #include <string>
