@@ -21,6 +21,8 @@
 #include <windows.h>
 #include <iostream>
 
+#include "LibraryLoader.h"
+
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         LPSTR lpCmdLine, int nCmdShow) {
     std::cout << "SlashDiablo Game Loader - Copyright (C) 2018 Mir Drualga" << std::endl;
@@ -29,6 +31,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     //ShowWindow(GetConsoleWindow(), SW_HIDE);
     HMODULE gameHandle = LoadLibrary("Game.exe");
+    loadLibraries();
 
     return 0;
 }
