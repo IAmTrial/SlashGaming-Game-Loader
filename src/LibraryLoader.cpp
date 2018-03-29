@@ -33,7 +33,7 @@ bool loadLibraries() {
         L"D2HD.dll"
     };
 
-    for (auto& libraryPath : libraryPaths) {
+    for (const auto& libraryPath : libraryPaths) {
         loadLibrarySafely(libraryPath);
     }
     return true;
