@@ -26,6 +26,15 @@
 #include <string_view>
 #include <unordered_set>
 
+const std::unordered_set<std::wstring>& getLibraryPaths() {
+    // Define libraries here.
+    static const std::unordered_set<std::wstring> libraryPaths = {
+        L"BH.dll",
+        L"D2HD.dll"
+    };
+    return libraryPaths;
+}
+
 bool injectLibraries(const PROCESS_INFORMATION *pProcessInformation) {
     void* pAllocatedRemoteMemory =
         VirtualAllocEx(pProcessInformation->hProcess, nullptr, MAX_PATH,
@@ -47,13 +56,7 @@ bool injectLibraries(const PROCESS_INFORMATION *pProcessInformation) {
 }
 
 bool loadLibraries() {
-    // Define libraries here.
-    static const std::unordered_set<std::wstring> libraryPaths = {
-        L"BH.dll",
-        L"D2HD.dll"
-    };
-
-    for (const auto& libraryPath : libraryPaths) {
+    for (const auto& libraryPath : getLibraryPaths()) {
         loadLibrarySafely(libraryPath);
     }
     return true;
