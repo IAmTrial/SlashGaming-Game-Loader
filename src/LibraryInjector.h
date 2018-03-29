@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef LIBRARYLOADER_H
-#define LIBRARYLOADER_H
+#ifndef LIBRARYINJECTOR_H
+#define LIBRARYINJECTOR_H
 
 #include <windows.h>
 
@@ -30,4 +30,4 @@
 bool loadLibraries();
 HMODULE loadLibrarySafely(std::wstring_view libraryPath);
 
-#endif // LIBRARYLOADER_H
+#endif // LIBRARYINJECTOR_H
