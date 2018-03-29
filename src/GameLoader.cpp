@@ -22,19 +22,19 @@
 
 #include <windows.h>
 
-bool startGame(PROCESS_INFORMATION *processInformation) {
+bool startGame(PROCESS_INFORMATION *pProcessInformation) {
     STARTUPINFO startupInfo = { 0 };
     startupInfo.cb = sizeof(startupInfo);
 
     // Create the desired process.
     if (!CreateProcess("Game.exe", GetCommandLine(), nullptr, nullptr, true,
             0, nullptr, nullptr, &startupInfo,
-            processInformation)) {
+            pProcessInformation)) {
         MessageBoxW(nullptr, L"Game.exe could not be found.",
             L"Game executable not found.", MB_OK | MB_ICONERROR);
         std::exit(0);
     }
 
     // Wait until the process is started.
-    return WaitForInputIdle(processInformation->hProcess, INFINITE) == 0;
+    return WaitForInputIdle(pProcessInformation->hProcess, INFINITE) == 0;
 }
