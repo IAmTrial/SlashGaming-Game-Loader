@@ -26,6 +26,26 @@
 #include <string_view>
 #include <unordered_set>
 
+bool injectLibraries(const PROCESS_INFORMATION *pProcessInformation) {
+    void* pAllocatedRemoteMemory =
+        VirtualAllocEx(pProcessInformation->hProcess, nullptr, MAX_PATH,
+            MEM_COMMIT, PAGE_READWRITE);
+
+    if (pAllocatedRemoteMemory == nullptr) {
+        return false;
+    }
+
+    //WriteProcessMemory();
+
+    if (!VirtualFreeEx(pProcessInformation->hProcess, pAllocatedRemoteMemory,
+            MAX_PATH, MEM_DECOMMIT)) {
+        std::cout << "Somehow, deallocation failed." << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
 bool loadLibraries() {
     // Define libraries here.
     static const std::unordered_set<std::wstring> libraryPaths = {
