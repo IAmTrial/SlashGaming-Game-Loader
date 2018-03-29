@@ -22,7 +22,7 @@
 #include <iostream>
 
 #include "GameLoader.h"
-#include "LibraryLoader.h"
+#include "LibraryInjector.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         LPSTR lpCmdLine, int nCmdShow) {

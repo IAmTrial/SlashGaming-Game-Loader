@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "LibraryLoader.h"
+#include "LibraryInjector.h"
 
 #include <windows.h>
 #include <iostream>
