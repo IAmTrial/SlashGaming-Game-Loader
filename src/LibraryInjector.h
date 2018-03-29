@@ -25,9 +25,23 @@
 
 #include <windows.h>
 
+#include <string>
 #include <string_view>
 
-bool injectLibraries(const PROCESS_INFORMATION *pProcessInformation);
+class LibraryInjector {
+public:
+    LibraryInjector(std::wstring_view,
+        const PROCESS_INFORMATION *pProcessInformation);
+    LibraryInjector(LibraryInjector&& libraryInjector) = default;
+
+    bool injectLibrary();
+
+    static bool injectLibraries(
+        const PROCESS_INFORMATION *pProcessInformation);
+private:
+    std::wstring libraryPath;
+    const PROCESS_INFORMATION *pProcessInformation;
+};
 
 bool loadLibraries();
 HMODULE loadLibrarySafely(std::wstring_view libraryPath);
