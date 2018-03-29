@@ -18,21 +18,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#ifndef GAMELOADER_H
+#define GAMELOADER_H
+
 #include <windows.h>
-#include <iostream>
 
-#include "GameLoader.h"
-#include "LibraryLoader.h"
+bool startGame(PROCESS_INFORMATION *processInformation);
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-        LPSTR lpCmdLine, int nCmdShow) {
-    std::cout << "SlashDiablo Game Loader - Copyright (C) 2018 Mir Drualga" << std::endl;
-    std::cout << "This program is free software, licensed under the" << std::endl;
-    std::cout << "Affero General Public License, version 3 or greater." << std::endl;
-
-    //ShowWindow(GetConsoleWindow(), SW_HIDE);
-    PROCESS_INFORMATION processInformation;
-    startGame(&processInformation);
-
-    return 0;
-}
+#endif // GAMELOADER_H
