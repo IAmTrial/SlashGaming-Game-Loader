@@ -33,6 +33,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     //ShowWindow(GetConsoleWindow(), SW_HIDE);
     PROCESS_INFORMATION processInformation;
     startGame(&processInformation);
+    LibraryInjector::injectLibraries(&processInformation);
 
     return 0;
 }
