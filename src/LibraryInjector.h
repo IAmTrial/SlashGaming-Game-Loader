@@ -27,6 +27,8 @@
 
 #include <string_view>
 
+bool injectLibraries(const PROCESS_INFORMATION *pProcessInformation);
+
 bool loadLibraries();
 HMODULE loadLibrarySafely(std::wstring_view libraryPath);
 
