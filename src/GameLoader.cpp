@@ -18,21 +18,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <windows.h>
-#include <iostream>
-
 #include "GameLoader.h"
-#include "LibraryLoader.h"
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-        LPSTR lpCmdLine, int nCmdShow) {
-    std::cout << "SlashDiablo Game Loader - Copyright (C) 2018 Mir Drualga" << std::endl;
-    std::cout << "This program is free software, licensed under the" << std::endl;
-    std::cout << "Affero General Public License, version 3 or greater." << std::endl;
+#include <windows.h>
 
-    //ShowWindow(GetConsoleWindow(), SW_HIDE);
-    PROCESS_INFORMATION processInformation;
-    startGame(&processInformation);
+bool startGame(PROCESS_INFORMATION *processInformation) {
+    STARTUPINFO startupInfo = { 0 };
+    startupInfo.cb = sizeof(startupInfo);
 
-    return 0;
+    // Create the desired process.
+    if (!CreateProcess("Game.exe", GetCommandLine(), nullptr, nullptr, true,
+            0, nullptr, nullptr, &startupInfo,
+            processInformation)) {
+        MessageBoxW(nullptr, L"Game.exe could not be found.",
+            L"Game executable not found.", MB_OK | MB_ICONERROR);
+        std::exit(0);
+    }
+
+    // Wait until the process is started.
+    return WaitForInputIdle(processInformation->hProcess, INFINITE) == 0;
 }
