@@ -23,16 +23,24 @@
 
 #include "GameLoader.h"
 #include "LibraryInjector.h"
+#include "TimeChecker.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         LPSTR lpCmdLine, int nCmdShow) {
     std::cout << "SlashDiablo Game Loader - Copyright (C) 2018 Mir Drualga" << std::endl;
     std::cout << "This program is free software, licensed under the" << std::endl;
     std::cout << "Affero General Public License, version 3 or greater." << std::endl;
+    std::cout << std::endl;
 
     //ShowWindow(GetConsoleWindow(), SW_HIDE);
+    TimeChecker::enforceTimeStamp();
+
+    // Create a new process, waiting for its full initialization before the
+    // startGame function can return.
     PROCESS_INFORMATION processInformation;
     startGame(&processInformation);
+
+    // Inject libraries, after reading all files.
     LibraryInjector::injectLibraries(&processInformation);
 
     return 0;
