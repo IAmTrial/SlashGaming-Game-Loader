@@ -79,7 +79,7 @@ Glide3xVersion D2Version::getGlide3xVersion(std::string_view versionString) {
 
 // Taken from StackOverflow user crashmstr
 std::string D2Version::determineVersionString(std::wstring_view filePath) {
-    DWORD versionHandle = 0;
+    DWORD versionHandle;
 
     // Check version size.
     DWORD versionSize = GetFileVersionInfoSizeW(filePath.data(), &versionHandle);
@@ -94,7 +94,7 @@ std::string D2Version::determineVersionString(std::wstring_view filePath) {
     }
 
     // Gather all of the information into the specified buffer.
-    UINT size = 0;
+    UINT size;
     VS_FIXEDFILEINFO* versionInfo = nullptr;
     if (!VerQueryValueW(versionData.get(), L"\\", (LPVOID*)&versionInfo, &size) ||
             size <= 0) {
