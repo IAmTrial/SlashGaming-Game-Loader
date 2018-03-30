@@ -30,9 +30,10 @@ class TimeChecker {
 public:
     static constexpr bool ENFORCE_TIMESTAMP = true;
     static constexpr const char *COMPILATION_DATE = __DATE__;
+    static constexpr int ALLOWED_MONTH_DIFFERENCE = 1;
 
-    static std::chrono::system_clock convertStringDate(
-        std::string_view dateString);
+    static std::chrono::duration<long long, std::ratio<2629746>>
+        getDaysFromDateString(std::string_view dateString);
     static void enforceTimeStamp();
     static bool isExecutionPermitted();
 

@@ -26,27 +26,28 @@
 #include <regex>
 #include <unordered_map>
 
-std::chrono::system_clock TimeChecker::convertStringDate(
-        std::string_view dateString) {
+std::chrono::duration<long long, std::ratio<2629746>>
+        TimeChecker::getDaysFromDateString(std::string_view dateString) {
     static const std::unordered_map<std::string, int> monthValues = {
         { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 }, { "May", 4 },
         { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 }, { "Sep", 8 }, { "Oct", 9 },
         { "Nov", 10 }, { "Dec", 11 }
     };
 
-    std::cout << dateString.data() <<std::endl;
-    const std::regex COMPILE_DATE_REGEX("(\\s+) (\\d+) (\\d+)");
+    const std::regex COMPILE_DATE_REGEX("(\\w+) (\\d+) (\\d+)");
     std::cmatch matches;
 
-    struct tm timeInfo;
     if (!std::regex_match(dateString.data(), matches, COMPILE_DATE_REGEX)) {
-        return std::chrono::system_clock();
+        return std::chrono::duration<long long, std::ratio<2629746>>(0);
     }
 
-    std::cout << matches[0] << std::endl;
-    std::cout << matches[1] << std::endl;
-    std::cout << matches[2] << std::endl;
-    std::cout << matches[3] << std::endl;
+    // Calculate number of months from epoch time (Jan 1, 1970).
+    long long month = monthValues.at(matches[1]);
+    long long year = std::stoll(matches[3].str()) - 1970;
+    std::chrono::duration<long long, std::ratio<2629746>>
+        totalDaysDuration(month + (year * 12));
+
+    return totalDaysDuration;
 }
 
 void TimeChecker::enforceTimeStamp() {
@@ -55,9 +56,11 @@ void TimeChecker::enforceTimeStamp() {
     }
 
     std::cout << "Timestamp is enforced, meaning that this program " <<
-        "will cease to function on " << COMPILATION_DATE << "." << std::endl;
-    std::cout << "This means that you have received a version of the " <<
+        "will cease to function " << ALLOWED_MONTH_DIFFERENCE <<
+        " month(s) after " << COMPILATION_DATE << "." << std::endl;
+    std::cout << "This means that you have received a version of this " <<
         "program not meant for public release." << std::endl;
+    std::cout << std::endl;
 
     if (!isExecutionPermitted()) {
         MessageBoxW(nullptr, L"Date of execution exceeds timestamp limit.",
@@ -67,6 +70,23 @@ void TimeChecker::enforceTimeStamp() {
 }
 
 bool TimeChecker::isExecutionPermitted() {
-    convertStringDate(COMPILATION_DATE);
-    return true;
+    auto compileMonthDuration =
+        getDaysFromDateString(COMPILATION_DATE);
+
+    // If the compilation date could not be parsed, don't allow execution.
+    if (compileMonthDuration ==
+            std::chrono::duration<long long, std::ratio<2629746>>(0)) {
+        return false;
+    }
+
+    // Calculate the difference in months between the two.
+    auto todayTimePoint = std::chrono::system_clock::now();
+    auto todayDuration = todayTimePoint.time_since_epoch();
+    auto todayMonthDuration =
+        std::chrono::duration_cast<std::chrono::duration<long long, std::ratio<2629746>>>(todayDuration);
+
+    auto monthDifference = todayMonthDuration - compileMonthDuration;
+
+    return (monthDifference.count() >= 0) &&
+        (monthDifference.count() <= ALLOWED_MONTH_DIFFERENCE);
 }
