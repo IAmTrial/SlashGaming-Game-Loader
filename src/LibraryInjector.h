@@ -33,6 +33,7 @@ public:
     LibraryInjector(std::wstring_view,
         const PROCESS_INFORMATION *pProcessInformation);
     LibraryInjector(LibraryInjector&& libraryInjector) = default;
+    ~LibraryInjector();
 
     bool injectLibrary();
 
@@ -40,7 +41,9 @@ public:
         const PROCESS_INFORMATION *pProcessInformation);
 private:
     std::wstring libraryPath;
+    size_t libraryPathSize;
     const PROCESS_INFORMATION *pProcessInformation;
+    wchar_t *pRemoteWChar;
 };
 
 bool loadLibraries();
