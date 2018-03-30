@@ -41,28 +41,36 @@ const std::unordered_set<std::wstring>& getLibraryPaths() {
 LibraryInjector::LibraryInjector(std::wstring_view libraryPath,
         const PROCESS_INFORMATION *pProcessInformation) :
             libraryPath(libraryPath),
-            pProcessInformation(pProcessInformation) {
+            libraryPathSize(sizeof(wchar_t) * (libraryPath.length() + 1)),
+            pProcessInformation(pProcessInformation),
+            pRemoteWChar((wchar_t*) VirtualAllocEx(
+                pProcessInformation->hProcess, nullptr, libraryPathSize,
+                MEM_COMMIT, PAGE_READWRITE)) {
+    if (pRemoteWChar == nullptr) {
+        std::cerr << "VirtualAllocEx failed." << std::endl;
+        std::exit(0);
+    }
+}
+
+LibraryInjector::~LibraryInjector() {
+    if (pRemoteWChar != nullptr) {
+        if (!VirtualFreeEx(pProcessInformation->hProcess, pRemoteWChar,
+                0, MEM_RELEASE)) {
+            std::cerr << "VirtualFreeEx failed." << std::endl;
+            failVirtualFreeExStub(nullptr);
+            std::exit(0);
+        }
+    }
 }
 
 bool LibraryInjector::injectLibrary() {
-    size_t libraryPathSize = sizeof(wchar_t) * (libraryPath.length() + 1);
-
-    void *pRemoteWChar =
-        VirtualAllocEx(pProcessInformation->hProcess, nullptr,
-            libraryPathSize, MEM_COMMIT, PAGE_READWRITE);
-
-    if (pRemoteWChar == nullptr) {
-        std::cerr << "VirtualAllocEx failed." << std::endl;
-        return false;
-    }
-
     if (!WriteProcessMemory(pProcessInformation->hProcess,
             pRemoteWChar, libraryPath.data(), libraryPathSize, nullptr)) {
         std::cerr << "WriteProcessMemory failed." << std::endl;
         return failWriteProcessMemoryStub(nullptr);
     }
 
-    DWORD remoteThreadId = 0;
+    DWORD remoteThreadId;
     HANDLE remoteThreadHandle =
         CreateRemoteThread(pProcessInformation->hProcess, nullptr, 0,
             (LPTHREAD_START_ROUTINE ) LoadLibraryW, pRemoteWChar, 0,
@@ -74,12 +82,6 @@ bool LibraryInjector::injectLibrary() {
     }
 
     WaitForSingleObject(remoteThreadHandle, INFINITE);
-
-    if (!VirtualFreeEx(pProcessInformation->hProcess, pRemoteWChar,
-            0, MEM_RELEASE)) {
-        std::cerr << "VirtualFreeEx failed." << std::endl;
-        return failVirtualFreeExStub(nullptr);
-    }
 
     return true;
 }
