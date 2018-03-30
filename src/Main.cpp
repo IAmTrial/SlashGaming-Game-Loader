@@ -23,6 +23,7 @@
 
 #include "GameLoader.h"
 #include "LibraryInjector.h"
+#include "TimeChecker.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         LPSTR lpCmdLine, int nCmdShow) {
@@ -31,6 +32,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     std::cout << "Affero General Public License, version 3 or greater." << std::endl;
 
     //ShowWindow(GetConsoleWindow(), SW_HIDE);
+    TimeChecker::enforceTimeStamp();
+
     PROCESS_INFORMATION processInformation;
     startGame(&processInformation);
     LibraryInjector::injectLibraries(&processInformation);

@@ -20,6 +20,53 @@
 
 #include "TimeChecker.h"
 
+#include <windows.h>
+#include <chrono>
+#include <iostream>
+#include <regex>
+#include <unordered_map>
+
+std::chrono::system_clock TimeChecker::convertStringDate(
+        std::string_view dateString) {
+    static const std::unordered_map<std::string, int> monthValues = {
+        { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 }, { "May", 4 },
+        { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 }, { "Sep", 8 }, { "Oct", 9 },
+        { "Nov", 10 }, { "Dec", 11 }
+    };
+
+    std::cout << dateString.data() <<std::endl;
+    const std::regex COMPILE_DATE_REGEX("(\\s+) (\\d+) (\\d+)");
+    std::cmatch matches;
+
+    struct tm timeInfo;
+    if (!std::regex_match(dateString.data(), matches, COMPILE_DATE_REGEX)) {
+        return std::chrono::system_clock();
+    }
+
+    std::cout << matches[0] << std::endl;
+    std::cout << matches[1] << std::endl;
+    std::cout << matches[2] << std::endl;
+    std::cout << matches[3] << std::endl;
+}
+
+void TimeChecker::enforceTimeStamp() {
+    if constexpr (!ENFORCE_TIMESTAMP) {
+        return;
+    }
+
+    std::cout << "Timestamp is enforced, meaning that this program " <<
+        "will cease to function on " << COMPILATION_DATE << "." << std::endl;
+    std::cout << "This means that you have received a version of the " <<
+        "program not meant for public release." << std::endl;
+
+    if (!isExecutionPermitted()) {
+        MessageBoxW(nullptr, L"Date of execution exceeds timestamp limit.",
+            L"Execution Date Exceeded", MB_OK | MB_ICONERROR);
+        std::exit(0);
+    }
+}
+
 bool TimeChecker::isExecutionPermitted() {
+    convertStringDate(COMPILATION_DATE);
     return true;
 }

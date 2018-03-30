@@ -23,11 +23,17 @@
 #ifndef TIMECHECKER_H
 #define TIMECHECKER_H
 
+#include <chrono>
+#include <string_view>
+
 class TimeChecker {
 public:
-    static constexpr bool ENFORCE_TIME_STAMP = true;
+    static constexpr bool ENFORCE_TIMESTAMP = true;
     static constexpr const char *COMPILATION_DATE = __DATE__;
 
+    static std::chrono::system_clock convertStringDate(
+        std::string_view dateString);
+    static void enforceTimeStamp();
     static bool isExecutionPermitted();
 
     TimeChecker() = delete;
