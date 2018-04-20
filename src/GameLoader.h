@@ -25,6 +25,6 @@
 
 #include <windows.h>
 
-bool startGame(PROCESS_INFORMATION *pProcessInformation);
+bool startGame(PROCESS_INFORMATION& pProcessInformation);
 
 #endif // GAMELOADER_H

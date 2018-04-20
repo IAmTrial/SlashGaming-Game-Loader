@@ -39,12 +39,12 @@ const std::unordered_set<std::wstring>& getLibraryPaths() {
 }
 
 LibraryInjector::LibraryInjector(std::wstring_view libraryPath,
-        const PROCESS_INFORMATION *pProcessInformation) :
+        const PROCESS_INFORMATION& pProcessInformation) :
             libraryPath(libraryPath),
             libraryPathSize(sizeof(wchar_t) * (libraryPath.length() + 1)),
             pProcessInformation(pProcessInformation),
             pRemoteWChar((wchar_t*) VirtualAllocEx(
-                pProcessInformation->hProcess, nullptr, libraryPathSize,
+                pProcessInformation.hProcess, nullptr, libraryPathSize,
                 MEM_COMMIT, PAGE_READWRITE)) {
     if (pRemoteWChar == nullptr) {
         std::cerr << "VirtualAllocEx failed." << std::endl;
@@ -54,7 +54,7 @@ LibraryInjector::LibraryInjector(std::wstring_view libraryPath,
 
 LibraryInjector::~LibraryInjector() {
     if (pRemoteWChar != nullptr) {
-        if (!VirtualFreeEx(pProcessInformation->hProcess, pRemoteWChar,
+        if (!VirtualFreeEx(pProcessInformation.hProcess, pRemoteWChar,
                 0, MEM_RELEASE)) {
             std::cerr << "VirtualFreeEx failed." << std::endl;
             failVirtualFreeExStub(nullptr);
@@ -64,7 +64,7 @@ LibraryInjector::~LibraryInjector() {
 }
 
 bool LibraryInjector::injectLibrary() {
-    if (!WriteProcessMemory(pProcessInformation->hProcess,
+    if (!WriteProcessMemory(pProcessInformation.hProcess,
             pRemoteWChar, libraryPath.data(), libraryPathSize, nullptr)) {
         std::cerr << "WriteProcessMemory failed." << std::endl;
         return failWriteProcessMemoryStub(nullptr);
@@ -72,7 +72,7 @@ bool LibraryInjector::injectLibrary() {
 
     DWORD remoteThreadId;
     HANDLE remoteThreadHandle =
-        CreateRemoteThread(pProcessInformation->hProcess, nullptr, 0,
+        CreateRemoteThread(pProcessInformation.hProcess, nullptr, 0,
             (LPTHREAD_START_ROUTINE ) LoadLibraryW, pRemoteWChar, 0,
             &remoteThreadId);
 
@@ -87,7 +87,7 @@ bool LibraryInjector::injectLibrary() {
 }
 
 bool LibraryInjector::injectLibraries(
-        const PROCESS_INFORMATION *pProcessInformation) {
+        const PROCESS_INFORMATION& pProcessInformation) {
     bool success = true;
 
     for (const auto& libraryPath : getLibraryPaths()) {
