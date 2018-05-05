@@ -34,7 +34,7 @@ std::chrono::duration<long long, std::ratio<2629746>>
         { "Nov", 10 }, { "Dec", 11 }
     };
 
-    const std::regex COMPILE_DATE_REGEX("(\\w+) (\\d+) (\\d+)");
+    const std::regex COMPILE_DATE_REGEX("(\\w+)\\s+(\\d+)\\s+(\\d+)");
     std::cmatch matches;
 
     if (!std::regex_match(dateString.data(), matches, COMPILE_DATE_REGEX)) {
