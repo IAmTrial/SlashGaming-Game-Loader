@@ -1,8 +1,8 @@
 /**
- * SlashDiablo Game Loader
+ * SlashGaming Diablo II Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashDiablo Game Loader.
+ * This file is part of SlashGaming Diablo II Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published

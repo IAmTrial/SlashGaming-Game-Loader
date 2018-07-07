@@ -1,8 +1,8 @@
 /**
- * SlashDiablo Game Loader
+ * SlashGaming Diablo II Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashDiablo Game Loader.
+ * This file is part of SlashGaming Diablo II Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -62,15 +62,15 @@ VS_VERSION_INFO    VERSIONINFO
     BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
     {
       VALUE "Build",            "2018\0"
-      VALUE "Comments",         "Licensed under AGPL v3+.\0"
-      VALUE "CompanyName",      "SlashDiablo\0"
+      VALUE "Comments",         "Licensed under Affero GPL v3+.\0"
+      VALUE "CompanyName",      "SlashGaming\0"
       VALUE "Developer",        "Mir Drualga\0"
       VALUE "FileDescription",  "Loads Game.exe and injects DLL files.\0"
       VALUE "InternalName",     "D2 Game Loader\0"
       VALUE "LegalCopyright",   "Copyright (C) 2018  Mir Drualga\0"
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "PrivateBuild",     "\0"
-      VALUE "ProductName",      "SlashDiablo Game Loader\0"
+      VALUE "ProductName",      "SlashGaming Diablo II Game Loader\0"
       VALUE "ProductVersion",   "1.0.0.0\0"
       VALUE "SpecialBuild",     "\0"
       VALUE "Support",          "reddit.com/r/SlashDiablo\0"
