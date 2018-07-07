@@ -41,6 +41,8 @@
 #include <chrono>
 #include <string_view>
 
+namespace slashgaming {
+
 class TimeChecker {
 public:
     static constexpr bool ENFORCE_TIMESTAMP = true;
@@ -55,5 +57,7 @@ public:
     TimeChecker() = delete;
 private:
 };
+
+} // namespace slashgaming
 
 #endif // TIMECHECKER_H

@@ -40,6 +40,10 @@
 
 #include <windows.h>
 
+namespace slashgaming {
+
 bool startGame(PROCESS_INFORMATION& pProcessInformation);
+
+} // namespace slashgaming
 
 #endif // GAMELOADER_H

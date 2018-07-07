@@ -43,6 +43,8 @@
 #include <string>
 #include <string_view>
 
+namespace slashgaming {
+
 class LibraryInjector {
 public:
     LibraryInjector(std::wstring_view,
@@ -63,5 +65,7 @@ private:
 
 bool loadLibraries();
 HMODULE loadLibrarySafely(std::wstring_view libraryPath);
+
+} // namespace slashgaming
 
 #endif // LIBRARYINJECTOR_H

@@ -40,7 +40,9 @@
 #include "LibraryInjector.h"
 #include "TimeChecker.h"
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+namespace slashgaming {
+
+extern "C" int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         LPSTR lpCmdLine, int nCmdShow) {
     std::cout << "SlashDiablo Game Loader - Copyright (C) 2018  Mir Drualga" << std::endl;
     std::cout << "This program is free software, licensed under the" << std::endl;
@@ -59,4 +61,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LibraryInjector::injectLibraries(processInformation);
 
     return 0;
+}
+
 }

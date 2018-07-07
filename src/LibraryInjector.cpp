@@ -41,6 +41,8 @@
 #include <string_view>
 #include <unordered_set>
 
+namespace slashgaming {
+
 extern "C" bool failVirtualFreeExStub(void *pAddress);
 extern "C" bool failWriteProcessMemoryStub(void *pAddress);
 
@@ -184,3 +186,5 @@ asm(".intel_syntax \n"
     "_failWriteProcessMemoryStubEND: \n"
     "   ret \n"
     ".att_syntax");
+
+} // namespace slashgaming

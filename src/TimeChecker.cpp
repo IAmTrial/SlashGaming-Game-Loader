@@ -41,6 +41,8 @@
 #include <regex>
 #include <unordered_map>
 
+namespace slashgaming {
+
 std::chrono::duration<long long, std::ratio<2629746>>
         TimeChecker::getDaysFromDateString(std::string_view dateString) {
     static const std::unordered_map<std::string, int> monthValues = {
@@ -105,3 +107,5 @@ bool TimeChecker::isExecutionPermitted() {
     return (monthDifference.count() >= 0) &&
         (monthDifference.count() <= ALLOWED_MONTH_DIFFERENCE);
 }
+
+} // namespace slashgaming

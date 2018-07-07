@@ -37,6 +37,8 @@
 
 #include <windows.h>
 
+namespace slashgaming {
+
 bool startGame(PROCESS_INFORMATION& pProcessInformation) {
     STARTUPINFO startupInfo = { 0 };
     startupInfo.cb = sizeof(startupInfo);
@@ -53,3 +55,5 @@ bool startGame(PROCESS_INFORMATION& pProcessInformation) {
     // Wait until the process is started.
     return WaitForInputIdle(pProcessInformation.hProcess, INFINITE) == 0;
 }
+
+} // namespace slashgaming
