@@ -33,39 +33,18 @@
  *  you additional permission to convey the resulting work.
  */
 
-#pragma once
-
-#ifndef LIBRARYINJECTOR_H
-#define LIBRARYINJECTOR_H
+#ifndef SLASHGAMING_LIBRARYINJECTOR_H_
+#define SLASHGAMING_LIBRARYINJECTOR_H_
 
 #include <windows.h>
 
-#include <string>
-#include <string_view>
+#include <unordered_set>
 
 namespace slashgaming {
 
-class LibraryInjector {
-public:
-    LibraryInjector(std::wstring_view,
-        const PROCESS_INFORMATION& pProcessInformation);
-    LibraryInjector(LibraryInjector&& libraryInjector) = default;
-    ~LibraryInjector();
-
-    bool injectLibrary();
-
-    static bool injectLibraries(
-        const PROCESS_INFORMATION& pProcessInformation);
-private:
-    std::wstring libraryPath;
-    size_t libraryPathSize;
-    const PROCESS_INFORMATION& pProcessInformation;
-    wchar_t *pRemoteWChar;
-};
-
-bool loadLibraries();
-HMODULE loadLibrarySafely(std::wstring_view libraryPath);
+bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
+                     const PROCESS_INFORMATION *process_info_ptr);
 
 } // namespace slashgaming
 
-#endif // LIBRARYINJECTOR_H
+#endif // SLASHGAMING_LIBRARYINJECTOR_H_

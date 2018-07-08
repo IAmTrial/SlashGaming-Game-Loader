@@ -33,17 +33,16 @@
  *  you additional permission to convey the resulting work.
  */
 
-#pragma once
-
-#ifndef GAMELOADER_H
-#define GAMELOADER_H
+#ifndef SLASHGAMING_GAMELOADER_H_
+#define SLASHGAMING_GAMELOADER_H_
 
 #include <windows.h>
 
 namespace slashgaming {
 
-bool startGame(PROCESS_INFORMATION& pProcessInformation);
+bool StartGame(PROCESS_INFORMATION* process_info_out_ptr);
+bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr);
 
 } // namespace slashgaming
 
-#endif // GAMELOADER_H
+#endif // SLASHGAMING_GAMELOADER_H_

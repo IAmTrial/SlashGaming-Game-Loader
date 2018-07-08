@@ -36,24 +36,56 @@
 #include "GameLoader.h"
 
 #include <windows.h>
+#include <iostream>
 
 namespace slashgaming {
 
-bool startGame(PROCESS_INFORMATION& pProcessInformation) {
-    STARTUPINFO startupInfo = { 0 };
-    startupInfo.cb = sizeof(startupInfo);
+bool StartGame(PROCESS_INFORMATION* process_info_out_ptr) {
+  STARTUPINFOW startup_info = { };
+  startup_info.cb = sizeof(startup_info);
 
-    // Create the desired process.
-    if (!CreateProcess("Game.exe", GetCommandLine(), nullptr, nullptr, true,
-            0, nullptr, nullptr, &startupInfo,
-            &pProcessInformation)) {
+  // Create the desired process.
+  if (!CreateProcessW(L"Game.exe",
+                      GetCommandLineW(),
+                      nullptr,
+                      nullptr,
+                      true,
+                      0,
+                      nullptr,
+                      nullptr,
+                      &startup_info,
+                      process_info_out_ptr)) {
         MessageBoxW(nullptr, L"Game.exe could not be found.",
-            L"Game executable not found.", MB_OK | MB_ICONERROR);
+                    L"Game executable not found.", MB_OK | MB_ICONERROR);
         std::exit(0);
     }
 
     // Wait until the process is started.
-    return WaitForInputIdle(pProcessInformation.hProcess, INFINITE) == 0;
+    return WaitForInputIdle(process_info_out_ptr->hProcess, INFINITE) == 0;
+}
+
+bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
+  STARTUPINFOW startup_info = { };
+  startup_info.cb = sizeof(startup_info);
+
+  // Create the desired process.
+  if (!CreateProcessW(L"Game.exe",
+                      GetCommandLineW(),
+                      nullptr,
+                      nullptr,
+                      true,
+                      CREATE_SUSPENDED,
+                      nullptr,
+                      nullptr,
+                      &startup_info,
+                      process_info_out_ptr)) {
+        MessageBoxW(nullptr, L"Game.exe could not be found.",
+                    L"Game executable not found.", MB_OK | MB_ICONERROR);
+        std::exit(0);
+    }
+
+    // Wait until the process is started.
+    return true;
 }
 
 } // namespace slashgaming

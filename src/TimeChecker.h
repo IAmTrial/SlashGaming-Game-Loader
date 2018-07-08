@@ -33,31 +33,20 @@
  *  you additional permission to convey the resulting work.
  */
 
-#pragma once
-
-#ifndef TIMECHECKER_H
-#define TIMECHECKER_H
+#ifndef SLASHGAMING_TIMECHECKER_H_
+#define SLASHGAMING_TIMECHECKER_H_
 
 #include <chrono>
 #include <string_view>
 
-namespace slashgaming {
+namespace slashgaming::timechecker {
 
-class TimeChecker {
-public:
-    static constexpr bool ENFORCE_TIMESTAMP = true;
-    static constexpr const char *COMPILATION_DATE = __DATE__;
-    static constexpr int ALLOWED_MONTH_DIFFERENCE = 1;
+  constexpr bool kIsEnforceTimestamp = false;
+  constexpr std::string_view kCompilationDate = __DATE__;
+  constexpr int kAllowedMonthDifference = 1;
 
-    static std::chrono::duration<long long, std::ratio<2629746>>
-        getDaysFromDateString(std::string_view dateString);
-    static void enforceTimeStamp();
-    static bool isExecutionPermitted();
+  void EnforceTimeStamp();
 
-    TimeChecker() = delete;
-private:
-};
+} // namespace slashgaming::timechecker
 
-} // namespace slashgaming
-
-#endif // TIMECHECKER_H
+#endif // SLASHGAMING_TIMECHECKER_H_
