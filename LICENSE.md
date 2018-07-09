@@ -28,3 +28,48 @@ it with Diablo II: Lord of Destruction (or a modified version of that
 game and its libraries), containing parts covered by the terms of
 Blizzard End User License Agreement, the licensors of this Program grant
 you additional permission to convey the resulting work.
+
+# Frozen
+Copyright 2017 Quarkslab
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+# JSON for Modern C++
+Copyright (c) 2013-2018 Niels Lohmann
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+The class contains the UTF-8 Decoder from Bjoern Hoehrmann which is
+licensed under the MIT License (see above). Copyright © 2008-2009
+Björn Hoehrmann bjoern@hoehrmann.de
+
+The class contains a slightly modified version of the Grisu2 algorithm
+from Florian Loitsch which is licensed under the MIT License (see
+above). Copyright © 2009 Florian Loitsch

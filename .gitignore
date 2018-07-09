@@ -12,3 +12,5 @@
 *.depend
 
 *.json
+*.zip
+*.7z
