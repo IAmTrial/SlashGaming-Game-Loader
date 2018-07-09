@@ -1,8 +1,8 @@
 /**
- * SlashDiablo Game Loader
- * Copyright (C) 2018 Mir Drualga
+ * SlashGaming Diablo II Game Loader
+ * Copyright (C) 2018  Mir Drualga
  *
- *  This file is part of SlashDiablo Game Loader.
+ * This file is part of SlashGaming Diablo II Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -16,10 +16,25 @@
  *
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Additional permissions under GNU Affero General Public License version 3
+ *  section 7
+ *
+ *  If you modify this Program, or any covered work, by linking or combining
+ *  it with Diablo II (or a modified version of that game and its
+ *  libraries), containing parts covered by the terms of Blizzard End User
+ *  License Agreement, the licensors of this Program grant you additional
+ *  permission to convey the resulting work.
+ *
+ *  If you modify this Program, or any covered work, by linking or combining
+ *  it with Diablo II: Lord of Destruction (or a modified version of that
+ *  game and its libraries), containing parts covered by the terms of
+ *  Blizzard End User License Agreement, the licensors of this Program grant
+ *  you additional permission to convey the resulting work.
  */
 
-#ifndef RESOURCE_RC
-#define RESOURCE_RC
+#ifndef SLASHGAMING_RESOURCE_RC_
+#define SLASHGAMING_RESOURCE_RC_
 
 #include <windows.h>
 
@@ -47,15 +62,15 @@ VS_VERSION_INFO    VERSIONINFO
     BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
     {
       VALUE "Build",            "2018\0"
-      VALUE "Comments",         "Licensed under AGPL v3+.\0"
-      VALUE "CompanyName",      "SlashDiablo\0"
+      VALUE "Comments",         "Licensed under Affero GPL v3+.\0"
+      VALUE "CompanyName",      "SlashGaming\0"
       VALUE "Developer",        "Mir Drualga\0"
       VALUE "FileDescription",  "Loads Game.exe and injects DLL files.\0"
       VALUE "InternalName",     "D2 Game Loader\0"
-      VALUE "LegalCopyright",   "Copyright (C) 2018 SlashDiablo Community\0"
+      VALUE "LegalCopyright",   "Copyright (C) 2018  Mir Drualga\0"
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "PrivateBuild",     "\0"
-      VALUE "ProductName",      "SlashDiablo Game Loader\0"
+      VALUE "ProductName",      "SlashGaming Diablo II Game Loader\0"
       VALUE "ProductVersion",   "1.0.0.0\0"
       VALUE "SpecialBuild",     "\0"
       VALUE "Support",          "reddit.com/r/SlashDiablo\0"
@@ -67,4 +82,4 @@ VS_VERSION_INFO    VERSIONINFO
   } // BLOCK "VarFileInfo"
 }
 
-#endif // RESOURCE_RC
+#endif // SLASHGAMING_RESOURCE_RC_

@@ -1,8 +1,8 @@
 /**
- * SlashDiablo Game Loader
- * Copyright (C) 2018 Mir Drualga
+ * SlashGaming Diablo II Game Loader
+ * Copyright (C) 2018  Mir Drualga
  *
- *  This file is part of SlashDiablo Game Loader.
+ * This file is part of SlashGaming Diablo II Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -16,37 +16,36 @@
  *
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Additional permissions under GNU Affero General Public License version 3
+ *  section 7
+ *
+ *  If you modify this Program, or any covered work, by linking or combining
+ *  it with Diablo II (or a modified version of that game and its
+ *  libraries), containing parts covered by the terms of Blizzard End User
+ *  License Agreement, the licensors of this Program grant you additional
+ *  permission to convey the resulting work.
+ *
+ *  If you modify this Program, or any covered work, by linking or combining
+ *  it with Diablo II: Lord of Destruction (or a modified version of that
+ *  game and its libraries), containing parts covered by the terms of
+ *  Blizzard End User License Agreement, the licensors of this Program grant
+ *  you additional permission to convey the resulting work.
  */
 
-#pragma once
-
-#ifndef LIBRARYINJECTOR_H
-#define LIBRARYINJECTOR_H
+#ifndef SLASHGAMING_LIBRARYINJECTOR_H_
+#define SLASHGAMING_LIBRARYINJECTOR_H_
 
 #include <windows.h>
 
-#include <string>
 #include <string_view>
+#include <unordered_set>
 
-class LibraryInjector {
-public:
-    LibraryInjector(std::wstring_view,
-        const PROCESS_INFORMATION& pProcessInformation);
-    LibraryInjector(LibraryInjector&& libraryInjector) = default;
-    ~LibraryInjector();
+namespace slashgaming {
 
-    bool injectLibrary();
+bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
+                     const PROCESS_INFORMATION *process_info_ptr);
 
-    static bool injectLibraries(
-        const PROCESS_INFORMATION& pProcessInformation);
-private:
-    std::wstring libraryPath;
-    size_t libraryPathSize;
-    const PROCESS_INFORMATION& pProcessInformation;
-    wchar_t *pRemoteWChar;
-};
+} // namespace slashgaming
 
-bool loadLibraries();
-HMODULE loadLibrarySafely(std::wstring_view libraryPath);
-
-#endif // LIBRARYINJECTOR_H
+#endif // SLASHGAMING_LIBRARYINJECTOR_H_
