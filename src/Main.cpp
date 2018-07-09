@@ -36,7 +36,9 @@
 #include <windows.h>
 #include <array>
 #include <iostream>
+#include <unordered_set>
 
+#include "ConfigReader.h"
 #include "GameLoader.h"
 #include "LibraryInjector.h"
 #include "TimeChecker.h"
@@ -45,7 +47,7 @@ namespace slashgaming {
 
 namespace {
 
-constexpr const std::array license_text = {
+constexpr const std::array<std::string_view, 19> kLicenseLines = {
     "SlashGaming Diablo II Game Loader",
     "Copyright (C) 2018  Mir Drualga",
     "",
@@ -68,7 +70,7 @@ constexpr const std::array license_text = {
 };
 
 void PrintLicenseNotice() {
-  for (const auto& line : license_text) {
+  for (const auto& line : kLicenseLines) {
     std::cout << line << std::endl;
   }
 
@@ -90,10 +92,16 @@ extern "C" int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   PROCESS_INFORMATION process_info;
   StartGame(&process_info);
 
-  std::unordered_set<std::string_view> library_paths = {};
+  // Read the list of DLLs to inject from the config.
+  std::unordered_set<std::string> library_paths = GetLibraryPaths();
+  std::unordered_set<std::string_view> library_paths_view;
+
+  for (const auto& libary_path_str : library_paths) {
+    library_paths_view.insert(libary_path_str);
+  }
 
   // Inject libraries, after reading all files.
-  if (InjectLibraries(library_paths, &process_info)) {
+  if (InjectLibraries(library_paths_view, &process_info)) {
     std::cout << "All libraries have been successfully injected." << std::endl;
   } else {
     std::cout << "Some or all libraries failed to inject." << std::endl;

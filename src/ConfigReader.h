@@ -33,19 +33,16 @@
  *  you additional permission to convey the resulting work.
  */
 
-#ifndef SLASHGAMING_LIBRARYINJECTOR_H_
-#define SLASHGAMING_LIBRARYINJECTOR_H_
+#ifndef SLASHGAMING_CONFIGREADER_H_
+#define SLASHGAMING_CONFIGREADER_H_
 
-#include <windows.h>
-
-#include <string_view>
+#include <string>
 #include <unordered_set>
 
 namespace slashgaming {
 
-bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
-                     const PROCESS_INFORMATION *process_info_ptr);
+std::unordered_set<std::string> GetLibraryPaths();
 
 } // namespace slashgaming
 
-#endif // SLASHGAMING_LIBRARYINJECTOR_H_
+#endif // SLASHGAMING_CONFIGREADER_H_
