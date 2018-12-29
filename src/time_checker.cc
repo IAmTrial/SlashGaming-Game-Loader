@@ -43,8 +43,7 @@
 #include <regex>
 #include <string_view>
 
-#include <frozen/string.h>
-#include <frozen/unordered_map.h>
+#include <boost/bimap.hpp>
 
 namespace sgd2gldr::timechecker {
 
@@ -53,12 +52,16 @@ using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 namespace {
 
 MonthsDuration GetDaysFromDateString(std::string_view date) {
-  constexpr const auto values_by_month =
-      frozen::make_unordered_map<frozen::string, int>({
-          { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 }, { "May", 4 },
-          { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 }, { "Sep", 8 }, { "Oct", 9 },
-          { "Nov", 10 }, { "Dec", 11 }
-      });
+  static const std::array<std::string_view, 12> month_value_pairs = {{
+      { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 }, { "May", 4 },
+      { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 }, { "Sep", 8 }, { "Oct", 9 },
+      { "Nov", 10 }, { "Dec", 11 }
+  }};
+
+  static const auto values_by_month = boost::bimap<std::string_view, int>(
+      month_value_pairs.cbegin(),
+      month_value_pairs.cend()
+  );
 
   const std::regex kCompileDateRegex("(\\w+)\\s+(\\d+)\\s+(\\d+)");
   std::cmatch matches;
@@ -68,9 +71,9 @@ MonthsDuration GetDaysFromDateString(std::string_view date) {
   }
 
   // Calculate number of months from epoch time (Jan 1, 1970).
-  long long month = values_by_month.at(
-      frozen::string(matches[1].str().data(),
-                     matches[1].str().length()));
+  long long month = values_by_month.left.at(
+      matches[1].str().data()
+  );
 
   long long year = std::stoll(matches[3].str()) - 1970;
   MonthsDuration total_days_duration(month + (year * 12));
