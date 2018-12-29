@@ -33,7 +33,7 @@
  *  you additional permission to convey the resulting work.
  */
 
-#include "ConfigReader.h"
+#include "config_reader.h"
 
 #include <windows.h>
 #include <fstream>

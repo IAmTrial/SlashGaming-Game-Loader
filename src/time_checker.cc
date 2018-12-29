@@ -33,7 +33,7 @@
  *  you additional permission to convey the resulting work.
  */
 
-#include "TimeChecker.h"
+#include "time_checker.h"
 
 #include <windows.h>
 #include <cstdint>

@@ -38,10 +38,10 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "ConfigReader.h"
-#include "GameLoader.h"
-#include "LibraryInjector.h"
-#include "TimeChecker.h"
+#include "config_reader.h"
+#include "game_loader.h"
+#include "library_injector.h"
+#include "time_checker.h"
 
 namespace sgd2gldr {
 

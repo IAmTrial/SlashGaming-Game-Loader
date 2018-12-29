@@ -33,7 +33,7 @@
  *  you additional permission to convey the resulting work.
  */
 
-#include "GameLoader.h"
+#include "game_loader.h"
 
 #include <windows.h>
 #include <iostream>

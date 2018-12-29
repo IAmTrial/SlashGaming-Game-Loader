@@ -33,7 +33,7 @@
  *  you additional permission to convey the resulting work.
  */
 
-#include "LibraryInjector.h"
+#include "library_injector.h"
 
 #include <windows.h>
 #include <cwchar>
