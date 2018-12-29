@@ -36,6 +36,7 @@
 #include <windows.h>
 #include <array>
 #include <iostream>
+#include <string_view>
 #include <unordered_set>
 
 #include "config_reader.h"

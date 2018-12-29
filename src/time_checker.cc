@@ -42,6 +42,7 @@
 #include <ratio>
 #include <regex>
 #include <string_view>
+#include <utility>
 
 #include <boost/bimap.hpp>
 
@@ -51,18 +52,25 @@ using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
 namespace {
 
-MonthsDuration GetDaysFromDateString(std::string_view date) {
-  static const std::array<std::string_view, 12> month_value_pairs = {{
-      { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 }, { "May", 4 },
-      { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 }, { "Sep", 8 }, { "Oct", 9 },
-      { "Nov", 10 }, { "Dec", 11 }
-  }};
+using MonthValueAndNameBimapType = boost::bimap<std::string_view, int>;
 
-  static const auto values_by_month = boost::bimap<std::string_view, int>(
-      month_value_pairs.cbegin(),
-      month_value_pairs.cend()
+const boost::bimap<std::string_view, int>& GetDaysAndDateNameBimap() {
+  static const std::array<MonthValueAndNameBimapType::value_type, 12>
+      month_value_pairs = { {
+          { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 },
+          { "May", 4 }, { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 },
+          { "Sep", 8 }, { "Oct", 9 }, { "Nov", 10 }, { "Dec", 11 }
+      } };
+
+  static const MonthValueAndNameBimapType values_and_month_bimap(
+      month_value_pairs.begin(),
+      month_value_pairs.end()
   );
 
+  return values_and_month_bimap;
+}
+
+MonthsDuration GetDaysFromDateString(std::string_view date) {
   const std::regex kCompileDateRegex("(\\w+)\\s+(\\d+)\\s+(\\d+)");
   std::cmatch matches;
 
@@ -71,7 +79,7 @@ MonthsDuration GetDaysFromDateString(std::string_view date) {
   }
 
   // Calculate number of months from epoch time (Jan 1, 1970).
-  long long month = values_by_month.left.at(
+  long long month = GetDaysAndDateNameBimap().left.at(
       matches[1].str().data()
   );
 
