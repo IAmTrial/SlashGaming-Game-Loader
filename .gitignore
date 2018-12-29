@@ -5,12 +5,22 @@
 *.def
 
 *.o
+*.obj
 
 *.cbp
 *.res
 *.layout
 *.depend
 
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
 *.json
 *.zip
 *.7z
+
+*.log
+*.tlog
+*.idb
+*.pdb
