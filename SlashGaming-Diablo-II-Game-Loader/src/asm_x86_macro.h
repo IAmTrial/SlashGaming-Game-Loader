@@ -45,6 +45,15 @@
 #define ASM_X86(...) \
     __asm __VA_ARGS__
 
+#else
+
+#define ASM_X86(...) \
+    asm(
+        ".intel_syntax \n" \
+        #__VA_ARGS__ "\n" \
+        ".att_syntax \n" \
+    )
+
 #endif
 
 #endif // SGD2GLDR_ASM_X86_MACRO_H_

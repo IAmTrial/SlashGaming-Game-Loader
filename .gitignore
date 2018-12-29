@@ -12,6 +12,7 @@
 *.layout
 *.depend
 
+*.sln
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
@@ -24,3 +25,7 @@
 *.tlog
 *.idb
 *.pdb
+
+.vs/
+Debug/
+Release/
