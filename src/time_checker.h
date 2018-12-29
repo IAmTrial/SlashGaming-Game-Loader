@@ -33,19 +33,20 @@
  *  you additional permission to convey the resulting work.
  */
 
-#ifndef SLASHGAMING_LIBRARYINJECTOR_H_
-#define SLASHGAMING_LIBRARYINJECTOR_H_
+#ifndef SGD2GLDR_TIME_CHECKER_H_
+#define SGD2GLDR_TIME_CHECKER_H_
 
-#include <windows.h>
-
+#include <chrono>
 #include <string_view>
-#include <unordered_set>
 
-namespace slashgaming {
+namespace sgd2gldr::timechecker {
 
-bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
-                     const PROCESS_INFORMATION *process_info_ptr);
+  constexpr bool kIsEnforceTimestamp = false;
+  constexpr std::string_view kCompilationDate = __DATE__;
+  constexpr int kAllowedMonthDifference = 1;
 
-} // namespace slashgaming
+  void EnforceTimeStamp();
 
-#endif // SLASHGAMING_LIBRARYINJECTOR_H_
+} // namespace sgd2gldr::timechecker
+
+#endif // SGD2GLDR_TIME_CHECKER_H_

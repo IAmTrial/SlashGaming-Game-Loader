@@ -33,16 +33,19 @@
  *  you additional permission to convey the resulting work.
  */
 
-#ifndef SLASHGAMING_GAMELOADER_H_
-#define SLASHGAMING_GAMELOADER_H_
+#ifndef SGD2GLDR_LIBRARY_INJECTOR_H_
+#define SGD2GLDR_LIBRARY_INJECTOR_H_
 
 #include <windows.h>
 
-namespace slashgaming {
+#include <string_view>
+#include <unordered_set>
 
-bool StartGame(PROCESS_INFORMATION* process_info_out_ptr);
-bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr);
+namespace sgd2gldr {
 
-} // namespace slashgaming
+bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
+                     const PROCESS_INFORMATION& process_info_ptr);
 
-#endif // SLASHGAMING_GAMELOADER_H_
+} // namespace sgd2gldr
+
+#endif // SGD2GLDR_LIBRARY_INJECTOR_H_

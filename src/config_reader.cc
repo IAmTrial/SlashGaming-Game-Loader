@@ -45,7 +45,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace slashgaming {
+namespace sgd2ldr {
 namespace {
 
 constexpr std::string_view kConfigPath = "./SlashGaming-Config.json";
@@ -135,4 +135,4 @@ std::unordered_set<std::string> GetLibraryPaths() {
   return dll_list;
 }
 
-} // namespace slashgaming
+} // namespace sgd2ldr

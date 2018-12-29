@@ -43,7 +43,7 @@
 #include "LibraryInjector.h"
 #include "TimeChecker.h"
 
-namespace slashgaming {
+namespace sgd2gldr {
 
 namespace {
 
@@ -112,4 +112,4 @@ extern "C" int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   return 0;
 }
 
-} // namespace slashgaming
+} // namespace sgd2gldr

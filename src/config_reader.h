@@ -33,20 +33,16 @@
  *  you additional permission to convey the resulting work.
  */
 
-#ifndef SLASHGAMING_TIMECHECKER_H_
-#define SLASHGAMING_TIMECHECKER_H_
+#ifndef SGD2LDR_CONFIG_READER_H_
+#define SGD2LDR_CONFIG_READER_H_
 
-#include <chrono>
-#include <string_view>
+#include <string>
+#include <unordered_set>
 
-namespace slashgaming::timechecker {
+namespace sgd2gldr {
 
-  constexpr bool kIsEnforceTimestamp = false;
-  constexpr std::string_view kCompilationDate = __DATE__;
-  constexpr int kAllowedMonthDifference = 1;
+std::unordered_set<std::string> GetLibraryPaths();
 
-  void EnforceTimeStamp();
+} // namespace sgd2gldr
 
-} // namespace slashgaming::timechecker
-
-#endif // SLASHGAMING_TIMECHECKER_H_
+#endif // SGD2LDR_CONFIG_READER_H_

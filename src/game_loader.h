@@ -33,16 +33,16 @@
  *  you additional permission to convey the resulting work.
  */
 
-#ifndef SLASHGAMING_CONFIGREADER_H_
-#define SLASHGAMING_CONFIGREADER_H_
+#ifndef SGD2LDR_GAME_LOADER_H_
+#define SGD2LDR_GAME_LOADER_H_
 
-#include <string>
-#include <unordered_set>
+#include <windows.h>
 
-namespace slashgaming {
+namespace sgd2gldr {
 
-std::unordered_set<std::string> GetLibraryPaths();
+bool StartGame(PROCESS_INFORMATION* process_info_out_ptr);
+bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr);
 
-} // namespace slashgaming
+} // namespace sgd2gldr
 
-#endif // SLASHGAMING_CONFIGREADER_H_
+#endif // SGD2LDR_GAME_LOADER_H_

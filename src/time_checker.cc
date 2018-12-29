@@ -46,7 +46,7 @@
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
 
-namespace slashgaming::timechecker {
+namespace sgd2gldr::timechecker {
 
 using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
@@ -124,4 +124,4 @@ void EnforceTimeStamp() {
   }
 }
 
-} // namespace slashgaming
+} // namespace sgd2gldr

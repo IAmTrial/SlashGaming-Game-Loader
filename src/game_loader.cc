@@ -38,7 +38,7 @@
 #include <windows.h>
 #include <iostream>
 
-namespace slashgaming {
+namespace sgd2gldr {
 
 bool StartGame(PROCESS_INFORMATION* process_info_out_ptr) {
   STARTUPINFOW startup_info = { };
@@ -88,4 +88,4 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
     return true;
 }
 
-} // namespace slashgaming
+} // namespace sgd2gldr

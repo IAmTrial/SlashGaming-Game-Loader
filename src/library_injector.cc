@@ -41,7 +41,7 @@
 #include <memory>
 #include <string_view>
 
-namespace slashgaming {
+namespace sgd2gldr {
 
 namespace {
 
@@ -196,4 +196,4 @@ bool InjectLibraries(
   return is_all_success;
 }
 
-} // namespace slashgaming
+} // namespace sgd2gldr
