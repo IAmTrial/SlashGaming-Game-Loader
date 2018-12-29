@@ -44,7 +44,7 @@
 namespace sgd2gldr {
 
 bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
-                     const PROCESS_INFORMATION& process_info_ptr);
+                     const PROCESS_INFORMATION* process_info_ptr);
 
 } // namespace sgd2gldr
 
