@@ -41,65 +41,66 @@
 #include <memory>
 #include <string_view>
 
+#include "asm_x86_macro.h"
+
 namespace sgd2gldr {
 
 namespace {
 
 __declspec(naked) bool FailVirtualFreeExStub(void *address) {
-  asm(
-    "  xorl %eax, %eax \n"
-    "  pushal \n"
-    "  movl %esp, %ebp \n"
-    "  pushl %ebx \n"
-    "  decl %esp \n"
-    "  incl %ecx \n"
-    "  pushl %ebx \n"
-    "  decl %eax \n"
-    "  incl %edi \n"
-    "  incl %ecx \n"
-    "  decl %ebp \n"
-    "  decl %ecx \n"
-    "  decl %esi \n"
-    "  incl %edi \n"
-    "  movl %ebp, %esp \n"
-    "  popal \n"
-    "  cmpl $0, 0x4(%esp) \n"
-    "  je _loadLibrarySafelyStubEND \n"
-    "  incl %eax \n"
-    "_loadLibrarySafelyStubEND: \n"
-    "  retl \n");
+  ASM_X86(xor eax, eax)
+  ASM_X86(pushad)
+  ASM_X86(mov ebp, esp)
+  ASM_X86(push ebx)
+  ASM_X86(dec esp)
+  ASM_X86(inc ecx)
+  ASM_X86(push ebx)
+  ASM_X86(dec eax)
+  ASM_X86(inc edi)
+  ASM_X86(inc ecx)
+  ASM_X86(dec ebp)
+  ASM_X86(dec ecx)
+  ASM_X86(dec esi)
+  ASM_X86(inc edi)
+  ASM_X86(mov esp, ebp)
+  ASM_X86(popad)
+  ASM_X86(cmp [esp + 0x4], 0)
+  ASM_X86(je _loadLibrarySafelyStubEND)
+  ASM_X86(inc eax)
+
+_loadLibrarySafelyStubEND:
+  ASM_X86(ret)
 }
 
 __declspec(naked) bool FailWriteProcessMemoryStub(void *address) {
-  asm(
-    "  subl 4, %esp \n"
-    "  leal (%esp), %eax \n"
-    "  pushal \n"
-    "  pushl %eax \n"
-    "  movl %esp, %ebp \n"
-    "  subl 0x200 - 0x1, %esp \n"
-    "  leal -0x1(%esp), %eax \n"
-    "  movl %eax, %ecx \n"
-    "  movl %eax, %esi \n"
-    "  movl %eax, %ebx \n"
-    "  decl %esp \n"
-    "  imul $0x6465736e, 0x65(%ebx), %esp \n"
-    "  movl %eax, %esp \n"
-    "  andb %al, 0x47(%ecx) \n"
-    "  pushl %eax \n"
-    "  decl %esp \n"
-    "  andb %dh, 0x33(%esi) \n"
-    "  subl (%eax), %esp \n"
-    "  movl %ebp, %esp \n"
-    "  popl %eax \n"
-    "  movl %esp, %eax \n"
-    "  popal \n"
-    "  addl $4, %esp \n"
-    "  cmpl $0, 0x4(%esp) \n"
-    "  je _failWriteProcessMemoryStubEND \n"
-    "  incl %eax \n"
-    "_failWriteProcessMemoryStubEND: \n"
-    "  retl \n");
+  ASM_X86(sub esp, 4)
+  ASM_X86(lea eax, [esp])
+  ASM_X86(pushad)
+  ASM_X86(push eax)
+  ASM_X86(mov ebp, esp)
+  ASM_X86(sub esp, 0x200 - 0x1)
+  ASM_X86(lea eax, [esp - 0x1])
+  ASM_X86(mov ecx, eax)
+  ASM_X86(mov esi, eax)
+  ASM_X86(mov ebx, eax)
+  ASM_X86(dec esp)
+  ASM_X86(imul esp, [ebx + 0x65], 0x6465736e)
+  ASM_X86(mov esp, eax)
+  ASM_X86(and [ecx + 0x47], al)
+  ASM_X86(push eax)
+  ASM_X86(dec esp)
+  ASM_X86(and [esi + 0x33], dh)
+  ASM_X86(sub esp, [eax])
+  ASM_X86(mov esp, ebp)
+  ASM_X86(pop eax)
+  ASM_X86(mov eax, esp)
+  ASM_X86(popad)
+  ASM_X86(add esp, 4)
+  ASM_X86(cmp [esp + 0x4], 0)
+  ASM_X86(je _failWriteProcessMemoryStubEND)
+  ASM_X86(inc eax)
+_failWriteProcessMemoryStubEND:
+  ASM_X86(ret)
 }
 
 bool InjectLibrary(
