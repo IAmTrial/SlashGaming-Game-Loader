@@ -39,7 +39,7 @@
 
 #include "asm_x86_macro.h"
 
-namespace sgd2gldr {
+namespace sgd2gexe {
 
 namespace {
 
@@ -193,4 +193,4 @@ bool InjectLibraries(
   return is_all_success;
 }
 
-} // namespace sgd2gldr
+} // namespace sgd2gexe

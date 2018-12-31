@@ -34,7 +34,7 @@
 #include <windows.h>
 #include <iostream>
 
-namespace sgd2gldr {
+namespace sgd2gexe {
 
 bool StartGame(PROCESS_INFORMATION* process_info_out_ptr) {
   STARTUPINFOW startup_info = { };
@@ -84,4 +84,4 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
     return true;
 }
 
-} // namespace sgd2gldr
+} // namespace sgd2gexe

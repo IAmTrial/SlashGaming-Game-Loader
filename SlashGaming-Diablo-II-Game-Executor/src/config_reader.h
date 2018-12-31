@@ -29,16 +29,16 @@
  *  the game.
  */
 
-#ifndef SGD2LDR_CONFIG_READER_H_
-#define SGD2LDR_CONFIG_READER_H_
+#ifndef SGD2GEXE_CONFIG_READER_H_
+#define SGD2GEXE_CONFIG_READER_H_
 
 #include <string>
 #include <unordered_set>
 
-namespace sgd2gldr {
+namespace sgd2gexe {
 
 std::unordered_set<std::string> GetLibraryPaths();
 
-} // namespace sgd2gldr
+} // namespace sgd2gexe
 
-#endif // SGD2LDR_CONFIG_READER_H_
+#endif // SGD2GEXE_CONFIG_READER_H_

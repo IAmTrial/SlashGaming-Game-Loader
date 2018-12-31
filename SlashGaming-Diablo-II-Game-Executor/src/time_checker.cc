@@ -42,7 +42,7 @@
 
 #include <boost/bimap.hpp>
 
-namespace sgd2gldr::timechecker {
+namespace sgd2gexe::timechecker {
 
 using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
@@ -131,4 +131,4 @@ void EnforceTimeStamp() {
   }
 }
 
-} // namespace sgd2gldr
+} // namespace sgd2gexe

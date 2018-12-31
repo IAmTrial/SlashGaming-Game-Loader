@@ -33,8 +33,8 @@
  * Warning: This header should never be used in any public interface!
  */
 
-#ifndef SGD2GLDR_ASM_X86_MACRO_H_
-#define SGD2GLDR_ASM_X86_MACRO_H_
+#ifndef SGD2GEXE_ASM_X86_MACRO_H_
+#define SGD2GEXE_ASM_X86_MACRO_H_
 
 #if defined(_MSVC_LANG)
 
@@ -52,4 +52,4 @@
 
 #endif
 
-#endif // SGD2GLDR_ASM_X86_MACRO_H_
+#endif // SGD2GEXE_ASM_X86_MACRO_H_

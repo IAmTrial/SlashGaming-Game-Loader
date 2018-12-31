@@ -29,13 +29,13 @@
  *  the game.
  */
 
-#ifndef SGD2GLDR_TIME_CHECKER_H_
-#define SGD2GLDR_TIME_CHECKER_H_
+#ifndef SGD2GEXE_TIME_CHECKER_H_
+#define SGD2GEXE_TIME_CHECKER_H_
 
 #include <chrono>
 #include <string_view>
 
-namespace sgd2gldr::timechecker {
+namespace sgd2gexe::timechecker {
 
   constexpr bool kIsEnforceTimestamp = false;
   constexpr std::string_view kCompilationDate = __DATE__;
@@ -43,6 +43,6 @@ namespace sgd2gldr::timechecker {
 
   void EnforceTimeStamp();
 
-} // namespace sgd2gldr::timechecker
+} // namespace sgd2gexe::timechecker
 
-#endif // SGD2GLDR_TIME_CHECKER_H_
+#endif // SGD2GEXE_TIME_CHECKER_H_

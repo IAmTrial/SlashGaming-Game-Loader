@@ -40,7 +40,7 @@
 #include "library_injector.h"
 #include "time_checker.h"
 
-namespace sgd2gldr {
+namespace sgd2gexe {
 
 namespace {
 
@@ -109,4 +109,4 @@ extern "C" int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   return 0;
 }
 
-} // namespace sgd2gldr
+} // namespace sgd2gexe

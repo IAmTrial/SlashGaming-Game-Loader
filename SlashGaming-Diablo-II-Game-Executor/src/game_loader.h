@@ -29,16 +29,16 @@
  *  the game.
  */
 
-#ifndef SGD2LDR_GAME_LOADER_H_
-#define SGD2LDR_GAME_LOADER_H_
+#ifndef SGD2GEXE_GAME_LOADER_H_
+#define SGD2GEXE_GAME_LOADER_H_
 
 #include <windows.h>
 
-namespace sgd2gldr {
+namespace sgd2gexe {
 
 bool StartGame(PROCESS_INFORMATION* process_info_out_ptr);
 bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr);
 
-} // namespace sgd2gldr
+} // namespace sgd2gexe
 
-#endif // SGD2LDR_GAME_LOADER_H_
+#endif // SGD2GEXE_GAME_LOADER_H_

@@ -29,19 +29,19 @@
  *  the game.
  */
 
-#ifndef SGD2GLDR_LIBRARY_INJECTOR_H_
-#define SGD2GLDR_LIBRARY_INJECTOR_H_
+#ifndef SGD2GEXE_LIBRARY_INJECTOR_H_
+#define SGD2GEXE_LIBRARY_INJECTOR_H_
 
 #include <windows.h>
 
 #include <string_view>
 #include <unordered_set>
 
-namespace sgd2gldr {
+namespace sgd2gexe {
 
 bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
                      const PROCESS_INFORMATION* process_info_ptr);
 
-} // namespace sgd2gldr
+} // namespace sgd2gexe
 
-#endif // SGD2GLDR_LIBRARY_INJECTOR_H_
+#endif // SGD2GEXE_LIBRARY_INJECTOR_H_
