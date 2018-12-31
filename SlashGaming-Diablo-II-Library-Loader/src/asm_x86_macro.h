@@ -24,25 +24,32 @@
  *  it with Diablo II (or a modified version of that game and its
  *  libraries), containing parts covered by the terms of Blizzard End User
  *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.
- *
- *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II: Lord of Destruction (or a modified version of that
- *  game and its libraries), containing parts covered by the terms of
- *  Blizzard End User License Agreement, the licensors of this Program grant
- *  you additional permission to convey the resulting work.
+ *  permission to convey the resulting work.  This additional permission is
+ *  also extended to any combination of expansions, mods, and remasters of
+ *  the game.
  */
 
-#ifndef SGD2LDR_CONFIG_READER_H_
-#define SGD2LDR_CONFIG_READER_H_
+/**
+ * Warning: This header should never be used in any public interface!
+ */
 
-#include <string>
-#include <unordered_set>
+#ifndef SGD2GLDR_ASM_X86_MACRO_H_
+#define SGD2GLDR_ASM_X86_MACRO_H_
 
-namespace sgd2gldr {
+#if defined(_MSVC_LANG)
 
-std::unordered_set<std::string> GetLibraryPaths();
+#define ASM_X86(...) \
+    __asm __VA_ARGS__
 
-} // namespace sgd2gldr
+#else
 
-#endif // SGD2LDR_CONFIG_READER_H_
+#define ASM_X86(...) \
+    asm(
+        ".intel_syntax \n" \
+        #__VA_ARGS__ "\n" \
+        ".att_syntax \n" \
+    )
+
+#endif
+
+#endif // SGD2GLDR_ASM_X86_MACRO_H_
