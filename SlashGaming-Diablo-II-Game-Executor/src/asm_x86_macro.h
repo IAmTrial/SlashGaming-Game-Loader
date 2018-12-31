@@ -39,7 +39,9 @@
 #if defined(_MSVC_LANG)
 
 #define ASM_X86(...) \
-    __asm __VA_ARGS__
+    __asm { \
+      __VA_ARGS__ \
+    }
 
 #else
 
