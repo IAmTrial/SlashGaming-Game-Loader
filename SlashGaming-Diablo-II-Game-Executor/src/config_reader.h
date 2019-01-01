@@ -32,12 +32,12 @@
 #ifndef SGD2GEXE_CONFIG_READER_H_
 #define SGD2GEXE_CONFIG_READER_H_
 
-#include <string>
-#include <unordered_set>
+#include <filesystem>
+#include <vector>
 
 namespace sgd2gexe {
 
-std::unordered_set<std::string>
+std::vector<std::filesystem::path>
 GetLibraryPaths(
     void
 );

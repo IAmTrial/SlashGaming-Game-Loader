@@ -33,14 +33,15 @@
 
 #include <windows.h>
 #include <cwchar>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include "asm_x86_macro.h"
 
 namespace sgd2gexe {
-
 namespace {
 
 __declspec(naked) bool
@@ -105,27 +106,14 @@ _failWriteProcessMemoryStubEND:
   ASM_X86(ret)
 }
 
-bool InjectLibrary(
-    std::string_view library_path,
+bool
+InjectLibrary(
+    const std::filesystem::path& library_path,
     const PROCESS_INFORMATION *process_info_ptr
 ) {
   // Encode the path to one understood by Windows.
-  std::size_t buffer_size = library_path.length() + 1;
-
-  auto library_path_wide_buf = std::make_unique<wchar_t[]>(buffer_size);
-  const char* library_path_buf = library_path.data();
-
-  std::mbstate_t state = std::mbstate_t();
-
-  if (std::mbsrtowcs(nullptr, &library_path_buf, 0, &state)
-      == static_cast<std::size_t>(-1)) {
-    return false;
-  }
-
-  library_path_buf = library_path.data();
-  std::mbsrtowcs(library_path_wide_buf.get(), &library_path_buf, buffer_size,
-                 &state);
-
+  const std::wstring& library_path_string = library_path.wstring();
+  std::size_t buffer_size = library_path_string.length() + 1;
 
   // Store the library path into the target process.
   LPVOID remote_buf = VirtualAllocEx(process_info_ptr->hProcess,
@@ -141,7 +129,7 @@ bool InjectLibrary(
 
   if (!WriteProcessMemory(process_info_ptr->hProcess,
                           remote_buf,
-                          library_path_wide_buf.get(),
+                          library_path_string.data(),
                           buffer_size * sizeof(wchar_t),
                           nullptr)) {
     std::cerr << "WriteProcessMemory failed." << std::endl;
@@ -181,8 +169,9 @@ bool InjectLibrary(
 
 } // namespace
 
-bool InjectLibraries(
-    const std::unordered_set<std::string_view>& library_paths,
+bool
+InjectLibraries(
+    const std::vector<std::filesystem::path>& library_paths,
     const PROCESS_INFORMATION *process_info_ptr
 ) {
   bool is_all_success = true;

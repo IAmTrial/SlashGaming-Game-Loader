@@ -62,15 +62,10 @@ WinMain(
   StartGame(&process_info);
 
   // Read the list of DLLs to inject from the config.
-  std::unordered_set<std::string> library_paths = GetLibraryPaths();
-  std::unordered_set<std::string_view> library_paths_view;
-
-  for (const auto& libary_path_str : library_paths) {
-    library_paths_view.insert(libary_path_str);
-  }
+  std::vector<std::filesystem::path> library_paths = GetLibraryPaths();
 
   // Inject libraries, after reading all files.
-  if (InjectLibraries(library_paths_view, &process_info)) {
+  if (InjectLibraries(library_paths, &process_info)) {
     std::cout << "All libraries have been successfully injected." << std::endl;
   } else {
     std::cout << "Some or all libraries failed to inject." << std::endl;

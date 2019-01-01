@@ -33,15 +33,14 @@
 #define SGD2GEXE_LIBRARY_INJECTOR_H_
 
 #include <windows.h>
-
-#include <string_view>
-#include <unordered_set>
+#include <filesystem>
+#include <vector>
 
 namespace sgd2gexe {
 
 bool
 InjectLibraries(
-    const std::unordered_set<std::string_view>& library_paths,
+    const std::vector<std::filesystem::path>& library_paths,
     const PROCESS_INFORMATION* process_info_ptr
 );
 

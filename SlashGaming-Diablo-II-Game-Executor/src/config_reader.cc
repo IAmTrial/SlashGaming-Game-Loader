@@ -32,112 +32,111 @@
 #include "config_reader.h"
 
 #include <windows.h>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <string_view>
-#include <unordered_set>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
 namespace sgd2gexe {
 namespace {
 
-constexpr std::string_view kConfigPath = "./SlashGaming-Config.json";
+const std::filesystem::path kConfigPath = "SlashGaming-Config.json";
 
 void
 CreateDefaultConfig(
-    std::string_view config_file_path
+    const std::filesystem::path& config_file_path
 ) {
-  std::ofstream file_stream(kConfigPath.data());
+  std::ofstream file_stream(config_file_path);
   file_stream << "{}" << std::endl;
 }
 
 void
 AddMissingEntries(
-    std::string_view config_path
+    const std::filesystem::path& config_path
 ) {
   nlohmann::json config;
   std::fstream config_stream;
 
-  config_stream.open(config_path.data(), std::ios::in);
+  config_stream.open(config_path, std::ios::in);
   config_stream >> config;
   config_stream.close();
 
-  if (auto& entry = config["Metadata - Do not modify!"];
-      entry.is_null() || !entry.is_object()) {
+  if (auto& entry = config["!!!Metadata - Do not modify!!!"];
+      !entry.is_object()) {
     entry = nlohmann::json::object();
   }
 
-  if (auto& entry = config["Metadata - Do not modify!"]["Major Version A"];
-      entry.is_null() || !entry.is_number()) {
+  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Major Version A"];
+      !entry.is_number()) {
     entry = 0;
   }
 
-  if (auto& entry = config["Metadata - Do not modify!"]["Major Version B"];
-      entry.is_null() || !entry.is_number()) {
-    entry = 1;
+  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Major Version B"];
+      !entry.is_number()) {
+    entry = 2;
   }
 
-  if (auto& entry = config["Metadata - Do not modify!"]["Minor Version A"];
-      entry.is_null() || !entry.is_number()) {
+  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Minor Version A"];
+      !entry.is_number()) {
     entry = 0;
   }
 
-  if (auto& entry = config["Metadata - Do not modify!"]["Minor Version B"];
-      entry.is_null() || !entry.is_number()) {
+  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Minor Version B"];
+      !entry.is_number()) {
     entry = 0;
   }
 
   if (auto& entry = config["SlashGaming Diablo II Loader"];
-      entry.is_null() || !entry.is_object()) {
+      !entry.is_object()) {
     entry = nlohmann::json::object();
   }
 
   if (auto& entry = config["SlashGaming Diablo II Loader"]["Inject DLLs"];
-      entry.is_null() || !entry.is_array()) {
+      !entry.is_array()) {
     entry = nlohmann::json::array();
   }
 
-  config_stream.open(kConfigPath.data(), std::ios::out | std::ios::trunc);
+  config_stream.open(config_path, std::ios::out | std::ios::trunc);
   config_stream << std::setw(4) << config << std::endl;
   config_stream.close();
 }
 
 } // namespace
 
-std::unordered_set<std::string>
+std::vector<std::filesystem::path>
 GetLibraryPaths(
     void
 ) {
-  std::fstream config_stream;
-  config_stream.open(kConfigPath.data(), std::ios::in);
-
-  if (!config_stream.good()) {
-    config_stream.close();
+  if (!std::filesystem::exists(kConfigPath)) {
     CreateDefaultConfig(kConfigPath);
   }
 
-  config_stream.close();
+  AddMissingEntries(kConfigPath);
 
-  AddMissingEntries(kConfigPath.data());
   nlohmann::json config;
-
-  config_stream.open(kConfigPath.data(), std::ios::in);
-  config_stream >> config;
-  config_stream.close();
+  if (std::ifstream config_stream(kConfigPath);
+      config_stream
+  ) {
+    config_stream >> config;
+  } else {
+    return std::vector<std::filesystem::path>();
+  }
 
   const auto& dll_list = config["SlashGaming Diablo II Loader"]["Inject DLLs"];
 
-  std::unordered_set<std::string> library_paths;
+  std::vector<std::filesystem::path> library_paths;
   for (const auto& dll : dll_list) {
     if (dll.is_string()) {
-      library_paths.insert(dll.get<std::string>());
+      library_paths.push_back(dll.get<std::string>());
     }
   }
 
-  return dll_list;
+  return library_paths;
 }
 
 } // namespace sgd2gexe
