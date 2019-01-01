@@ -46,12 +46,18 @@ namespace {
 
 constexpr std::string_view kConfigPath = "./SlashGaming-Config.json";
 
-void CreateDefaultConfig(std::string_view config_file_path) {
+void
+CreateDefaultConfig(
+    std::string_view config_file_path
+) {
   std::ofstream file_stream(kConfigPath.data());
   file_stream << "{}" << std::endl;
 }
 
-void AddMissingEntries(std::string_view config_path) {
+void
+AddMissingEntries(
+    std::string_view config_path
+) {
   nlohmann::json config;
   std::fstream config_stream;
 
@@ -101,7 +107,10 @@ void AddMissingEntries(std::string_view config_path) {
 
 } // namespace
 
-std::unordered_set<std::string> GetLibraryPaths() {
+std::unordered_set<std::string>
+GetLibraryPaths(
+    void
+) {
   std::fstream config_stream;
   config_stream.open(kConfigPath.data(), std::ios::in);
 

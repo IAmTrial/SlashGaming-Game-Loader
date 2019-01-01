@@ -39,8 +39,11 @@
 
 namespace sgd2gexe {
 
-bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
-                     const PROCESS_INFORMATION* process_info_ptr);
+bool
+InjectLibraries(
+    const std::unordered_set<std::string_view>& library_paths,
+    const PROCESS_INFORMATION* process_info_ptr
+);
 
 } // namespace sgd2gexe
 

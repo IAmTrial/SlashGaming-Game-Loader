@@ -36,52 +36,70 @@
 
 namespace sgd2gexe {
 
-bool StartGame(PROCESS_INFORMATION* process_info_out_ptr) {
+bool
+StartGame(
+    PROCESS_INFORMATION* process_info_out_ptr
+) {
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
-  // Create the desired process.
-  if (!CreateProcessW(L"Game.exe",
-                      GetCommandLineW(),
-                      nullptr,
-                      nullptr,
-                      true,
-                      0,
-                      nullptr,
-                      nullptr,
-                      &startup_info,
-                      process_info_out_ptr)) {
-        MessageBoxW(nullptr, L"Game.exe could not be found.",
-                    L"Game executable not found.", MB_OK | MB_ICONERROR);
-        std::exit(0);
-    }
+  BOOL is_create_process_success = CreateProcessW(
+      L"Game.exe",
+      GetCommandLineW(),
+      nullptr,
+      nullptr,
+      true,
+      0,
+      nullptr,
+      nullptr,
+      &startup_info,
+      process_info_out_ptr
+  );
 
-    // Wait until the process is started.
-    return WaitForInputIdle(process_info_out_ptr->hProcess, INFINITE) == 0;
+  // Create the desired process.
+  if (!is_create_process_success) {
+    MessageBoxW(
+        nullptr,
+        L"Game.exe could not be found.",
+        L"Game executable not found.",
+        MB_OK | MB_ICONERROR
+    );
+    std::exit(0);
+  }
+
+  // Wait until the process is started.
+  return WaitForInputIdle(process_info_out_ptr->hProcess, INFINITE) == 0;
 }
 
 bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
-  // Create the desired process.
-  if (!CreateProcessW(L"Game.exe",
-                      GetCommandLineW(),
-                      nullptr,
-                      nullptr,
-                      true,
-                      CREATE_SUSPENDED,
-                      nullptr,
-                      nullptr,
-                      &startup_info,
-                      process_info_out_ptr)) {
-        MessageBoxW(nullptr, L"Game.exe could not be found.",
-                    L"Game executable not found.", MB_OK | MB_ICONERROR);
-        std::exit(0);
-    }
+  BOOL is_create_process_success = CreateProcessW(L"Game.exe",
+      GetCommandLineW(),
+      nullptr,
+      nullptr,
+      true,
+      CREATE_SUSPENDED,
+      nullptr,
+      nullptr,
+      &startup_info,
+      process_info_out_ptr
+  );
 
-    // Wait until the process is started.
-    return true;
+  // Create the desired process.
+  if (!is_create_process_success) {
+    MessageBoxW(
+        nullptr,
+        L"Game.exe could not be found.",
+        L"Game executable not found.",
+        MB_OK | MB_ICONERROR
+    );
+    std::exit(0);
+  }
+
+  // Wait until the process is started.
+  return true;
 }
 
 } // namespace sgd2gexe

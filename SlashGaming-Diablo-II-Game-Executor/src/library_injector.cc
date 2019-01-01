@@ -43,7 +43,10 @@ namespace sgd2gexe {
 
 namespace {
 
-__declspec(naked) bool FailVirtualFreeExStub(void *address) {
+__declspec(naked) bool
+FailVirtualFreeExStub(
+  void* address
+) {
   ASM_X86(xor eax, eax)
   ASM_X86(pushad)
   ASM_X86(mov ebp, esp)
@@ -68,7 +71,10 @@ _loadLibrarySafelyStubEND:
   ASM_X86(ret)
 }
 
-__declspec(naked) bool FailWriteProcessMemoryStub(void *address) {
+__declspec(naked) bool
+FailWriteProcessMemoryStub(
+    void* address
+) {
   ASM_X86(sub esp, 4)
   ASM_X86(lea eax, [esp])
   ASM_X86(pushad)
@@ -101,7 +107,8 @@ _failWriteProcessMemoryStubEND:
 
 bool InjectLibrary(
     std::string_view library_path,
-    const PROCESS_INFORMATION *process_info_ptr) {
+    const PROCESS_INFORMATION *process_info_ptr
+) {
   // Encode the path to one understood by Windows.
   std::size_t buffer_size = library_path.length() + 1;
 
@@ -176,7 +183,8 @@ bool InjectLibrary(
 
 bool InjectLibraries(
     const std::unordered_set<std::string_view>& library_paths,
-    const PROCESS_INFORMATION *process_info_ptr) {
+    const PROCESS_INFORMATION *process_info_ptr
+) {
   bool is_all_success = true;
 
   for (const auto& library_path : library_paths) {

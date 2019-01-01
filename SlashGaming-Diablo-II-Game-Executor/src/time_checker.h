@@ -41,7 +41,10 @@ constexpr bool kIsEnforceTimestamp = false;
 constexpr std::string_view kCompilationDate = __DATE__;
 constexpr int kAllowedMonthDifference = 1;
 
-void EnforceTimeStamp();
+void
+EnforceTimeStamp(
+    void
+);
 
 } // namespace sgd2gexe::timechecker
 

@@ -36,8 +36,15 @@
 
 namespace sgd2gexe {
 
-bool StartGame(PROCESS_INFORMATION* process_info_out_ptr);
-bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr);
+bool
+StartGame(
+    PROCESS_INFORMATION* process_info_out_ptr
+);
+
+bool
+StartGameSuspended(
+    PROCESS_INFORMATION* process_info_out_ptr
+);
 
 } // namespace sgd2gexe
 

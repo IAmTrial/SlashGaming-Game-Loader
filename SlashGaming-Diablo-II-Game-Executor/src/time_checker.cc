@@ -51,7 +51,9 @@ namespace {
 using MonthNameAndValueBimapType = boost::bimap<std::string_view, int>;
 
 const boost::bimap<std::string_view, int>&
-GetMonthNameAndValueBimap() {
+GetMonthNameAndValueBimap(
+    void
+) {
   static const std::array<MonthNameAndValueBimapType::value_type, 12>
       month_name_and_value_pairs = { {
           { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 },
@@ -90,7 +92,9 @@ GetDaysFromDateString(
 }
 
 bool
-IsExecutionPermitted() {
+IsExecutionPermitted(
+    void
+) {
   auto compile_month_duration = GetDaysFromDateString(kCompilationDate);
 
   // If the compilation date could not be parsed, don't allow execution.
@@ -114,7 +118,9 @@ IsExecutionPermitted() {
 
 
 void
-EnforceTimeStamp() {
+EnforceTimeStamp(
+    void
+) {
   if constexpr (!kIsEnforceTimestamp) {
     return;
   }

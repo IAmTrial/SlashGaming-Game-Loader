@@ -37,7 +37,10 @@
 
 namespace sgd2gexe {
 
-std::unordered_set<std::string> GetLibraryPaths();
+std::unordered_set<std::string>
+GetLibraryPaths(
+    void
+);
 
 } // namespace sgd2gexe
 

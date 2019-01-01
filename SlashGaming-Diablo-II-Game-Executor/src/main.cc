@@ -76,8 +76,13 @@ void PrintLicenseNotice() {
 
 } // namespace
 
-extern "C" int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                                LPSTR lpCmdLine, int nCmdShow) {
+extern "C" int CALLBACK
+WinMain(
+    HINSTANCE hInstance,
+    HINSTANCE hPrevInstance,
+    LPSTR lpCmdLine,
+    int nCmdShow
+) {
   PrintLicenseNotice();
   std::cout << "----------" << std::endl;
 
