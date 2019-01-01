@@ -29,56 +29,16 @@
  *  the game.
  */
 
-#include <windows.h>
-#include <array>
-#include <iostream>
-#include <string_view>
-#include <unordered_set>
-
-#include "config_reader.h"
-#include "game_loader.h"
-#include "library_injector.h"
-#include "license.h"
-#include "time_checker.h"
+#ifndef SGD2GEXE_LICENSE_H_
+#define SGD2GEXE_LICENSE_H_
 
 namespace sgd2gexe {
 
-extern "C" int CALLBACK
-WinMain(
-    HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    LPSTR lpCmdLine,
-    int nCmdShow
-) {
-  PrintLicenseNotice();
-  std::cout << "----------" << std::endl;
-
-  // ShowWindow(GetConsoleWindow(), SW_HIDE);
-  timechecker::EnforceTimeStamp();
-
-  // Create a new process, waiting for its full initialization before the
-  // startGame function can return.
-  PROCESS_INFORMATION process_info;
-  StartGame(&process_info);
-
-  // Read the list of DLLs to inject from the config.
-  std::unordered_set<std::string> library_paths = GetLibraryPaths();
-  std::unordered_set<std::string_view> library_paths_view;
-
-  for (const auto& libary_path_str : library_paths) {
-    library_paths_view.insert(libary_path_str);
-  }
-
-  // Inject libraries, after reading all files.
-  if (InjectLibraries(library_paths_view, &process_info)) {
-    std::cout << "All libraries have been successfully injected." << std::endl;
-  } else {
-    std::cout << "Some or all libraries failed to inject." << std::endl;
-  }
-
-  Sleep(500);
-
-  return 0;
-}
+void
+PrintLicenseNotice(
+    void
+);
 
 } // namespace sgd2gexe
+
+#endif  // SGD2GEXE_LICENSE_H_
