@@ -48,25 +48,29 @@ using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
 namespace {
 
-using MonthValueAndNameBimapType = boost::bimap<std::string_view, int>;
+using MonthNameAndValueBimapType = boost::bimap<std::string_view, int>;
 
-const boost::bimap<std::string_view, int>& GetDaysAndDateNameBimap() {
-  static const std::array<MonthValueAndNameBimapType::value_type, 12>
-      month_value_pairs = { {
+const boost::bimap<std::string_view, int>&
+GetMonthNameAndValueBimap() {
+  static const std::array<MonthNameAndValueBimapType::value_type, 12>
+      month_name_and_value_pairs = { {
           { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 },
           { "May", 4 }, { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 },
           { "Sep", 8 }, { "Oct", 9 }, { "Nov", 10 }, { "Dec", 11 }
       } };
 
-  static const MonthValueAndNameBimapType values_and_month_bimap(
-      month_value_pairs.begin(),
-      month_value_pairs.end()
+  static const MonthNameAndValueBimapType month_name_and_values_bimap(
+      month_name_and_value_pairs.begin(),
+      month_name_and_value_pairs.end()
   );
 
-  return values_and_month_bimap;
+  return month_name_and_values_bimap;
 }
 
-MonthsDuration GetDaysFromDateString(std::string_view date) {
+MonthsDuration
+GetDaysFromDateString(
+    std::string_view date
+) {
   const std::regex kCompileDateRegex("(\\w+)\\s+(\\d+)\\s+(\\d+)");
   std::cmatch matches;
 
@@ -75,7 +79,7 @@ MonthsDuration GetDaysFromDateString(std::string_view date) {
   }
 
   // Calculate number of months from epoch time (Jan 1, 1970).
-  long long month = GetDaysAndDateNameBimap().left.at(
+  long long month = GetMonthNameAndValueBimap().left.at(
       matches[1].str().data()
   );
 
@@ -85,7 +89,8 @@ MonthsDuration GetDaysFromDateString(std::string_view date) {
   return total_days_duration;
 }
 
-bool IsExecutionPermitted() {
+bool
+IsExecutionPermitted() {
   auto compile_month_duration = GetDaysFromDateString(kCompilationDate);
 
   // If the compilation date could not be parsed, don't allow execution.
@@ -108,7 +113,8 @@ bool IsExecutionPermitted() {
 } // namespace
 
 
-void EnforceTimeStamp() {
+void
+EnforceTimeStamp() {
   if constexpr (!kIsEnforceTimestamp) {
     return;
   }
@@ -125,7 +131,8 @@ void EnforceTimeStamp() {
         nullptr,
         L"Date of execution exceeds timestamp limit.",
         L"Execution Date Exceeded",
-        MB_OK | MB_ICONERROR);
+        MB_OK | MB_ICONERROR
+    );
 
     std::exit(0);
   }
