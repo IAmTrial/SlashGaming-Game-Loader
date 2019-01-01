@@ -55,16 +55,17 @@ CreateDefaultConfig(
   file_stream << "{}" << std::endl;
 }
 
-void
+bool
 AddMissingEntries(
     const std::filesystem::path& config_path
 ) {
   nlohmann::json config;
-  std::fstream config_stream;
-
-  config_stream.open(config_path, std::ios::in);
-  config_stream >> config;
-  config_stream.close();
+  if (std::ifstream config_stream(config_path);
+      config_stream) {
+    config_stream >> config;
+  } else {
+    return false;
+  }
 
   if (auto& entry = config["!!!Metadata - Do not modify!!!"];
       !entry.is_object()) {
@@ -101,9 +102,14 @@ AddMissingEntries(
     entry = nlohmann::json::array();
   }
 
-  config_stream.open(config_path, std::ios::out | std::ios::trunc);
-  config_stream << std::setw(4) << config << std::endl;
-  config_stream.close();
+  if (std::fstream config_stream(config_path, std::ios::out | std::ios::trunc);
+      config_stream) {
+    config_stream << std::setw(4) << config << std::endl;
+  } else {
+    return false;
+  }
+
+  return true;
 }
 
 } // namespace
@@ -116,7 +122,10 @@ GetLibraryPaths(
     CreateDefaultConfig(kConfigPath);
   }
 
-  AddMissingEntries(kConfigPath);
+  bool is_missing_entry_added = AddMissingEntries(kConfigPath);
+  if (!is_missing_entry_added) {
+    return std::vector<std::filesystem::path>();
+  }
 
   nlohmann::json config;
   if (std::ifstream config_stream(kConfigPath);
