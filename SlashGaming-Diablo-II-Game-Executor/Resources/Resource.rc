@@ -24,17 +24,13 @@
  *  it with Diablo II (or a modified version of that game and its
  *  libraries), containing parts covered by the terms of Blizzard End User
  *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.
- *
- *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II: Lord of Destruction (or a modified version of that
- *  game and its libraries), containing parts covered by the terms of
- *  Blizzard End User License Agreement, the licensors of this Program grant
- *  you additional permission to convey the resulting work.
+ *  permission to convey the resulting work.  This additional permission is
+ *  also extended to any combination of expansions, mods, and remasters of
+ *  the game.
  */
 
-#ifndef SLASHGAMING_RESOURCE_RC_
-#define SLASHGAMING_RESOURCE_RC_
+#ifndef SGD2GEXE_RESOURCE_RC_
+#define SGD2GEXE_RESOURCE_RC_
 
 #include <windows.h>
 
@@ -45,8 +41,8 @@ SLASH_ICON ICON "Flame Icons.ico"
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO    VERSIONINFO
-  FILEVERSION      1,0,0,1
-  PRODUCTVERSION   1,0,0,1
+  FILEVERSION      1,0,0,2
+  PRODUCTVERSION   1,0,0,2
   FILEFLAGSMASK    0x3fL // VS_FFI_FILEFLAGSMASK
 #ifdef _DEBUG
   FILEFLAGS        0x1L  // VS_FF_DEBUG|VS_FF_PRIVATEBUILD|VS_FF_PRERELEASE
@@ -71,7 +67,7 @@ VS_VERSION_INFO    VERSIONINFO
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "PrivateBuild",     "\0"
       VALUE "ProductName",      "SlashGaming Diablo II Game Loader\0"
-      VALUE "ProductVersion",   "1.0.0.0\0"
+      VALUE "ProductVersion",   "1.0.0.2\0"
       VALUE "SpecialBuild",     "\0"
       VALUE "Support",          "reddit.com/r/SlashDiablo\0"
     } // BLOCK "040904E4"
@@ -82,4 +78,4 @@ VS_VERSION_INFO    VERSIONINFO
   } // BLOCK "VarFileInfo"
 }
 
-#endif // SLASHGAMING_RESOURCE_RC_
+#endif // SGD2GEXE_RESOURCE_RC_
