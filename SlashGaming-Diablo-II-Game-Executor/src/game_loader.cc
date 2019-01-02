@@ -43,6 +43,9 @@ namespace {
 constexpr std::wstring_view kGameFileNotFoundErrorMessage =
     L"%s could not be found.";
 
+constexpr std::wstring_view kCreateErrorMessage =
+    L"%s could not be started, with error code %x.";
+
 } // namespace
 
 bool
@@ -82,10 +85,16 @@ StartGame(
 
   // Create the desired process.
   if (!is_create_process_success) {
+    std::wstring full_message = (
+        boost::wformat(kCreateErrorMessage.data())
+            % kGameFilePath.c_str()
+            % GetLastError()
+    ).str();
+
     MessageBoxW(
         nullptr,
-        L"Game.exe could not be found.",
-        L"Game Executable Not Found",
+        full_message.data(),
+        L"Could Not Start Game",
         MB_OK | MB_ICONERROR
     );
     std::exit(0);
@@ -124,10 +133,16 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
 
   // Create the desired process.
   if (!is_create_process_success) {
+    std::wstring full_message = (
+        boost::wformat(kCreateErrorMessage.data())
+            % kGameFilePath.c_str()
+            % GetLastError()
+    ).str();
+
     MessageBoxW(
         nullptr,
-        L"Game.exe could not be found.",
-        L"Game Executable Not Found",
+        full_message.data(),
+        L"Could Not Start Game",
         MB_OK | MB_ICONERROR
     );
     std::exit(0);
