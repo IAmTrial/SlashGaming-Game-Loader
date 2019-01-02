@@ -46,7 +46,7 @@ namespace {
 
 __declspec(naked) bool
 FailVirtualFreeExStub(
-  void* address
+    void* address
 ) {
   ASM_X86(xor eax, eax)
   ASM_X86(pushad)
@@ -112,29 +112,39 @@ InjectLibrary(
     const PROCESS_INFORMATION *process_info_ptr
 ) {
   // Encode the path to one understood by Windows.
-  const std::wstring& library_path_string = library_path.wstring();
+  std::wstring library_path_string = library_path.wstring();
   std::size_t buffer_size = library_path_string.length() + 1;
 
   // Store the library path into the target process.
-  LPVOID remote_buf = VirtualAllocEx(process_info_ptr->hProcess,
-                                     nullptr,
-                                     buffer_size * sizeof(wchar_t),
-                                     MEM_COMMIT,
-                                     PAGE_READWRITE);
+  LPVOID remote_buf = VirtualAllocEx(
+      process_info_ptr->hProcess,
+      nullptr,
+      buffer_size * sizeof(wchar_t),
+      MEM_COMMIT,
+      PAGE_READWRITE
+  );
 
   if (remote_buf == nullptr) {
     std::cerr << "VirtualAllocEx failed." << std::endl;
     std::exit(0);
   }
 
-  if (!WriteProcessMemory(process_info_ptr->hProcess,
-                          remote_buf,
-                          library_path_string.data(),
-                          buffer_size * sizeof(wchar_t),
-                          nullptr)) {
+  BOOL is_write_success = WriteProcessMemory(
+      process_info_ptr->hProcess,
+      remote_buf,
+      library_path_string.data(),
+      buffer_size * sizeof(wchar_t),
+      nullptr
+  );
+
+  if (!is_write_success) {
     std::cerr << "WriteProcessMemory failed." << std::endl;
-    VirtualFreeEx(process_info_ptr->hProcess, remote_buf, 0,
-                  MEM_RELEASE);
+    VirtualFreeEx(
+        process_info_ptr->hProcess,
+        remote_buf,
+        0,
+        MEM_RELEASE
+    );
     return FailWriteProcessMemoryStub(nullptr);
   }
 
@@ -147,7 +157,8 @@ InjectLibrary(
       (LPTHREAD_START_ROUTINE) LoadLibraryW,
       remote_buf,
       0,
-      &remote_thread_id);
+      &remote_thread_id
+  );
 
   if (remote_thread_handle == nullptr) {
     std::cerr << "CreateRemoteThread failed." << std::endl;
@@ -157,8 +168,14 @@ InjectLibrary(
   WaitForSingleObject(remote_thread_handle, INFINITE);
 
   // Free used resources.
-  if (!VirtualFreeEx(process_info_ptr->hProcess, remote_buf, 0,
-                     MEM_RELEASE)) {
+  BOOL is_free_success = VirtualFreeEx(
+      process_info_ptr->hProcess,
+      remote_buf,
+      0,
+      MEM_RELEASE
+  );
+
+  if (!is_free_success) {
     std::cerr << "VirtualFreeEx failed." << std::endl;
     FailVirtualFreeExStub(nullptr);
     std::exit(0);
