@@ -46,7 +46,7 @@ namespace {
 
 __declspec(naked) bool
 FailVirtualFreeExStub(
-    void* address
+    BOOL is_free_success
 ) {
   ASM_X86(xor eax, eax)
   ASM_X86(pushad)
@@ -74,7 +74,7 @@ _loadLibrarySafelyStubEND:
 
 __declspec(naked) bool
 FailWriteProcessMemoryStub(
-    void* address
+    BOOL is_write_success
 ) {
   ASM_X86(sub esp, 4)
   ASM_X86(lea eax, [esp])
@@ -145,7 +145,7 @@ InjectLibrary(
         0,
         MEM_RELEASE
     );
-    return FailWriteProcessMemoryStub(nullptr);
+    return FailWriteProcessMemoryStub(is_write_success);
   }
 
   // Load library from the target process.
@@ -177,7 +177,7 @@ InjectLibrary(
 
   if (!is_free_success) {
     std::cerr << "VirtualFreeEx failed." << std::endl;
-    FailVirtualFreeExStub(nullptr);
+    FailVirtualFreeExStub(is_free_success);
     std::exit(0);
   }
 
