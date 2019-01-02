@@ -33,6 +33,7 @@
 
 #include <windows.h>
 #include <cstdint>
+#include <charconv>
 #include <chrono>
 #include <iostream>
 #include <ratio>
@@ -81,11 +82,22 @@ GetDaysFromDateString(
   }
 
   // Calculate number of months from epoch time (Jan 1, 1970).
-  long long month = GetMonthNameAndValueBimap().left.at(
-      matches[1].str().data()
+  int month = GetMonthNameAndValueBimap().left.at(
+      matches[1].str()
   );
 
-  long long year = std::stoll(matches[3].str()) - 1970;
+  std::string year_text = matches[3].str();
+  std::size_t year_text_size = year_text.length()
+      * sizeof(decltype(year_text)::value_type);
+
+  std::intmax_t year;
+  std::from_chars(
+      year_text.data(),
+      year_text.data() + year_text_size,
+      year
+  );
+  year -= 1970;
+
   MonthsDuration total_days_duration(month + (year * 12));
 
   return total_days_duration;
