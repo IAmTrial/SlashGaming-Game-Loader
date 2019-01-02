@@ -52,11 +52,11 @@ namespace {
 
 using MonthNameAndValueBimapType = boost::bimap<std::string_view, int>;
 
-std::string_view timestamp_message_01 =
+constexpr std::string_view kTimestampMessage01 =
     "Timestamp is enforced, meaning that this program will cease "
     "to function %d month(s) after %s.";
 
-std::string_view timestamp_message_02 =
+constexpr std::string_view kTimestampMessage02 =
     "This means that you have received a version of this "
     "program not meant for public release.";
 
@@ -146,13 +146,13 @@ EnforceTimeStamp(
   }
 
   std::string full_message_01 = (
-    boost::format(timestamp_message_01.data())
-        % kAllowedMonthDifference
-        % kCompilationDate
-    ).str();
+      boost::format(kTimestampMessage01.data())
+          % kAllowedMonthDifference
+          % kCompilationDate
+  ).str();
 
   std::cout << full_message_01 << std::endl;
-  std::cout << timestamp_message_02 << std::endl << std::endl;
+  std::cout << kTimestampMessage02 << std::endl << std::endl;
 
   if (!IsExecutionPermitted()) {
     MessageBoxW(
