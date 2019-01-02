@@ -32,7 +32,6 @@
 #ifndef SGD2GEXE_TIME_CHECKER_H_
 #define SGD2GEXE_TIME_CHECKER_H_
 
-#include <chrono>
 #include <string_view>
 
 namespace sgd2gexe::timechecker {
