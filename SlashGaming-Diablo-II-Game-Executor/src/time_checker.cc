@@ -42,6 +42,7 @@
 #include <utility>
 
 #include <boost/bimap.hpp>
+#include <boost/format.hpp>
 
 namespace sgd2gexe::timechecker {
 
@@ -50,6 +51,14 @@ using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 namespace {
 
 using MonthNameAndValueBimapType = boost::bimap<std::string_view, int>;
+
+std::string_view timestamp_message_01 =
+    "Timestamp is enforced, meaning that this program will cease "
+    "to function %d month(s) after %s.";
+
+std::string_view timestamp_message_02 =
+    "This means that you have received a version of this "
+    "program not meant for public release.";
 
 const boost::bimap<std::string_view, int>&
 GetMonthNameAndValueBimap(
@@ -128,7 +137,6 @@ IsExecutionPermitted(
 
 } // namespace
 
-
 void
 EnforceTimeStamp(
     void
@@ -137,12 +145,14 @@ EnforceTimeStamp(
     return;
   }
 
-  std::cout << "Timestamp is enforced, meaning that this program will cease "
-               "to function " << kAllowedMonthDifference << " month(s) after "
-            << kCompilationDate << "." << std::endl;
-  std::cout << "This means that you have received a version of this "
-               "program not meant for public release." << std::endl
-            << std::endl;
+  std::string full_message_01 = (
+    boost::format(timestamp_message_01.data())
+        % kAllowedMonthDifference
+        % kCompilationDate
+    ).str();
+
+  std::cout << full_message_01 << std::endl;
+  std::cout << timestamp_message_02 << std::endl << std::endl;
 
   if (!IsExecutionPermitted()) {
     MessageBoxW(
