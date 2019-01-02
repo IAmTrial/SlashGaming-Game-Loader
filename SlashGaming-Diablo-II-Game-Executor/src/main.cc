@@ -43,12 +43,10 @@
 
 namespace sgd2gexe {
 
-extern "C" int CALLBACK
-WinMain(
-    HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    LPSTR lpCmdLine,
-    int nCmdShow
+extern "C" int
+main(
+    int argc,
+    const char* argv[]
 ) {
   PrintLicenseNotice();
   std::cout << "----------" << std::endl;
