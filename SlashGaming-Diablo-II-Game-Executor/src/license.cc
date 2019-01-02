@@ -24,27 +24,18 @@
  *  it with Diablo II (or a modified version of that game and its
  *  libraries), containing parts covered by the terms of Blizzard End User
  *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.
- *
- *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II: Lord of Destruction (or a modified version of that
- *  game and its libraries), containing parts covered by the terms of
- *  Blizzard End User License Agreement, the licensors of this Program grant
- *  you additional permission to convey the resulting work.
+ *  permission to convey the resulting work.  This additional permission is
+ *  also extended to any combination of expansions, mods, and remasters of
+ *  the game.
  */
 
-#include <windows.h>
+#include "license.h"
+
 #include <array>
 #include <iostream>
-#include <unordered_set>
+#include <string_view>
 
-#include "ConfigReader.h"
-#include "GameLoader.h"
-#include "LibraryInjector.h"
-#include "TimeChecker.h"
-
-namespace slashgaming {
-
+namespace sgd2gexe {
 namespace {
 
 constexpr const std::array<std::string_view, 19> kLicenseLines = {
@@ -69,47 +60,15 @@ constexpr const std::array<std::string_view, 19> kLicenseLines = {
     "information."
 };
 
-void PrintLicenseNotice() {
+} // namespace
+
+void
+PrintLicenseNotice(
+    void
+) {
   for (const auto& line : kLicenseLines) {
     std::cout << line << std::endl;
   }
-
-  std::cout << std::endl;
 }
 
-} // namespace
-
-extern "C" int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                                LPSTR lpCmdLine, int nCmdShow) {
-  PrintLicenseNotice();
-  std::cout << "----------" << std::endl;
-
-  // ShowWindow(GetConsoleWindow(), SW_HIDE);
-  timechecker::EnforceTimeStamp();
-
-  // Create a new process, waiting for its full initialization before the
-  // startGame function can return.
-  PROCESS_INFORMATION process_info;
-  StartGame(&process_info);
-
-  // Read the list of DLLs to inject from the config.
-  std::unordered_set<std::string> library_paths = GetLibraryPaths();
-  std::unordered_set<std::string_view> library_paths_view;
-
-  for (const auto& libary_path_str : library_paths) {
-    library_paths_view.insert(libary_path_str);
-  }
-
-  // Inject libraries, after reading all files.
-  if (InjectLibraries(library_paths_view, &process_info)) {
-    std::cout << "All libraries have been successfully injected." << std::endl;
-  } else {
-    std::cout << "Some or all libraries failed to inject." << std::endl;
-  }
-
-  Sleep(500);
-
-  return 0;
-}
-
-} // namespace slashgaming
+} // namespace sgd2gexe

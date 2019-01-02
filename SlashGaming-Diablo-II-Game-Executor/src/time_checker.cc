@@ -24,42 +24,65 @@
  *  it with Diablo II (or a modified version of that game and its
  *  libraries), containing parts covered by the terms of Blizzard End User
  *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.
- *
- *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II: Lord of Destruction (or a modified version of that
- *  game and its libraries), containing parts covered by the terms of
- *  Blizzard End User License Agreement, the licensors of this Program grant
- *  you additional permission to convey the resulting work.
+ *  permission to convey the resulting work.  This additional permission is
+ *  also extended to any combination of expansions, mods, and remasters of
+ *  the game.
  */
 
-#include "TimeChecker.h"
+#include "time_checker.h"
 
 #include <windows.h>
 #include <cstdint>
+#include <charconv>
 #include <chrono>
 #include <iostream>
 #include <ratio>
 #include <regex>
 #include <string_view>
+#include <utility>
 
-#include <frozen/string.h>
-#include <frozen/unordered_map.h>
+#include <boost/bimap.hpp>
+#include <boost/format.hpp>
 
-namespace slashgaming::timechecker {
+namespace sgd2gexe::timechecker {
 
 using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
 namespace {
 
-MonthsDuration GetDaysFromDateString(std::string_view date) {
-  constexpr const auto values_by_month =
-      frozen::make_unordered_map<frozen::string, int>({
-          { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 }, { "May", 4 },
-          { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 }, { "Sep", 8 }, { "Oct", 9 },
-          { "Nov", 10 }, { "Dec", 11 }
-      });
+using MonthNameAndValueBimapType = boost::bimap<std::string_view, int>;
 
+constexpr std::string_view kTimestampMessage01 =
+    "Timestamp is enforced, meaning that this program will cease "
+    "to function %d month(s) after %s.";
+
+constexpr std::string_view kTimestampMessage02 =
+    "This means that you have received a version of this "
+    "program not meant for public release.";
+
+const boost::bimap<std::string_view, int>&
+GetMonthNameAndValueBimap(
+    void
+) {
+  static const std::array<MonthNameAndValueBimapType::value_type, 12>
+      month_name_and_value_pairs = { {
+          { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 },
+          { "May", 4 }, { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 },
+          { "Sep", 8 }, { "Oct", 9 }, { "Nov", 10 }, { "Dec", 11 }
+      } };
+
+  static const MonthNameAndValueBimapType month_name_and_values_bimap(
+      month_name_and_value_pairs.begin(),
+      month_name_and_value_pairs.end()
+  );
+
+  return month_name_and_values_bimap;
+}
+
+MonthsDuration
+GetDaysFromDateString(
+    std::string_view date
+) {
   const std::regex kCompileDateRegex("(\\w+)\\s+(\\d+)\\s+(\\d+)");
   std::cmatch matches;
 
@@ -68,17 +91,31 @@ MonthsDuration GetDaysFromDateString(std::string_view date) {
   }
 
   // Calculate number of months from epoch time (Jan 1, 1970).
-  long long month = values_by_month.at(
-      frozen::string(matches[1].str().data(),
-                     matches[1].str().length()));
+  int month = GetMonthNameAndValueBimap().left.at(
+      matches[1].str()
+  );
 
-  long long year = std::stoll(matches[3].str()) - 1970;
+  std::string year_text = matches[3].str();
+  std::size_t year_text_size = year_text.length()
+      * sizeof(decltype(year_text)::value_type);
+
+  std::intmax_t year;
+  std::from_chars(
+      year_text.data(),
+      year_text.data() + year_text_size,
+      year
+  );
+  year -= 1970;
+
   MonthsDuration total_days_duration(month + (year * 12));
 
   return total_days_duration;
 }
 
-bool IsExecutionPermitted() {
+bool
+IsExecutionPermitted(
+    void
+) {
   auto compile_month_duration = GetDaysFromDateString(kCompilationDate);
 
   // If the compilation date could not be parsed, don't allow execution.
@@ -100,28 +137,33 @@ bool IsExecutionPermitted() {
 
 } // namespace
 
-
-void EnforceTimeStamp() {
+void
+EnforceTimeStamp(
+    void
+) {
   if constexpr (!kIsEnforceTimestamp) {
     return;
   }
 
-  std::cout << "Timestamp is enforced, meaning that this program will cease "
-               "to function " << kAllowedMonthDifference << " month(s) after "
-            << kCompilationDate << "." << std::endl;
-  std::cout << "This means that you have received a version of this "
-               "program not meant for public release." << std::endl
-            << std::endl;
+  std::string full_message_01 = (
+      boost::format(kTimestampMessage01.data())
+          % kAllowedMonthDifference
+          % kCompilationDate
+  ).str();
+
+  std::cout << full_message_01 << std::endl;
+  std::cout << kTimestampMessage02 << std::endl << std::endl;
 
   if (!IsExecutionPermitted()) {
     MessageBoxW(
         nullptr,
         L"Date of execution exceeds timestamp limit.",
         L"Execution Date Exceeded",
-        MB_OK | MB_ICONERROR);
+        MB_OK | MB_ICONERROR
+    );
 
     std::exit(0);
   }
 }
 
-} // namespace slashgaming
+} // namespace sgd2gexe

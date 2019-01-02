@@ -24,25 +24,31 @@
  *  it with Diablo II (or a modified version of that game and its
  *  libraries), containing parts covered by the terms of Blizzard End User
  *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.
- *
- *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II: Lord of Destruction (or a modified version of that
- *  game and its libraries), containing parts covered by the terms of
- *  Blizzard End User License Agreement, the licensors of this Program grant
- *  you additional permission to convey the resulting work.
+ *  permission to convey the resulting work.  This additional permission is
+ *  also extended to any combination of expansions, mods, and remasters of
+ *  the game.
  */
 
-#ifndef SLASHGAMING_CONFIGREADER_H_
-#define SLASHGAMING_CONFIGREADER_H_
+#ifndef SGD2GEXE_GAME_LOADER_H_
+#define SGD2GEXE_GAME_LOADER_H_
 
-#include <string>
-#include <unordered_set>
+#include <windows.h>
+#include <filesystem>
 
-namespace slashgaming {
+namespace sgd2gexe {
 
-std::unordered_set<std::string> GetLibraryPaths();
+const std::filesystem::path kGameFilePath = "Game.exe";
 
-} // namespace slashgaming
+bool
+StartGame(
+    PROCESS_INFORMATION* process_info_out_ptr
+);
 
-#endif // SLASHGAMING_CONFIGREADER_H_
+bool
+StartGameSuspended(
+    PROCESS_INFORMATION* process_info_out_ptr
+);
+
+} // namespace sgd2gexe
+
+#endif // SGD2GEXE_GAME_LOADER_H_

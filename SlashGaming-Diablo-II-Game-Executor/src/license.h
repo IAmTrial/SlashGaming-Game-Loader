@@ -24,28 +24,21 @@
  *  it with Diablo II (or a modified version of that game and its
  *  libraries), containing parts covered by the terms of Blizzard End User
  *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.
- *
- *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II: Lord of Destruction (or a modified version of that
- *  game and its libraries), containing parts covered by the terms of
- *  Blizzard End User License Agreement, the licensors of this Program grant
- *  you additional permission to convey the resulting work.
+ *  permission to convey the resulting work.  This additional permission is
+ *  also extended to any combination of expansions, mods, and remasters of
+ *  the game.
  */
 
-#ifndef SLASHGAMING_LIBRARYINJECTOR_H_
-#define SLASHGAMING_LIBRARYINJECTOR_H_
+#ifndef SGD2GEXE_LICENSE_H_
+#define SGD2GEXE_LICENSE_H_
 
-#include <windows.h>
+namespace sgd2gexe {
 
-#include <string_view>
-#include <unordered_set>
+void
+PrintLicenseNotice(
+    void
+);
 
-namespace slashgaming {
+} // namespace sgd2gexe
 
-bool InjectLibraries(const std::unordered_set<std::string_view>& library_paths,
-                     const PROCESS_INFORMATION *process_info_ptr);
-
-} // namespace slashgaming
-
-#endif // SLASHGAMING_LIBRARYINJECTOR_H_
+#endif  // SGD2GEXE_LICENSE_H_

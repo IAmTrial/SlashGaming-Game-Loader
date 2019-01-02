@@ -24,25 +24,54 @@
  *  it with Diablo II (or a modified version of that game and its
  *  libraries), containing parts covered by the terms of Blizzard End User
  *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.
- *
- *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II: Lord of Destruction (or a modified version of that
- *  game and its libraries), containing parts covered by the terms of
- *  Blizzard End User License Agreement, the licensors of this Program grant
- *  you additional permission to convey the resulting work.
+ *  permission to convey the resulting work.  This additional permission is
+ *  also extended to any combination of expansions, mods, and remasters of
+ *  the game.
  */
 
-#ifndef SLASHGAMING_GAMELOADER_H_
-#define SLASHGAMING_GAMELOADER_H_
-
 #include <windows.h>
+#include <array>
+#include <iostream>
+#include <string_view>
+#include <unordered_set>
 
-namespace slashgaming {
+#include "config_reader.h"
+#include "game_loader.h"
+#include "library_injector.h"
+#include "license.h"
+#include "time_checker.h"
 
-bool StartGame(PROCESS_INFORMATION* process_info_out_ptr);
-bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr);
+namespace sgd2gexe {
 
-} // namespace slashgaming
+extern "C" int
+main(
+    int argc,
+    const char* argv[]
+) {
+  PrintLicenseNotice();
+  std::cout << "----------" << std::endl;
 
-#endif // SLASHGAMING_GAMELOADER_H_
+  // ShowWindow(GetConsoleWindow(), SW_HIDE);
+  timechecker::EnforceTimeStamp();
+
+  // Create a new process, waiting for its full initialization before the
+  // startGame function can return.
+  PROCESS_INFORMATION process_info;
+  StartGame(&process_info);
+
+  // Read the list of DLLs to inject from the config.
+  std::vector<std::filesystem::path> library_paths = GetLibraryPaths();
+
+  // Inject libraries, after reading all files.
+  if (InjectLibraries(library_paths, process_info)) {
+    std::cout << "All libraries have been successfully injected." << std::endl;
+  } else {
+    std::cout << "Some or all libraries failed to inject." << std::endl;
+  }
+
+  Sleep(500);
+
+  return 0;
+}
+
+} // namespace sgd2gexe
