@@ -114,13 +114,14 @@ InjectLibrary(
 ) {
   // Encode the path to one understood by Windows.
   std::wstring library_path_string = library_path.wstring();
-  std::size_t buffer_size = library_path_string.length() + 1;
+  std::size_t buffer_size = (library_path_string.length() + 1)
+      * sizeof(decltype(library_path_string)::value_type);
 
   // Store the library path into the target process.
   LPVOID remote_buf = VirtualAllocEx(
       process_info_ptr->hProcess,
       nullptr,
-      buffer_size * sizeof(wchar_t),
+      buffer_size,
       MEM_COMMIT,
       PAGE_READWRITE
   );
@@ -151,7 +152,7 @@ InjectLibrary(
       process_info_ptr->hProcess,
       remote_buf,
       library_path_string.data(),
-      buffer_size * sizeof(wchar_t),
+      buffer_size,
       nullptr
   );
 
