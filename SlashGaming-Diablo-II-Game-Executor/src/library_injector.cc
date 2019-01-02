@@ -34,15 +34,19 @@
 #include <windows.h>
 #include <filesystem>
 #include <iostream>
-#include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
+#include <boost/format.hpp>
 #include <boost/scope_exit.hpp>
 #include "asm_x86_macro.h"
 
 namespace sgd2gexe {
 namespace {
+
+constexpr std::wstring_view kFunctionFailErrorMessage =
+    L"%s failed, with error code %x.";
 
 __declspec(naked) bool
 FailVirtualFreeExStub(
@@ -126,7 +130,18 @@ InjectLibrary(
   );
 
   if (remote_buf == nullptr) {
-    std::cerr << "VirtualAllocEx failed." << std::endl;
+    std::wstring full_message = (
+        boost::wformat(kFunctionFailErrorMessage.data())
+        % "VirtualAllocEx"
+        % GetLastError()
+    ).str();
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"VirtualAllocEx Failed",
+        MB_OK | MB_ICONERROR
+    );
     std::exit(0);
   }
 
@@ -140,8 +155,19 @@ InjectLibrary(
     );
 
     if (!is_free_success) {
-      std::cerr << "VirtualFreeEx failed." << std::endl;
+      std::wstring full_message = (
+          boost::wformat(kFunctionFailErrorMessage.data())
+          % "VirtualFreeEx"
+          % GetLastError()
+      ).str();
+
       FailVirtualFreeExStub(is_free_success);
+      MessageBoxW(
+          nullptr,
+          full_message.data(),
+          L"VirtualFreeEx Failed",
+          MB_OK | MB_ICONERROR
+      );
       std::exit(0);
     }
   } BOOST_SCOPE_EXIT_END
@@ -156,7 +182,18 @@ InjectLibrary(
   );
 
   if (!is_write_success) {
-    std::cerr << "WriteProcessMemory failed." << std::endl;
+    std::wstring full_message = (
+        boost::wformat(kFunctionFailErrorMessage.data())
+        % "WriteProcessMemory"
+        % GetLastError()
+    ).str();
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"WriteProcessMemory Failed",
+        MB_OK | MB_ICONERROR
+    );
     return FailWriteProcessMemoryStub(is_write_success);
   }
 
@@ -173,7 +210,18 @@ InjectLibrary(
   );
 
   if (remote_thread_handle == nullptr) {
-    std::cerr << "CreateRemoteThread failed." << std::endl;
+    std::wstring full_message = (
+        boost::wformat(kFunctionFailErrorMessage.data())
+        % "CreateRemoteThread"
+        % GetLastError()
+    ).str();
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"CreateRemoteThread Failed",
+        MB_OK | MB_ICONERROR
+    );
     return false;
   }
 
