@@ -33,8 +33,11 @@
 #define SGD2GEXE_GAME_LOADER_H_
 
 #include <windows.h>
+#include <filesystem>
 
 namespace sgd2gexe {
+
+const std::filesystem::path kGameFilePath = "Game.exe";
 
 bool
 StartGame(

@@ -44,7 +44,7 @@ StartGame(
   startup_info.cb = sizeof(startup_info);
 
   BOOL is_create_process_success = CreateProcessW(
-      L"Game.exe",
+      kGameFilePath.c_str(),
       GetCommandLineW(),
       nullptr,
       nullptr,
@@ -61,7 +61,7 @@ StartGame(
     MessageBoxW(
         nullptr,
         L"Game.exe could not be found.",
-        L"Game executable not found.",
+        L"Game Executable Not Found",
         MB_OK | MB_ICONERROR
     );
     std::exit(0);
@@ -75,7 +75,8 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
-  BOOL is_create_process_success = CreateProcessW(L"Game.exe",
+  BOOL is_create_process_success = CreateProcessW(
+      kGameFilePath.c_str(),
       GetCommandLineW(),
       nullptr,
       nullptr,
@@ -92,7 +93,7 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
     MessageBoxW(
         nullptr,
         L"Game.exe could not be found.",
-        L"Game executable not found.",
+        L"Game Executable Not Found",
         MB_OK | MB_ICONERROR
     );
     std::exit(0);
