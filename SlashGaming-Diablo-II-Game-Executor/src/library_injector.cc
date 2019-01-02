@@ -39,6 +39,7 @@
 #include <string_view>
 #include <vector>
 
+#include <boost/scope_exit.hpp>
 #include "asm_x86_macro.h"
 
 namespace sgd2gexe {
@@ -129,6 +130,23 @@ InjectLibrary(
     std::exit(0);
   }
 
+  // Free used resources at the end of the function scope.
+  BOOST_SCOPE_EXIT(&process_info_ptr, &remote_buf) {
+    BOOL is_free_success = VirtualFreeEx(
+        process_info_ptr->hProcess,
+        remote_buf,
+        0,
+        MEM_RELEASE
+    );
+
+    if (!is_free_success) {
+      std::cerr << "VirtualFreeEx failed." << std::endl;
+      FailVirtualFreeExStub(is_free_success);
+      std::exit(0);
+    }
+  } BOOST_SCOPE_EXIT_END
+
+  // Write the library name into the remote program.
   BOOL is_write_success = WriteProcessMemory(
       process_info_ptr->hProcess,
       remote_buf,
@@ -139,12 +157,6 @@ InjectLibrary(
 
   if (!is_write_success) {
     std::cerr << "WriteProcessMemory failed." << std::endl;
-    VirtualFreeEx(
-        process_info_ptr->hProcess,
-        remote_buf,
-        0,
-        MEM_RELEASE
-    );
     return FailWriteProcessMemoryStub(is_write_success);
   }
 
@@ -166,20 +178,6 @@ InjectLibrary(
   }
 
   WaitForSingleObject(remote_thread_handle, INFINITE);
-
-  // Free used resources.
-  BOOL is_free_success = VirtualFreeEx(
-      process_info_ptr->hProcess,
-      remote_buf,
-      0,
-      MEM_RELEASE
-  );
-
-  if (!is_free_success) {
-    std::cerr << "VirtualFreeEx failed." << std::endl;
-    FailVirtualFreeExStub(is_free_success);
-    std::exit(0);
-  }
 
   return true;
 }
