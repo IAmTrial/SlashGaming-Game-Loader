@@ -99,7 +99,6 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
     std::exit(0);
   }
 
-  // Wait until the process is started.
   return true;
 }
 
