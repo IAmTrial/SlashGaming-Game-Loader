@@ -32,7 +32,6 @@
 #include "library_injector.h"
 
 #include <windows.h>
-#include <cwchar>
 #include <filesystem>
 #include <iostream>
 #include <memory>
