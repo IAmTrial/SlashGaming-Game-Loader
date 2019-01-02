@@ -32,14 +32,38 @@
 #include "game_loader.h"
 
 #include <windows.h>
+#include <filesystem>
 #include <iostream>
 
+#include <boost/format.hpp>
+
 namespace sgd2gexe {
+namespace {
+
+constexpr std::wstring_view kGameFileNotFoundErrorMessage =
+    L"%s could not be found.";
+
+} // namespace
 
 bool
 StartGame(
     PROCESS_INFORMATION* process_info_out_ptr
 ) {
+  if (!std::filesystem::exists(kGameFilePath)) {
+    std::wstring full_message = (
+        boost::wformat(kGameFileNotFoundErrorMessage.data())
+            % kGameFilePath
+    ).str();
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"Game Executable Not Found",
+        MB_OK | MB_ICONERROR
+    );
+    std::exit(0);
+  }
+
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
@@ -72,6 +96,16 @@ StartGame(
 }
 
 bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
+  if (!std::filesystem::exists(kGameFilePath)) {
+    MessageBoxW(
+        nullptr,
+        L"Game.exe could not be found.",
+        L"Game Executable Not Found",
+        MB_OK | MB_ICONERROR
+    );
+    std::exit(0);
+  }
+
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
