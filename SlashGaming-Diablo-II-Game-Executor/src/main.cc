@@ -65,7 +65,7 @@ WinMain(
   std::vector<std::filesystem::path> library_paths = GetLibraryPaths();
 
   // Inject libraries, after reading all files.
-  if (InjectLibraries(library_paths, &process_info)) {
+  if (InjectLibraries(library_paths, process_info)) {
     std::cout << "All libraries have been successfully injected." << std::endl;
   } else {
     std::cout << "Some or all libraries failed to inject." << std::endl;

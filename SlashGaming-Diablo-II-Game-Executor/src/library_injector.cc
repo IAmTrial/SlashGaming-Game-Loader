@@ -188,13 +188,13 @@ InjectLibrary(
 bool
 InjectLibraries(
     const std::vector<std::filesystem::path>& library_paths,
-    const PROCESS_INFORMATION *process_info_ptr
+    const PROCESS_INFORMATION& process_info_ptr
 ) {
   bool is_all_success = true;
 
   for (const auto& library_path : library_paths) {
     std::cout << "Injecting: " << library_path << std::endl;
-    bool is_current_success = InjectLibrary(library_path, process_info_ptr);
+    bool is_current_success = InjectLibrary(library_path, &process_info_ptr);
 
     if (!is_current_success) {
       std::cout << library_path << " failed to inject." << std::endl;

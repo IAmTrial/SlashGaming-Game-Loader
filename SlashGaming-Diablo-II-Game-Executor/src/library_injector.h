@@ -41,7 +41,7 @@ namespace sgd2gexe {
 bool
 InjectLibraries(
     const std::vector<std::filesystem::path>& library_paths,
-    const PROCESS_INFORMATION* process_info_ptr
+    const PROCESS_INFORMATION& process_info_ptr
 );
 
 } // namespace sgd2gexe
