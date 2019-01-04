@@ -68,7 +68,7 @@ FailVirtualFreeExStub(
   ASM_X86(inc edi)
   ASM_X86(mov esp, ebp)
   ASM_X86(popad)
-  ASM_X86(cmp [esp + 0x4], 0)
+  ASM_X86(cmp dword ptr[esp + 0x4], 0)
   ASM_X86(je _loadLibrarySafelyStubEND)
   ASM_X86(inc eax)
 
@@ -103,7 +103,7 @@ FailWriteProcessMemoryStub(
   ASM_X86(mov eax, esp)
   ASM_X86(popad)
   ASM_X86(add esp, 4)
-  ASM_X86(cmp [esp + 0x4], 0)
+  ASM_X86(cmp dword ptr[esp + 0x4], 0)
   ASM_X86(je _failWriteProcessMemoryStubEND)
   ASM_X86(inc eax)
 _failWriteProcessMemoryStubEND:
