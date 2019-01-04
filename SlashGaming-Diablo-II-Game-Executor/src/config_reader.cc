@@ -47,6 +47,23 @@ namespace {
 
 const std::filesystem::path kConfigPath = "SlashGaming-Config.json";
 
+constexpr std::string_view kMainEntryKey = "SlashGaming Loader";
+constexpr std::string_view kMetaDataKey = "!!!Metadata (Do not modify)!!!";
+
+// Note that this signifies the last version where the config formatting and
+// entries were updated. These values do not need to change with respect to API
+// file version!
+constexpr std::string_view kMajorVersionAKey = "Major Version A";
+constexpr int kMajorVersionAValue = 1;
+constexpr std::string_view kMajorVersionBKey = "Major Version B";
+constexpr int kMajorVersionBValue = 0;
+constexpr std::string_view kMinorVersionAKey = "Minor Version A";
+constexpr int kMinorVersionAValue = 0;
+constexpr std::string_view kMinorVersionBKey = "Minor Version B";
+constexpr int kMinorVersionBValue = 0;
+
+constexpr std::string_view kInjectDllsKey = "Inject DLLs";
+
 void
 CreateDefaultConfig(
     const std::filesystem::path& config_file_path
@@ -67,37 +84,63 @@ AddMissingEntries(
     return false;
   }
 
-  if (auto& entry = config["!!!Metadata - Do not modify!!!"];
-      !entry.is_object()) {
-    entry = nlohmann::json::object();
+  auto& main_entry = config[kMainEntryKey.data()];
+  if (!main_entry.is_object()) {
+    main_entry = {};
   }
 
-  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Major Version A"];
-      !entry.is_number()) {
-    entry = 0;
+  auto& metadata_entry = main_entry[kMetaDataKey.data()];
+  if (!metadata_entry.is_object()) {
+    metadata_entry = {};
   }
 
-  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Major Version B"];
-      !entry.is_number()) {
-    entry = 2;
+  // Check that the actual config version is less than or equal to the expected
+  // config version. If the actual is larger, then do not add any new entries.
+  // If there are any breaking config changes, then the program will most
+  // likely crash.
+  auto& major_version_a = metadata_entry[kMajorVersionAKey.data()];
+  auto& major_version_b = metadata_entry[kMajorVersionBKey.data()];
+  auto& minor_version_a = metadata_entry[kMinorVersionAKey.data()];
+  auto& minor_version_b = metadata_entry[kMinorVersionBKey.data()];
+
+  bool is_config_version_smaller = false;
+
+  if (!major_version_a.is_number() || major_version_a < kMajorVersionAValue) {
+    major_version_a = kMajorVersionAValue;
+    major_version_b = 0;
+    minor_version_a = 0;
+    minor_version_b = 0;
+
+    is_config_version_smaller = true;
   }
 
-  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Minor Version A"];
-      !entry.is_number()) {
-    entry = 0;
+  if (!major_version_b.is_number() || major_version_b < kMajorVersionBValue) {
+    major_version_b = kMajorVersionBValue;
+    minor_version_a = 0;
+    minor_version_b = 0;
+
+    is_config_version_smaller = true;
   }
 
-  if (auto& entry = config["!!!Metadata - Do not modify!!!"]["Minor Version B"];
-      !entry.is_number()) {
-    entry = 0;
+  if (!minor_version_a.is_number() || minor_version_a < kMinorVersionAValue) {
+    minor_version_a = kMinorVersionAValue;
+    minor_version_b = 0;
+
+    is_config_version_smaller = true;
   }
 
-  if (auto& entry = config["SlashGaming Diablo II Loader"];
-      !entry.is_object()) {
-    entry = nlohmann::json::object();
+  if (!minor_version_b.is_number() || minor_version_b < kMinorVersionBValue) {
+    minor_version_b = kMinorVersionBValue;
+
+    is_config_version_smaller = true;
   }
 
-  if (auto& entry = config["SlashGaming Diablo II Loader"]["Inject DLLs"];
+  // The user's config matches or is smaller, so do not add defaults.
+  if (!is_config_version_smaller) {
+    return true;
+  }
+
+  if (auto& entry = main_entry[kInjectDllsKey.data()];
       !entry.is_array()) {
     entry = nlohmann::json::array();
   }
@@ -136,7 +179,7 @@ GetLibraryPaths(
     return std::vector<std::filesystem::path>();
   }
 
-  const auto& dll_list = config["SlashGaming Diablo II Loader"]["Inject DLLs"];
+  const auto& dll_list = config[kMainEntryKey.data()][kInjectDllsKey.data()];
 
   std::vector<std::filesystem::path> library_paths;
   for (const auto& dll : dll_list) {
