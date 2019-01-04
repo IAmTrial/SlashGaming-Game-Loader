@@ -39,7 +39,7 @@ namespace sgd2gexe {
 namespace {
 
 constexpr const std::array<std::string_view, 19> kLicenseLines = {
-    "SlashGaming Diablo II Game Loader",
+    "SlashGaming Loader",
     "Copyright (C) 2018  Mir Drualga",
     "",
     "This program is free software: you can redistribute it and/or modify",
