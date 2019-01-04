@@ -60,7 +60,8 @@ constexpr int kMinorVersionAValue = 0;
 constexpr std::string_view kMinorVersionBKey = "Minor Version B";
 constexpr int kMinorVersionBValue = 0;
 
-constexpr std::string_view kInjectDllsKey = "Inject DLLs";
+constexpr std::string_view kInjectDllKey = "Inject DLL";
+constexpr std::string_view kDefaultLibraryLoader = "LibraryLoader.dll";
 
 void
 CreateDefaultConfig(
@@ -138,9 +139,9 @@ AddMissingEntries(
     return true;
   }
 
-  if (auto& entry = main_entry[kInjectDllsKey.data()];
-      !entry.is_array()) {
-    entry = nlohmann::json::array();
+  if (auto& entry = main_entry[kInjectDllKey.data()];
+      !entry.is_string()) {
+    entry = kDefaultLibraryLoader;
   }
 
   if (std::fstream config_stream(config_path, std::ios::out | std::ios::trunc);
@@ -153,10 +154,8 @@ AddMissingEntries(
   return true;
 }
 
-} // namespace
-
-std::vector<std::filesystem::path>
-GetLibraryPaths(
+nlohmann::json
+ReadConfig(
     void
 ) {
   if (!std::filesystem::exists(kConfigPath)) {
@@ -173,20 +172,31 @@ GetLibraryPaths(
       config_stream
   ) {
     config_stream >> config;
-  } else {
-    return std::vector<std::filesystem::path>();
   }
 
-  const auto& dll_list = config[kMainEntryKey.data()][kInjectDllsKey.data()];
+  return config;
+}
 
-  std::vector<std::filesystem::path> library_paths;
-  for (const auto& dll : dll_list) {
-    if (dll.is_string()) {
-      library_paths.push_back(dll.get<std::string>());
-    }
-  }
+nlohmann::json
+GetConfig(
+    void
+) {
+  static nlohmann::json config = ReadConfig();
 
-  return library_paths;
+  return config;
+}
+
+} // namespace
+
+std::filesystem::path
+GetLibraryLoaderPath(
+    void
+) {
+  nlohmann::json config = GetConfig();
+  std::filesystem::path library_loader_path =
+      config[kInjectDllKey.data()].get<std::string>().data();
+
+  return library_loader_path;
 }
 
 } // namespace sgexe

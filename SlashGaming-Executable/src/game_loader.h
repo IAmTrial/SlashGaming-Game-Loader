@@ -35,15 +35,15 @@
 
 namespace sgexe {
 
-const std::filesystem::path kGameFilePath = "Game.exe";
-
 bool
 StartGame(
+    std::filesystem::path game_executable,
     PROCESS_INFORMATION* process_info_out_ptr
 );
 
 bool
 StartGameSuspended(
+    std::filesystem::path game_executable,
     PROCESS_INFORMATION* process_info_out_ptr
 );
 

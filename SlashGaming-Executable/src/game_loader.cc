@@ -48,12 +48,13 @@ constexpr std::wstring_view kCreateErrorMessage =
 
 bool
 StartGame(
+    std::filesystem::path game_file_path,
     PROCESS_INFORMATION* process_info_out_ptr
 ) {
-  if (!std::filesystem::exists(kGameFilePath)) {
+  if (!std::filesystem::exists(game_file_path)) {
     std::wstring full_message = (
         boost::wformat(kGameFileNotFoundErrorMessage.data())
-            % kGameFilePath
+            % game_file_path
     ).str();
 
     MessageBoxW(
@@ -69,7 +70,7 @@ StartGame(
   startup_info.cb = sizeof(startup_info);
 
   BOOL is_create_process_success = CreateProcessW(
-      kGameFilePath.c_str(),
+      game_file_path.c_str(),
       GetCommandLineW(),
       nullptr,
       nullptr,
@@ -85,7 +86,7 @@ StartGame(
   if (!is_create_process_success) {
     std::wstring full_message = (
         boost::wformat(kCreateErrorMessage.data())
-            % kGameFilePath.c_str()
+            % game_file_path.c_str()
             % GetLastError()
     ).str();
 
@@ -102,8 +103,12 @@ StartGame(
   return WaitForInputIdle(process_info_out_ptr->hProcess, INFINITE) == 0;
 }
 
-bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
-  if (!std::filesystem::exists(kGameFilePath)) {
+bool
+StartGameSuspended(
+    std::filesystem::path game_file_path,
+    PROCESS_INFORMATION* process_info_out_ptr
+) {
+  if (!std::filesystem::exists(game_file_path)) {
     MessageBoxW(
         nullptr,
         L"Game.exe could not be found.",
@@ -117,7 +122,7 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
   startup_info.cb = sizeof(startup_info);
 
   BOOL is_create_process_success = CreateProcessW(
-      kGameFilePath.c_str(),
+      game_file_path.c_str(),
       GetCommandLineW(),
       nullptr,
       nullptr,
@@ -133,7 +138,7 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
   if (!is_create_process_success) {
     std::wstring full_message = (
         boost::wformat(kCreateErrorMessage.data())
-            % kGameFilePath.c_str()
+            % game_file_path.c_str()
             % GetLastError()
     ).str();
 

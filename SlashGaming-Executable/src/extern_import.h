@@ -32,7 +32,7 @@
 
 #include <windows.h>
 
-const char* GetGameExecutable(
+const char* GetGameExecutableFileName(
     HMODULE dll_handle
 );
 

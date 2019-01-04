@@ -34,7 +34,7 @@
 
 #include <boost/format.hpp>
 
-const char* GetGameExecutable(
+const char* GetGameExecutableFileName(
     HMODULE dll_handle
 ) {
   using FuncType = const char*(*)(void);

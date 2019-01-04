@@ -37,9 +37,9 @@
 namespace sgexe {
 
 bool
-InjectLibraries(
-    const std::vector<std::filesystem::path>& library_paths,
-    const PROCESS_INFORMATION& process_info_ptr
+InjectLibrary(
+    const std::filesystem::path& library_path,
+    const PROCESS_INFORMATION& process_info
 );
 
 } // namespace sgexe

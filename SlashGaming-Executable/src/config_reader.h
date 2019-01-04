@@ -35,8 +35,8 @@
 
 namespace sgexe {
 
-std::vector<std::filesystem::path>
-GetLibraryPaths(
+std::filesystem::path
+GetLibraryLoaderPath(
     void
 );
 

@@ -34,6 +34,7 @@
 #include <unordered_set>
 
 #include "config_reader.h"
+#include "extern_import.h"
 #include "game_loader.h"
 #include "library_injector.h"
 #include "license.h"
@@ -52,16 +53,23 @@ main(
   // ShowWindow(GetConsoleWindow(), SW_HIDE);
   timechecker::EnforceTimeStamp();
 
+  // Load the injectable library to retrieve necessary information.
+  std::filesystem::path library_loader_path = GetLibraryLoaderPath();
+  HMODULE dll_handle = LoadLibraryW(library_loader_path.c_str());
+
+  const char* game_version_text = GetGameVersionText(dll_handle);
+
+  std::cout << "Game version is: " << game_version_text << std::endl;
+
   // Create a new process, waiting for its full initialization before the
   // startGame function can return.
   PROCESS_INFORMATION process_info;
-  StartGame(&process_info);
+  std::filesystem::path game_executable_path =
+      GetGameExecutableFileName(dll_handle);
+  StartGame(game_executable_path, &process_info);
 
-  // Read the list of DLLs to inject from the config.
-  std::vector<std::filesystem::path> library_paths = GetLibraryPaths();
-
-  // Inject libraries, after reading all files.
-  if (InjectLibraries(library_paths, process_info)) {
+  // Inject the library, after reading all files.
+  if (InjectLibrary(library_loader_path, process_info)) {
     std::cout << "All libraries have been successfully injected." << std::endl;
   } else {
     std::cout << "Some or all libraries failed to inject." << std::endl;

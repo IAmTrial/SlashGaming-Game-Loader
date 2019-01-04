@@ -108,10 +108,12 @@ _failWriteProcessMemoryStubEND:
   ASM_X86(ret)
 }
 
+} // namespace
+
 bool
 InjectLibrary(
     const std::filesystem::path& library_path,
-    const PROCESS_INFORMATION *process_info_ptr
+    const PROCESS_INFORMATION& process_info
 ) {
   // Encode the path to one understood by Windows.
   std::wstring library_path_string = library_path.wstring();
@@ -120,7 +122,7 @@ InjectLibrary(
 
   // Store the library path into the target process.
   LPVOID remote_buf = VirtualAllocEx(
-      process_info_ptr->hProcess,
+      process_info.hProcess,
       nullptr,
       buffer_size,
       MEM_COMMIT,
@@ -144,9 +146,9 @@ InjectLibrary(
   }
 
   // Free used resources at the end of the function scope.
-  BOOST_SCOPE_EXIT(&process_info_ptr, &remote_buf) {
+  BOOST_SCOPE_EXIT(&process_info, &remote_buf) {
     BOOL is_free_success = VirtualFreeEx(
-        process_info_ptr->hProcess,
+        process_info.hProcess,
         remote_buf,
         0,
         MEM_RELEASE
@@ -172,7 +174,7 @@ InjectLibrary(
 
   // Write the library name into the remote program.
   BOOL is_write_success = WriteProcessMemory(
-      process_info_ptr->hProcess,
+      process_info.hProcess,
       remote_buf,
       library_path_string.data(),
       buffer_size,
@@ -198,7 +200,7 @@ InjectLibrary(
   // Load library from the target process.
   DWORD remote_thread_id;
   HANDLE remote_thread_handle = CreateRemoteThread(
-      process_info_ptr->hProcess,
+      process_info.hProcess,
       nullptr,
       0,
       (LPTHREAD_START_ROUTINE) LoadLibraryW,
@@ -226,29 +228,6 @@ InjectLibrary(
   WaitForSingleObject(remote_thread_handle, INFINITE);
 
   return true;
-}
-
-} // namespace
-
-bool
-InjectLibraries(
-    const std::vector<std::filesystem::path>& library_paths,
-    const PROCESS_INFORMATION& process_info_ptr
-) {
-  bool is_all_success = true;
-
-  for (const auto& library_path : library_paths) {
-    std::cout << "Injecting: " << library_path << std::endl;
-    bool is_current_success = InjectLibrary(library_path, &process_info_ptr);
-
-    if (!is_current_success) {
-      std::cout << library_path << " failed to inject." << std::endl;
-    }
-
-    is_all_success = is_all_success && is_current_success;
-  }
-
-  return is_all_success;
 }
 
 } // namespace sgexe
