@@ -46,9 +46,9 @@
 #else
 
 #define ASM_X86(...) \
-    asm(
+    asm( \
         ".intel_syntax \n" \
-        #__VA_ARGS__ "\n" \
+        #__VA_ARGS__ " \n" \
         ".att_syntax \n" \
     )
 
