@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -29,21 +29,29 @@
  *  the game.
  */
 
-#ifndef SGD2GEXE_LIBRARY_INJECTOR_H_
-#define SGD2GEXE_LIBRARY_INJECTOR_H_
+/**
+ * Warning: This header should never be used in any public interface!
+ */
 
-#include <windows.h>
-#include <filesystem>
-#include <vector>
+#ifndef SGEXE_ASM_X86_MACRO_H_
+#define SGEXE_ASM_X86_MACRO_H_
 
-namespace sgd2gexe {
+#if defined(_MSVC_LANG)
 
-bool
-InjectLibraries(
-    const std::vector<std::filesystem::path>& library_paths,
-    const PROCESS_INFORMATION& process_info_ptr
-);
+#define ASM_X86(...) \
+    __asm { \
+      __VA_ARGS__ \
+    }
 
-} // namespace sgd2gexe
+#else
 
-#endif // SGD2GEXE_LIBRARY_INJECTOR_H_
+#define ASM_X86(...) \
+    asm( \
+        ".intel_syntax \n" \
+        #__VA_ARGS__ " \n" \
+        ".att_syntax \n" \
+    )
+
+#endif
+
+#endif // SGEXE_ASM_X86_MACRO_H_

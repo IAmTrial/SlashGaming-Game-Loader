@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -37,7 +37,7 @@
 
 #include <boost/format.hpp>
 
-namespace sgd2gexe {
+namespace sgexe {
 namespace {
 
 constexpr std::wstring_view kGameFileNotFoundErrorMessage =
@@ -151,4 +151,4 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
   return true;
 }
 
-} // namespace sgd2gexe
+} // namespace sgexe

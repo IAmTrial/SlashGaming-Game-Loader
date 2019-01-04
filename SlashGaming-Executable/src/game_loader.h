@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -29,13 +29,13 @@
  *  the game.
  */
 
-#ifndef SGD2GEXE_GAME_LOADER_H_
-#define SGD2GEXE_GAME_LOADER_H_
+#ifndef SGEXE_GAME_LOADER_H_
+#define SGEXE_GAME_LOADER_H_
 
 #include <windows.h>
 #include <filesystem>
 
-namespace sgd2gexe {
+namespace sgexe {
 
 const std::filesystem::path kGameFilePath = "Game.exe";
 
@@ -49,6 +49,6 @@ StartGameSuspended(
     PROCESS_INFORMATION* process_info_out_ptr
 );
 
-} // namespace sgd2gexe
+} // namespace sgexe
 
-#endif // SGD2GEXE_GAME_LOADER_H_
+#endif // SGEXE_GAME_LOADER_H_

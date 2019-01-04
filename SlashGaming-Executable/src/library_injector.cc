@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -42,7 +42,7 @@
 #include <boost/scope_exit.hpp>
 #include "asm_x86_macro.h"
 
-namespace sgd2gexe {
+namespace sgexe {
 namespace {
 
 constexpr std::wstring_view kFunctionFailErrorMessage =
@@ -253,4 +253,4 @@ InjectLibraries(
   return is_all_success;
 }
 
-} // namespace sgd2gexe
+} // namespace sgexe

@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -44,7 +44,7 @@
 #include <boost/bimap.hpp>
 #include <boost/format.hpp>
 
-namespace sgd2gexe::timechecker {
+namespace sgexe::timechecker {
 
 using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
@@ -166,4 +166,4 @@ EnforceTimeStamp(
   }
 }
 
-} // namespace sgd2gexe
+} // namespace sgexe

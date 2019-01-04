@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -42,12 +42,12 @@
 
 #include <nlohmann/json.hpp>
 
-namespace sgd2gexe {
+namespace sgexe {
 namespace {
 
 const std::filesystem::path kConfigPath = "SlashGaming-Config.json";
 
-constexpr std::string_view kMainEntryKey = "SlashGaming Loader";
+constexpr std::string_view kMainEntryKey = "SlashGaming Game Loader";
 constexpr std::string_view kMetaDataKey = "!!!Metadata (Do not modify)!!!";
 
 // Note that this signifies the last version where the config formatting and
@@ -191,4 +191,4 @@ GetLibraryPaths(
   return library_paths;
 }
 
-} // namespace sgd2gexe
+} // namespace sgexe

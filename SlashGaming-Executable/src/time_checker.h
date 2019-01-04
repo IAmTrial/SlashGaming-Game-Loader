@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -29,29 +29,22 @@
  *  the game.
  */
 
-/**
- * Warning: This header should never be used in any public interface!
- */
+#ifndef SGEXE_TIME_CHECKER_H_
+#define SGEXE_TIME_CHECKER_H_
 
-#ifndef SGD2GEXE_ASM_X86_MACRO_H_
-#define SGD2GEXE_ASM_X86_MACRO_H_
+#include <string_view>
 
-#if defined(_MSVC_LANG)
+namespace sgexe::timechecker {
 
-#define ASM_X86(...) \
-    __asm { \
-      __VA_ARGS__ \
-    }
+constexpr bool kIsEnforceTimestamp = false;
+constexpr std::string_view kCompilationDate = __DATE__;
+constexpr int kAllowedMonthDifference = 1;
 
-#else
+void
+EnforceTimeStamp(
+    void
+);
 
-#define ASM_X86(...) \
-    asm( \
-        ".intel_syntax \n" \
-        #__VA_ARGS__ " \n" \
-        ".att_syntax \n" \
-    )
+} // namespace sgexe::timechecker
 
-#endif
-
-#endif // SGD2GEXE_ASM_X86_MACRO_H_
+#endif // SGEXE_TIME_CHECKER_H_

@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
+ * SlashGaming Game Loader
  * Copyright (C) 2018  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -29,19 +29,21 @@
  *  the game.
  */
 
-#ifndef SGD2GEXE_CONFIG_READER_H_
-#define SGD2GEXE_CONFIG_READER_H_
+#ifndef SGEXE_LIBRARY_INJECTOR_H_
+#define SGEXE_LIBRARY_INJECTOR_H_
 
+#include <windows.h>
 #include <filesystem>
 #include <vector>
 
-namespace sgd2gexe {
+namespace sgexe {
 
-std::vector<std::filesystem::path>
-GetLibraryPaths(
-    void
+bool
+InjectLibraries(
+    const std::vector<std::filesystem::path>& library_paths,
+    const PROCESS_INFORMATION& process_info_ptr
 );
 
-} // namespace sgd2gexe
+} // namespace sgexe
 
-#endif // SGD2GEXE_CONFIG_READER_H_
+#endif // SGEXE_LIBRARY_INJECTOR_H_
