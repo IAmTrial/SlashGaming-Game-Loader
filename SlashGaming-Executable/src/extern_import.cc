@@ -30,6 +30,9 @@
 #include "extern_import.h"
 
 #include <windows.h>
+#include <cstdlib>
+
+#include <boost/format.hpp>
 
 const char* GetGameExecutable(
     HMODULE dll_handle
@@ -41,6 +44,23 @@ const char* GetGameExecutable(
           __func__
       )
   );
+
+  if (func == nullptr) {
+    std::wstring full_message = (
+        boost::wformat(L"GetProcAddress failed in %s, with error code %x.")
+            % __func__
+            % GetLastError()
+    ).str();
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"GetProcAddress Failed",
+        MB_OK | MB_ICONERROR
+    );
+
+    std::exit(0);
+  }
 
   return func();
 }
@@ -55,6 +75,10 @@ const char* GetGameVersionText(
           __func__
       )
   );
+
+  if (func == nullptr) {
+    return "Unidentified Version";
+  }
 
   return func();
 }
