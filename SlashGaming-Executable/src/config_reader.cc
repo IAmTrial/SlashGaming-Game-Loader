@@ -144,7 +144,7 @@ AddMissingEntries(
     entry = kDefaultLibraryLoader;
   }
 
-  if (std::fstream config_stream(config_path, std::ios::out | std::ios::trunc);
+  if (std::ofstream config_stream(config_path);
       config_stream) {
     config_stream << std::setw(4) << config << std::endl;
   } else {
@@ -164,7 +164,7 @@ ReadConfig(
 
   bool is_missing_entry_added = AddMissingEntries(kConfigPath);
   if (!is_missing_entry_added) {
-    return std::vector<std::filesystem::path>();
+    return {};
   }
 
   nlohmann::json config;
