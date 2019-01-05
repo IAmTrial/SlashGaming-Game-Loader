@@ -191,9 +191,16 @@ std::filesystem::path
 GetLibraryLoaderPath(
     void
 ) {
-  nlohmann::json config = GetConfig();
-  std::filesystem::path library_loader_path =
-      config[kInjectDllKey.data()].get<std::string>().data();
+  nlohmann::json& config = GetConfig();
+
+  auto& library_loader_path_entry = config[kMainEntryKey.data()][kInjectDllKey.data()];
+  if (!library_loader_path_entry.is_string()) {
+    library_loader_path_entry = kDefaultLibraryLoader;
+  }
+
+  std::filesystem::path library_loader_path(
+      library_loader_path_entry.get<std::string>()
+  );
 
   return library_loader_path;
 }
