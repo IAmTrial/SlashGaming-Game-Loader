@@ -177,12 +177,11 @@ ReadConfig(
   return config;
 }
 
-nlohmann::json
+nlohmann::json&
 GetConfig(
     void
 ) {
   static nlohmann::json config = ReadConfig();
-
   return config;
 }
 
