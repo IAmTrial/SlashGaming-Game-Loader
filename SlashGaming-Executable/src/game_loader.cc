@@ -30,8 +30,11 @@
 #include "game_loader.h"
 
 #include <windows.h>
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <string>
+#include <string_view>
 
 #include <boost/format.hpp>
 
