@@ -62,10 +62,9 @@ main(
   std::cout << "Game version is: " << game_version_text << std::endl;
 
   // Create a new process.
-  PROCESS_INFORMATION process_info;
   std::filesystem::path game_executable_path =
       GetGameExecutableFileName(dll_handle);
-  StartGame(game_executable_path, &process_info);
+  PROCESS_INFORMATION process_info = StartGame(game_executable_path);
 
   // Inject the library, after reading all files.
   if (InjectLibrary(library_loader_path, process_info)) {

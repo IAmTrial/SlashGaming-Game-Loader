@@ -46,10 +46,9 @@ constexpr std::wstring_view kCreateErrorMessage =
 
 } // namespace
 
-bool
+PROCESS_INFORMATION
 StartGame(
-    std::filesystem::path game_file_path,
-    PROCESS_INFORMATION* process_info_out_ptr
+    std::filesystem::path game_file_path
 ) {
   if (!std::filesystem::exists(game_file_path)) {
     std::wstring full_message = (
@@ -69,6 +68,8 @@ StartGame(
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
+  PROCESS_INFORMATION process_info;
+
   BOOL is_create_process_success = CreateProcessW(
       game_file_path.c_str(),
       GetCommandLineW(),
@@ -79,7 +80,7 @@ StartGame(
       nullptr,
       nullptr,
       &startup_info,
-      process_info_out_ptr
+      &process_info
   );
 
   // Create the desired process.
@@ -100,13 +101,14 @@ StartGame(
   }
 
   // Wait until the process is started.
-  return WaitForInputIdle(process_info_out_ptr->hProcess, INFINITE) == 0;
+  WaitForInputIdle(process_info.hProcess, INFINITE) == 0;
+
+  return process_info;
 }
 
-bool
+PROCESS_INFORMATION
 StartGameSuspended(
-    std::filesystem::path game_file_path,
-    PROCESS_INFORMATION* process_info_out_ptr
+    std::filesystem::path game_file_path
 ) {
   if (!std::filesystem::exists(game_file_path)) {
     MessageBoxW(
@@ -121,6 +123,8 @@ StartGameSuspended(
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
+  PROCESS_INFORMATION process_info;
+
   BOOL is_create_process_success = CreateProcessW(
       game_file_path.c_str(),
       GetCommandLineW(),
@@ -131,7 +135,7 @@ StartGameSuspended(
       nullptr,
       nullptr,
       &startup_info,
-      process_info_out_ptr
+      &process_info
   );
 
   // Create the desired process.
@@ -151,7 +155,7 @@ StartGameSuspended(
     std::exit(0);
   }
 
-  return true;
+  return process_info;
 }
 
 } // namespace sgexe

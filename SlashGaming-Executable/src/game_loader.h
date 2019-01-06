@@ -35,16 +35,14 @@
 
 namespace sgexe {
 
-bool
+PROCESS_INFORMATION
 StartGame(
-    std::filesystem::path game_executable,
-    PROCESS_INFORMATION* process_info_out_ptr
+    std::filesystem::path game_executable
 );
 
-bool
+PROCESS_INFORMATION
 StartGameSuspended(
-    std::filesystem::path game_executable,
-    PROCESS_INFORMATION* process_info_out_ptr
+    std::filesystem::path game_executable
 );
 
 } // namespace sgexe
