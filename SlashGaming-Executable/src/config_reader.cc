@@ -60,7 +60,7 @@ constexpr int kMinorVersionAValue = 0;
 constexpr std::string_view kMinorVersionBKey = "Minor Version B";
 constexpr int kMinorVersionBValue = 0;
 
-constexpr std::string_view kInjectDllKey = "Inject DLL";
+constexpr std::string_view kInjectDllKey = "Library Loader DLL";
 constexpr std::string_view kDefaultLibraryLoader = "LibraryLoader.dll";
 
 void
