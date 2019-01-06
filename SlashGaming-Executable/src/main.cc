@@ -61,8 +61,7 @@ main(
 
   std::cout << "Game version is: " << game_version_text << std::endl;
 
-  // Create a new process, waiting for its full initialization before the
-  // startGame function can return.
+  // Create a new process.
   PROCESS_INFORMATION process_info;
   std::filesystem::path game_executable_path =
       GetGameExecutableFileName(dll_handle);
