@@ -60,7 +60,7 @@ constexpr int kMinorVersionAValue = 0;
 constexpr std::string_view kMinorVersionBKey = "Minor Version B";
 constexpr int kMinorVersionBValue = 0;
 
-constexpr std::string_view kInjectDllKey = "Library Loader DLL";
+constexpr std::string_view kLibraryLoaderDllKey = "Library Loader DLL";
 constexpr std::string_view kDefaultLibraryLoader = "LibraryLoader.dll";
 
 void
@@ -132,7 +132,9 @@ AddMissingEntries(
     return true;
   }
 
-  if (auto& entry = main_entry[kInjectDllKey.data()];
+  // The user's config is less or equal, so add defaults if missing.
+
+  if (auto& entry = main_entry[kLibraryLoaderDllKey.data()];
       !entry.is_string()) {
     entry = kDefaultLibraryLoader;
   }
@@ -186,7 +188,7 @@ GetLibraryLoaderPath(
 ) {
   nlohmann::json& config = GetConfig();
 
-  auto& library_loader_path_entry = config[kMainEntryKey.data()][kInjectDllKey.data()];
+  auto& library_loader_path_entry = config[kMainEntryKey.data()][kLibraryLoaderDllKey.data()];
   if (!library_loader_path_entry.is_string()) {
     library_loader_path_entry = kDefaultLibraryLoader;
   }
