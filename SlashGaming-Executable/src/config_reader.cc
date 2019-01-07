@@ -102,40 +102,33 @@ AddMissingEntries(
   auto& minor_version_a = metadata_entry[kMinorVersionAKey.data()];
   auto& minor_version_b = metadata_entry[kMinorVersionBKey.data()];
 
-  bool is_config_version_smaller = false;
-
   if (!major_version_a.is_number() || major_version_a < kMajorVersionAValue) {
     major_version_a = kMajorVersionAValue;
     major_version_b = 0;
     minor_version_a = 0;
     minor_version_b = 0;
-
-    is_config_version_smaller = true;
+  } else if (major_version_a > kMajorVersionAValue) {
+    return true;
   }
 
   if (!major_version_b.is_number() || major_version_b < kMajorVersionBValue) {
     major_version_b = kMajorVersionBValue;
     minor_version_a = 0;
     minor_version_b = 0;
-
-    is_config_version_smaller = true;
+  } else if (major_version_b > kMajorVersionBValue) {
+    return true;
   }
 
   if (!minor_version_a.is_number() || minor_version_a < kMinorVersionAValue) {
     minor_version_a = kMinorVersionAValue;
     minor_version_b = 0;
-
-    is_config_version_smaller = true;
+  } else if (minor_version_a > kMinorVersionAValue) {
+    return true;
   }
 
   if (!minor_version_b.is_number() || minor_version_b < kMinorVersionBValue) {
     minor_version_b = kMinorVersionBValue;
-
-    is_config_version_smaller = true;
-  }
-
-  // The user's config matches or is smaller, so do not add defaults.
-  if (!is_config_version_smaller) {
+  } else if (minor_version_b > kMinorVersionBValue) {
     return true;
   }
 
