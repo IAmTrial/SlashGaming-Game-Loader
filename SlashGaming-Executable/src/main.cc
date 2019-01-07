@@ -66,6 +66,7 @@ main(
         L"File Not Found",
         MB_OK | MB_ICONERROR
     );
+    std::exit(0);
   }
   HMODULE dll_handle = LoadLibraryW(library_loader_path.c_str());
 
