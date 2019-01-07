@@ -33,6 +33,7 @@
 #include <string_view>
 #include <unordered_set>
 
+#include <boost/format.hpp>
 #include "config_reader.h"
 #include "extern_import.h"
 #include "game_loader.h"
@@ -55,6 +56,17 @@ main(
 
   // Load the injectable library to retrieve necessary information.
   std::filesystem::path library_loader_path = GetLibraryLoaderPath();
+  if (!std::filesystem::exists(library_loader_path)) {
+    MessageBoxW(
+        nullptr,
+        (
+          boost::wformat(L"The file %s could not be found.")
+              % library_loader_path.c_str()
+        ).str().data(),
+        L"File Not Found",
+        MB_OK | MB_ICONERROR
+    );
+  }
   HMODULE dll_handle = LoadLibraryW(library_loader_path.c_str());
 
   const char* game_version_text = GetGameVersionText(dll_handle);
