@@ -57,12 +57,14 @@ main(
   // Load the injectable library to retrieve necessary information.
   std::filesystem::path library_loader_path = GetLibraryLoaderPath();
   if (!std::filesystem::exists(library_loader_path)) {
+    std::wstring full_message = (
+        boost::wformat(L"The file %s could not be found.")
+            % library_loader_path.c_str()
+    ).str();
+
     MessageBoxW(
         nullptr,
-        (
-          boost::wformat(L"The file %s could not be found.")
-              % library_loader_path.c_str()
-        ).str().data(),
+        full_message.data(),
         L"File Not Found",
         MB_OK | MB_ICONERROR
     );
