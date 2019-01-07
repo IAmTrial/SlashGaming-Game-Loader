@@ -104,7 +104,18 @@ StartGame(
   }
 
   // Wait until the process is started.
-  WaitForInputIdle(process_info.hProcess, INFINITE) == 0;
+  HANDLE open_process_result;
+  do {
+    open_process_result = OpenProcess(
+        PROCESS_QUERY_INFORMATION,
+        FALSE,
+        process_info.dwProcessId
+    );
+
+    Sleep(100);
+  } while (open_process_result == nullptr);
+
+  CloseHandle(open_process_result);
 
   return process_info;
 }
