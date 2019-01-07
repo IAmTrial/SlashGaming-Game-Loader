@@ -68,10 +68,10 @@ main(
     );
     std::exit(0);
   }
+
+  // Log the current game version (for users).
   HMODULE dll_handle = LoadLibraryW(library_loader_path.c_str());
-
   const char* game_version_text = GetGameVersionText(dll_handle);
-
   std::cout << "Game version is: " << game_version_text << std::endl;
 
   // Create a new process.
