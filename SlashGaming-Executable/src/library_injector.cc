@@ -64,6 +64,7 @@ FailVirtualFreeExStub(
   ASM_X86(dec ecx)
   ASM_X86(dec esi)
   ASM_X86(inc edi)
+  ASM_X86(add ebp, 1)
   ASM_X86(mov esp, ebp)
   ASM_X86(popad)
   ASM_X86(cmp dword ptr[esp + 0x4], 0)
