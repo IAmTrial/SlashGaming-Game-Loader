@@ -34,7 +34,7 @@
 #ifndef SGEXE_ASM_X86_MACRO_H_
 #define SGEXE_ASM_X86_MACRO_H_
 
-#if defined(_MSVC_LANG)
+#if defined(_MSC_VER)
 
 #define ASM_X86(...) \
     __asm { \
