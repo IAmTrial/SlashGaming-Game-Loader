@@ -231,4 +231,19 @@ InjectLibrary(
   return true;
 }
 
+bool
+InjectLibraries(
+    const std::vector<std::filesystem::path>& libraries_paths,
+    const PROCESS_INFORMATION& process_info
+) {
+  bool is_all_success = true;
+
+  for (const auto& library_path : libraries_paths) {
+    is_all_success = InjectLibrary(library_path, process_info)
+        && is_all_success;
+  }
+
+  return is_all_success;
+}
+
 } // namespace sgexe

@@ -60,8 +60,12 @@ constexpr int kMinorVersionAValue = 0;
 constexpr std::string_view kMinorVersionBKey = "Minor Version B";
 constexpr int kMinorVersionBValue = 0;
 
-constexpr std::string_view kLibraryLoaderDllKey = "Library Loader DLL";
-constexpr std::string_view kDefaultLibraryLoader = "LibraryLoader.dll";
+// Version detector library variable.
+constexpr std::string_view kVersionDetectorLibraryKey = "Library Loader DLL";
+constexpr std::string_view kDefaultVersionDetectorLibraryValue = "LibraryLoader.dll";
+
+// Injected libraries variables.
+constexpr std::string_view kInjectDllsKey = "Inject Dlls";
 
 void
 CreateDefaultConfig(
@@ -134,9 +138,14 @@ AddMissingEntries(
 
   // The user's config is less or equal, so add defaults if missing.
 
-  if (auto& entry = main_entry[kLibraryLoaderDllKey.data()];
+  if (auto& entry = main_entry[kVersionDetectorLibraryKey.data()];
       !entry.is_string()) {
-    entry = kDefaultLibraryLoader;
+    entry = kDefaultVersionDetectorLibraryValue;
+  }
+
+  if (auto& entry = main_entry[kInjectDllsKey.data()];
+      !entry.is_array()) {
+    entry = nlohmann::json::array();
   }
 
   if (std::ofstream config_stream(config_path);
@@ -183,21 +192,45 @@ GetConfig(
 } // namespace
 
 std::filesystem::path
-GetLibraryLoaderPath(
+GetVersionDetectorLibraryPath(
     void
 ) {
   nlohmann::json& config = GetConfig();
 
-  auto& library_loader_path_entry = config[kMainEntryKey.data()][kLibraryLoaderDllKey.data()];
-  if (!library_loader_path_entry.is_string()) {
-    library_loader_path_entry = kDefaultLibraryLoader;
+  auto& version_detector_path_entry =
+      config[kMainEntryKey.data()][kVersionDetectorLibraryKey.data()];
+  if (!version_detector_path_entry.is_string()) {
+    version_detector_path_entry = kDefaultVersionDetectorLibraryValue;
   }
 
-  std::filesystem::path library_loader_path(
-      library_loader_path_entry.get<std::string>()
+  std::filesystem::path version_detector_path(
+      version_detector_path_entry.get<std::string>()
   );
 
-  return library_loader_path;
+  return version_detector_path;
+}
+
+std::vector<std::filesystem::path>
+GetInjectDllsPaths(
+    void
+) {
+  nlohmann::json& config = GetConfig();
+
+  auto& inject_dlls_paths_entry =
+      config[kMainEntryKey.data()][kInjectDllsKey.data()];
+  if (!inject_dlls_paths_entry.is_array()) {
+    inject_dlls_paths_entry = nlohmann::json::array();
+  }
+
+  std::vector inject_dlls_paths_texts =
+      inject_dlls_paths_entry.get<std::vector<std::string>>();
+
+  std::vector<std::filesystem::path> inject_dlls_paths(
+      inject_dlls_paths_texts.cbegin(),
+      inject_dlls_paths_texts.cend()
+  );
+
+  return inject_dlls_paths;
 }
 
 } // namespace sgexe

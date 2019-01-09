@@ -36,7 +36,12 @@
 namespace sgexe {
 
 std::filesystem::path
-GetLibraryLoaderPath(
+GetVersionDetectorLibraryPath(
+    void
+);
+
+std::vector<std::filesystem::path>
+GetInjectDllsPaths(
     void
 );
 

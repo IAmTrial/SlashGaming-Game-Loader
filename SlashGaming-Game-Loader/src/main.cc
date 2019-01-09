@@ -55,11 +55,12 @@ main(
   timechecker::EnforceTimeStamp();
 
   // Load the injectable library to retrieve necessary information.
-  std::filesystem::path library_loader_path = GetLibraryLoaderPath();
-  if (!std::filesystem::exists(library_loader_path)) {
+  std::filesystem::path version_detector_path =
+      GetVersionDetectorLibraryPath();
+  if (!std::filesystem::exists(version_detector_path)) {
     std::wstring full_message = (
         boost::wformat(L"The file %s could not be found.")
-            % library_loader_path.c_str()
+            % version_detector_path.c_str()
     ).str();
 
     MessageBoxW(
@@ -72,8 +73,8 @@ main(
   }
 
   // Log the current game version (for users).
-  HMODULE dll_handle = LoadLibraryW(library_loader_path.c_str());
-  const char* game_version_text = GetGameVersionText(dll_handle);
+  HMODULE dll_handle = LoadLibraryW(version_detector_path.c_str());
+  std::string_view game_version_text = GetGameVersionText(dll_handle);
   std::cout << "Game version is: " << game_version_text << std::endl;
 
   // Create a new process.
@@ -82,7 +83,8 @@ main(
   PROCESS_INFORMATION process_info = StartGame(game_executable_path);
 
   // Inject the library, after reading all files.
-  if (InjectLibrary(library_loader_path, process_info)) {
+  std::vector inject_libraries_paths = GetInjectDllsPaths();
+  if (InjectLibraries(inject_libraries_paths, process_info)) {
     std::cout << "All libraries have been successfully injected." << std::endl;
   } else {
     std::cout << "Some or all libraries failed to inject." << std::endl;

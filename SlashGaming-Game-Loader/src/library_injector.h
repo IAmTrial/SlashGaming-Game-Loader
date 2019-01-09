@@ -42,6 +42,12 @@ InjectLibrary(
     const PROCESS_INFORMATION& process_info
 );
 
+bool
+InjectLibraries(
+    const std::vector<std::filesystem::path>& libraries_paths,
+    const PROCESS_INFORMATION& process_info
+);
+
 } // namespace sgexe
 
 #endif // SGEXE_LIBRARY_INJECTOR_H_
