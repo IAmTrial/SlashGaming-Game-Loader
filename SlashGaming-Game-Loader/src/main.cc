@@ -48,8 +48,12 @@ main(
     int argc,
     const char* argv[]
 ) {
+  // Print the license notice.
   PrintLicenseNotice();
-  std::cout << "----------" << std::endl;
+  for (int i = 0; i < 79; i++) {
+    std::cout << '-';
+  }
+  std::cout << std::endl;
 
   // ShowWindow(GetConsoleWindow(), SW_HIDE);
   timechecker::EnforceTimeStamp();
