@@ -61,8 +61,9 @@ constexpr std::string_view kMinorVersionBKey = "Minor Version B";
 constexpr int kMinorVersionBValue = 0;
 
 // Version detector library variable.
-constexpr std::string_view kVersionDetectorLibraryKey = "Library Loader DLL";
-constexpr std::string_view kDefaultVersionDetectorLibraryValue = "LibraryLoader.dll";
+constexpr std::string_view kVersionDetectorLibraryKey = "Version Detector DLL";
+constexpr std::string_view kDefaultVersionDetectorLibraryValue =
+    "VersionDetector.dll";
 
 // Injected libraries variables.
 constexpr std::string_view kInjectDllsKey = "Inject Dlls";
