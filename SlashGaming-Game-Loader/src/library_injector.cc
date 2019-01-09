@@ -133,8 +133,8 @@ InjectLibrary(
   if (remote_buf == nullptr) {
     std::wstring full_message = (
         boost::wformat(kFunctionFailErrorMessage.data())
-        % "VirtualAllocEx"
-        % GetLastError()
+            % "VirtualAllocEx"
+            % GetLastError()
     ).str();
 
     MessageBoxW(
@@ -158,8 +158,8 @@ InjectLibrary(
     if (!is_free_success) {
       std::wstring full_message = (
           boost::wformat(kFunctionFailErrorMessage.data())
-          % "VirtualFreeEx"
-          % GetLastError()
+              % "VirtualFreeEx"
+              % GetLastError()
       ).str();
 
       FailVirtualFreeExStub(is_free_success);
@@ -185,8 +185,8 @@ InjectLibrary(
   if (!is_write_success) {
     std::wstring full_message = (
         boost::wformat(kFunctionFailErrorMessage.data())
-        % "WriteProcessMemory"
-        % GetLastError()
+            % "WriteProcessMemory"
+            % GetLastError()
     ).str();
 
     MessageBoxW(
@@ -213,8 +213,8 @@ InjectLibrary(
   if (remote_thread_handle == nullptr) {
     std::wstring full_message = (
         boost::wformat(kFunctionFailErrorMessage.data())
-        % "CreateRemoteThread"
-        % GetLastError()
+            % "CreateRemoteThread"
+            % GetLastError()
     ).str();
 
     MessageBoxW(
