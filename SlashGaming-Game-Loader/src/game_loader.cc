@@ -36,6 +36,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/scope_exit.hpp>
 
 namespace sgexe {
 namespace {
@@ -114,7 +115,9 @@ StartGame(
     Sleep(100);
   } while (open_process_result == nullptr);
 
-  CloseHandle(open_process_result);
+  BOOST_SCOPE_EXIT(&open_process_result) {
+    CloseHandle(open_process_result);
+  } BOOST_SCOPE_EXIT_END
 
   return process_info;
 }

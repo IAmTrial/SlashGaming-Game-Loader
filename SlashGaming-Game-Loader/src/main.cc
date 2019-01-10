@@ -34,6 +34,7 @@
 #include <unordered_set>
 
 #include <boost/format.hpp>
+#include <boost/scope_exit.hpp>
 #include "config_reader.h"
 #include "extern_import.h"
 #include "game_loader.h"
@@ -85,6 +86,11 @@ main(
   boost::filesystem::path game_executable_path =
       GetGameExecutableFileName(dll_handle);
   PROCESS_INFORMATION process_info = StartGame(game_executable_path);
+
+  BOOST_SCOPE_EXIT(&process_info) {
+    CloseHandle(process_info.hProcess);
+    CloseHandle(process_info.hThread);
+  } BOOST_SCOPE_EXIT_END
 
   // Inject the library, after reading all files.
   std::vector inject_libraries_paths = config::GetInjectDllsPaths();
