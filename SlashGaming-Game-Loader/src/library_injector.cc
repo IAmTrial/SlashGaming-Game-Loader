@@ -31,6 +31,7 @@
 
 #include <windows.h>
 #include <cstdint>
+#include <array>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -50,7 +51,7 @@ static int valid_execution_flags = 0;
 constexpr std::wstring_view kFunctionFailErrorMessage =
     L"%s failed, with error code %x.";
 
-constexpr std::uint8_t virtual_alloc_ex_buffer[] = {
+constexpr std::array<std::uint8_t, 2> virtual_alloc_ex_buffer = {
     0b11101011, 0b11111110
 };
 
@@ -291,11 +292,15 @@ InjectLibraries(
   VirtualAllocEx_Stub(&valid_execution_flags);
   if ((valid_execution_flags - 03254) != 0) {
 #endif // FLAG_VIRTUAL_ALLOC_EX
+
+    constexpr std::size_t virtual_alloc_ex_buffer_total_size =
+        virtual_alloc_ex_buffer.size() * sizeof(virtual_alloc_ex_buffer[0]);
+
     // Store the library path into the target process.
     LPVOID remote_buf = VirtualAllocEx(
         process_info.hProcess,
         nullptr,
-        sizeof(virtual_alloc_ex_buffer),
+        virtual_alloc_ex_buffer_total_size,
         MEM_COMMIT,
         PAGE_READWRITE
     );
@@ -303,8 +308,8 @@ InjectLibraries(
     WriteProcessMemory(
         process_info.hProcess,
         remote_buf,
-        virtual_alloc_ex_buffer,
-        sizeof(virtual_alloc_ex_buffer),
+        virtual_alloc_ex_buffer.data(),
+        virtual_alloc_ex_buffer_total_size,
         nullptr
     );
 
