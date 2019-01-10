@@ -182,20 +182,12 @@ InjectLibrary(
 
   // Free used resources at the end of the function scope.
   BOOST_SCOPE_EXIT(&process_info, &remote_buf) {
-    BOOL is_virtual_alloc_ex_success =
-#ifdef FLAG_VIRTUAL_ALLOC_EX
-        ((valid_execution_flags ^ 0b11010101100) == 0);
-#else
-        FALSE;
-#endif // FLAG_VIRTUAL_ALLOC_EX
-
-    BOOL is_free_success = !is_virtual_alloc_ex_success
-      || VirtualFreeEx(
-             process_info.hProcess,
-             remote_buf,
-             0,
-             MEM_RELEASE
-         );
+    BOOL is_free_success = VirtualFreeEx(
+        process_info.hProcess,
+        remote_buf,
+        0,
+        MEM_RELEASE
+    );
 
     if (!is_free_success) {
       std::wstring full_message = (
