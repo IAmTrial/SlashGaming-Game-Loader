@@ -31,18 +31,19 @@
 #define SGEXE_GAME_LOADER_H_
 
 #include <windows.h>
-#include <filesystem>
+
+#include <boost/filesystem.hpp>
 
 namespace sgexe {
 
 PROCESS_INFORMATION
 StartGame(
-    std::filesystem::path game_executable
+    const boost::filesystem::path& game_executable
 );
 
 PROCESS_INFORMATION
 StartGameSuspended(
-    std::filesystem::path game_executable
+    const boost::filesystem::path& game_executable
 );
 
 } // namespace sgexe

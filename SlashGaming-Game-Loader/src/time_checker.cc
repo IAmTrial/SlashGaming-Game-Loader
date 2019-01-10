@@ -95,7 +95,7 @@ GetDaysFromDateString(
 
   std::string year_text = matches[3].str();
   std::size_t year_text_size = year_text.length()
-      * sizeof(decltype(year_text)::value_type);
+      * sizeof(year_text[0]);
 
   std::intmax_t year;
   std::from_chars(

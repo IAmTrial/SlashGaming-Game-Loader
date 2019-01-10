@@ -30,17 +30,18 @@
 #ifndef SGEXE_CONFIG_READER_H_
 #define SGEXE_CONFIG_READER_H_
 
-#include <filesystem>
 #include <vector>
+
+#include <boost/filesystem.hpp>
 
 namespace sgexe {
 
-std::filesystem::path
+boost::filesystem::path
 GetVersionDetectorLibraryPath(
     void
 );
 
-std::vector<std::filesystem::path>
+std::vector<boost::filesystem::path>
 GetInjectDllsPaths(
     void
 );

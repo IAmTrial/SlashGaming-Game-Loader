@@ -31,11 +31,10 @@
 
 #include <windows.h>
 #include <cstdlib>
-#include <filesystem>
-#include <iostream>
 #include <string>
 #include <string_view>
 
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 
 namespace sgexe {
@@ -51,9 +50,9 @@ constexpr std::wstring_view kCreateErrorMessage =
 
 PROCESS_INFORMATION
 StartGame(
-    std::filesystem::path game_file_path
+    const boost::filesystem::path& game_file_path
 ) {
-  if (!std::filesystem::exists(game_file_path)) {
+  if (!boost::filesystem::exists(game_file_path)) {
     std::wstring full_message = (
         boost::wformat(kGameFileNotFoundErrorMessage.data())
             % game_file_path
@@ -122,9 +121,9 @@ StartGame(
 
 PROCESS_INFORMATION
 StartGameSuspended(
-    std::filesystem::path game_file_path
+    const boost::filesystem::path& game_file_path
 ) {
-  if (!std::filesystem::exists(game_file_path)) {
+  if (!boost::filesystem::exists(game_file_path)) {
     MessageBoxW(
         nullptr,
         L"Game.exe could not be found.",

@@ -59,9 +59,9 @@ main(
   timechecker::EnforceTimeStamp();
 
   // Load the injectable library to retrieve necessary information.
-  std::filesystem::path version_detector_path =
+  boost::filesystem::path version_detector_path =
       GetVersionDetectorLibraryPath();
-  if (!std::filesystem::exists(version_detector_path)) {
+  if (!boost::filesystem::exists(version_detector_path)) {
     std::wstring full_message = (
         boost::wformat(L"The file %s could not be found.")
             % version_detector_path.c_str()
@@ -82,7 +82,7 @@ main(
   std::cout << "Game version is: " << game_version_text << std::endl;
 
   // Create a new process.
-  std::filesystem::path game_executable_path =
+  boost::filesystem::path game_executable_path =
       GetGameExecutableFileName(dll_handle);
   PROCESS_INFORMATION process_info = StartGame(game_executable_path);
 
