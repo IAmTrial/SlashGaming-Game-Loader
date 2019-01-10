@@ -30,7 +30,7 @@
 #ifndef SGEXE_LICENSE_H_
 #define SGEXE_LICENSE_H_
 
-namespace sgexe {
+namespace sgexe::license {
 
 void
 PrintLicenseNotice(

@@ -38,7 +38,7 @@
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 
-namespace sgexe {
+namespace sgexe::config {
 namespace {
 
 const boost::filesystem::path kConfigPath = "SlashGaming-Config.json";

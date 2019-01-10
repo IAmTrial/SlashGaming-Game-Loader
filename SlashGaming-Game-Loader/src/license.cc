@@ -33,7 +33,7 @@
 #include <iostream>
 #include <string_view>
 
-namespace sgexe {
+namespace sgexe::license {
 namespace {
 
 constexpr const std::array<std::string_view, 19> kLicenseLines = {

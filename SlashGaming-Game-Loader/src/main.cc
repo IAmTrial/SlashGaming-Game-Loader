@@ -49,7 +49,7 @@ main(
     const char* argv[]
 ) {
   // Print the license notice.
-  PrintLicenseNotice();
+  license::PrintLicenseNotice();
   for (int i = 0; i < 79; i++) {
     std::cout << '-';
   }
@@ -60,7 +60,7 @@ main(
 
   // Load the injectable library to retrieve necessary information.
   boost::filesystem::path version_detector_path =
-      GetVersionDetectorLibraryPath();
+      config::GetVersionDetectorLibraryPath();
   if (!boost::filesystem::exists(version_detector_path)) {
     std::wstring full_message = (
         boost::wformat(L"The file %s could not be found.")
@@ -87,7 +87,7 @@ main(
   PROCESS_INFORMATION process_info = StartGame(game_executable_path);
 
   // Inject the library, after reading all files.
-  std::vector inject_libraries_paths = GetInjectDllsPaths();
+  std::vector inject_libraries_paths = config::GetInjectDllsPaths();
   if (InjectLibraries(inject_libraries_paths, process_info)) {
     std::cout << "All libraries have been successfully injected." << std::endl;
   } else {

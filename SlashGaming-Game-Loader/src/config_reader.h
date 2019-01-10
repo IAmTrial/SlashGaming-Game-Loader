@@ -34,7 +34,7 @@
 
 #include <boost/filesystem.hpp>
 
-namespace sgexe {
+namespace sgexe::config {
 
 boost::filesystem::path
 GetVersionDetectorLibraryPath(
