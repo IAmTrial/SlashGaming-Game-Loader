@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * Copyright (C) 2018-2019  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -61,7 +61,7 @@ VS_VERSION_INFO    VERSIONINFO
       VALUE "Developer",        "Mir Drualga\0"
       VALUE "FileDescription",  "SlashGaming Game Loader\0"
       VALUE "InternalName",     "SlashGaming Game Loader\0"
-      VALUE "LegalCopyright",   "Copyright (C) 2018  Mir Drualga\0"
+      VALUE "LegalCopyright",   "Copyright (C) 2018-2019  Mir Drualga\0"
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "PrivateBuild",     "\0"
       VALUE "ProductName",      "SlashGaming Game Loader\0"

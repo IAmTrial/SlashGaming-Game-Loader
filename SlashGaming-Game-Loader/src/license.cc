@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * Copyright (C) 2018-2019  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -38,7 +38,7 @@ namespace {
 
 constexpr const std::array<std::string_view, 19> kLicenseLines = {
     "SlashGaming Game Loader",
-    "Copyright (C) 2018  Mir Drualga",
+    "Copyright (C) 2018-2019  Mir Drualga",
     "",
     "This program is free software: you can redistribute it and/or modify",
     "it under the terms of the GNU Affero General Public License as published",

@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * Copyright (C) 2018-2019  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
