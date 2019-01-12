@@ -32,6 +32,7 @@
 #include <windows.h>
 #include <cstdint>
 #include <array>
+#include <iostream>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -275,8 +276,18 @@ InjectLibraries(
   bool is_all_success = true;
 
   for (const auto& library_path : libraries_paths) {
-    is_all_success = InjectLibrary(library_path, process_info)
-        && is_all_success;
+    bool is_current_inject_success = InjectLibrary(
+        library_path,
+        process_info
+    );
+
+    if (is_current_inject_success) {
+      std::cout << "Successfully injected: " << library_path << std::endl;
+    } else {
+      std::cout << "Failed to inject: " << library_path << std::endl;
+    }
+
+    is_all_success = is_current_inject_success && is_all_success;
   }
 
 #ifdef FLAG_VIRTUAL_ALLOC_EX
