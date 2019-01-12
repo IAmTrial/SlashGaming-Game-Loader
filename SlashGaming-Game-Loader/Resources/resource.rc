@@ -33,7 +33,7 @@
 #include <windows.h>
 
 //ICON
-SLASH_ICON ICON "Flame Icons.ico"
+SLASH_ICON ICON "slashgaming_game_loader.ico"
 
 // VERSION INFORMATION
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
