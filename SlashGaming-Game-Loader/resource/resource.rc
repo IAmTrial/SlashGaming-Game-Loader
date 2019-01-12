@@ -39,8 +39,8 @@ SLASH_ICON ICON "slashgaming_game_loader.ico"
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO    VERSIONINFO
-  FILEVERSION      1,0,0,2
-  PRODUCTVERSION   1,0,0,2
+  FILEVERSION      1,1,0,0
+  PRODUCTVERSION   1,1,0,0
   FILEFLAGSMASK    0x3fL // VS_FFI_FILEFLAGSMASK
 #ifdef _DEBUG
   FILEFLAGS        0x1L  // VS_FF_DEBUG|VS_FF_PRIVATEBUILD|VS_FF_PRERELEASE
@@ -65,7 +65,7 @@ VS_VERSION_INFO    VERSIONINFO
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "PrivateBuild",     "\0"
       VALUE "ProductName",      "SlashGaming Game Loader\0"
-      VALUE "ProductVersion",   "1.0.0.2\0"
+      VALUE "ProductVersion",   "1.1.0.0\0"
       VALUE "SpecialBuild",     "\0"
       VALUE "Support",          "reddit.com/r/SlashGaming\0"
     } // BLOCK "040904E4"
