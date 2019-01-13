@@ -46,7 +46,7 @@
 namespace sgexe {
 namespace {
 
-static int valid_execution_flags = 0;
+int valid_execution_flags = 0;
 
 constexpr std::wstring_view kFunctionFailErrorMessage =
     L"%s failed, with error code %x.";
@@ -55,11 +55,14 @@ constexpr std::array<std::uint8_t, 2> virtual_alloc_ex_buffer = {
     0b11101011, 0b11111110
 };
 
-static bool __declspec(naked)
+__declspec(naked) bool __cdecl
 InjectLibraries_Stub(
     int* flags
 ) {
-  ASM_X86(mov ecx, [esp + 4])
+  ASM_X86(push eax)
+  ASM_X86(push ecx)
+  ASM_X86(push edx)
+  ASM_X86(mov ecx, [esp + 020])
   ASM_X86(test ecx, ecx)
   ASM_X86(sete ch)
   ASM_X86(setne cl)
@@ -87,18 +90,24 @@ InjectLibraries_Stub(
   ASM_X86(mov dword ptr[esi + edi], 640)
   ASM_X86(popad)
   ASM_X86(add esp, 4)
-  ASM_X86(mov eax, dword ptr[esp + 010])
+  ASM_X86(mov eax, dword ptr[esp + 024])
   ASM_X86(mov ecx, dword ptr[esi])
   ASM_X86(or dword ptr[eax], ecx)
   ASM_X86(pop esi)
+  ASM_X86(pop edx)
+  ASM_X86(pop ecx)
+  ASM_X86(pop eax)
   ASM_X86(ret)
 }
 
-__declspec(naked) bool
+__declspec(naked) bool __cdecl
 VirtualAllocEx_Stub(
     int* flags
 ) {
-  ASM_X86(mov edx, [esp + 4])
+  ASM_X86(push eax)
+  ASM_X86(push ecx)
+  ASM_X86(push edx)
+  ASM_X86(mov edx, [esp + 020])
   ASM_X86(test edx, edx)
   ASM_X86(setne al)
   ASM_X86(movsx ecx, al)
@@ -133,10 +142,13 @@ VirtualAllocEx_Stub(
   ASM_X86(add esp, 8)
   ASM_X86(not edx)
 #define FLAG_VIRTUAL_ALLOC_EX
-  ASM_X86(mov eax, dword ptr[esp + 010])
+  ASM_X86(mov eax, dword ptr[esp + 024])
   ASM_X86(lea edx, [edx + 2])
   ASM_X86(or dword ptr[eax], edx)
   ASM_X86(pop edi)
+  ASM_X86(pop edx)
+  ASM_X86(pop ecx)
+  ASM_X86(pop eax)
   ASM_X86(ret)
 }
 
