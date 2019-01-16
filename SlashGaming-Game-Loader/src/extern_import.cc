@@ -52,7 +52,9 @@ GetGameExecutableFileName(
         L"File: %s \n"
         L"Line: %d \n"
         L"GetProcAddress failed in %s, with error code %x.",
-        fmt::to_wstring(__func__).data(),
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        fmt::to_wstring(__func__),
         GetLastError()
     );
 
