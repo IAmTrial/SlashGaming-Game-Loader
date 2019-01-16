@@ -48,7 +48,7 @@
         ".intel_syntax \n" \
         #__VA_ARGS__ " \n" \
         ".att_syntax \n" \
-    )
+    );
 
 #endif
 
