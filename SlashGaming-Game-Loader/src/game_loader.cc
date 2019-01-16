@@ -31,10 +31,10 @@
 
 #include <windows.h>
 #include <cstdlib>
+#include <filesystem>
 #include <string>
 #include <string_view>
 
-#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/scope_exit.hpp>
 
@@ -51,9 +51,9 @@ constexpr std::wstring_view kCreateErrorMessage =
 
 PROCESS_INFORMATION
 StartGame(
-    const boost::filesystem::path& game_file_path
+    const std::filesystem::path& game_file_path
 ) {
-  if (!boost::filesystem::exists(game_file_path)) {
+  if (!std::filesystem::exists(game_file_path)) {
     std::wstring full_message = (
         boost::wformat(kGameFileNotFoundErrorMessage.data())
             % game_file_path
@@ -124,9 +124,9 @@ StartGame(
 
 PROCESS_INFORMATION
 StartGameSuspended(
-    const boost::filesystem::path& game_file_path
+    const std::filesystem::path& game_file_path
 ) {
-  if (!boost::filesystem::exists(game_file_path)) {
+  if (!std::filesystem::exists(game_file_path)) {
     MessageBoxW(
         nullptr,
         L"Game.exe could not be found.",

@@ -32,13 +32,13 @@
 #include <windows.h>
 #include <cstdint>
 #include <array>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
 
-#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/scope_exit.hpp>
 #include "asm_x86_macro.h"
@@ -144,7 +144,7 @@ VirtualAllocEx_Stub(
 
 bool
 InjectLibrary(
-    const boost::filesystem::path& library_path,
+    const std::filesystem::path& library_path,
     const PROCESS_INFORMATION& process_info
 ) {
   // Encode the path to one understood by Windows.
@@ -266,7 +266,7 @@ InjectLibrary(
 
 bool
 InjectLibraries(
-    const std::vector<boost::filesystem::path>& libraries_paths,
+    const std::vector<std::filesystem::path>& libraries_paths,
     const PROCESS_INFORMATION& process_info
 ) {
 #ifdef FLAG_INJECT_LIBRARIES

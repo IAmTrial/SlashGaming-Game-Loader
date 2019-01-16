@@ -29,6 +29,7 @@
 
 #include <windows.h>
 #include <array>
+#include <filesystem>
 #include <iostream>
 #include <string_view>
 #include <unordered_set>
@@ -60,9 +61,9 @@ main(
   timechecker::EnforceTimeStamp();
 
   // Load the injectable library to retrieve necessary information.
-  boost::filesystem::path version_detector_path =
+  std::filesystem::path version_detector_path =
       config::GetVersionDetectorLibraryPath();
-  if (!boost::filesystem::exists(version_detector_path)) {
+  if (!std::filesystem::exists(version_detector_path)) {
     std::wstring full_message = (
         boost::wformat(L"The file %s could not be found.")
             % version_detector_path.c_str()
@@ -83,7 +84,7 @@ main(
   std::cout << "Game version is: " << game_version_text << std::endl;
 
   // Create a new process.
-  boost::filesystem::path game_executable_path =
+  std::filesystem::path game_executable_path =
       GetGameExecutableFileName(dll_handle);
   PROCESS_INFORMATION process_info = StartGame(game_executable_path);
 

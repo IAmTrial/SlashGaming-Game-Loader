@@ -31,21 +31,20 @@
 #define SGEXE_LIBRARY_INJECTOR_H_
 
 #include <windows.h>
+#include <filesystem>
 #include <vector>
-
-#include <boost/filesystem.hpp>
 
 namespace sgexe {
 
 bool
 InjectLibrary(
-    const boost::filesystem::path& library_path,
+    const std::filesystem::path& library_path,
     const PROCESS_INFORMATION& process_info
 );
 
 bool
 InjectLibraries(
-    const std::vector<boost::filesystem::path>& libraries_paths,
+    const std::vector<std::filesystem::path>& libraries_paths,
     const PROCESS_INFORMATION& process_info
 );
 

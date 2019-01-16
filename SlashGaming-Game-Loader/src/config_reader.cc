@@ -30,18 +30,19 @@
 #include "config_reader.h"
 
 #include <windows.h>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 
 namespace sgexe::config {
 namespace {
 
-const boost::filesystem::path kConfigPath = "SlashGaming-Config.json";
+const std::filesystem::path kConfigPath = "SlashGaming-Config.json";
 
 constexpr std::string_view kMainEntryKey = "SlashGaming Game Loader";
 constexpr std::string_view kMetaDataKey = "!!!Metadata (Do not modify)!!!";
@@ -68,18 +69,18 @@ constexpr std::string_view kInjectDllsKey = "Inject Dlls";
 
 void
 CreateDefaultConfig(
-    const boost::filesystem::path& config_file_path
+    const std::filesystem::path& config_file_path
 ) {
-  boost::filesystem::ofstream file_stream(config_file_path);
+  std::ofstream file_stream(config_file_path);
   file_stream << "{}" << std::endl;
 }
 
 bool
 AddMissingEntries(
-    const boost::filesystem::path& config_path
+    const std::filesystem::path& config_path
 ) {
   nlohmann::json config;
-  if (boost::filesystem::ifstream config_stream(config_path);
+  if (std::ifstream config_stream(config_path);
       config_stream) {
     config_stream >> config;
   } else {
@@ -147,7 +148,7 @@ AddMissingEntries(
     entry = nlohmann::json::array();
   }
 
-  if (boost::filesystem::ofstream config_stream(config_path);
+  if (std::ofstream config_stream(config_path);
       config_stream) {
     config_stream << std::setw(4) << config << std::endl;
   } else {
@@ -161,7 +162,7 @@ nlohmann::json
 ReadConfig(
     void
 ) {
-  if (!boost::filesystem::exists(kConfigPath)) {
+  if (!std::filesystem::exists(kConfigPath)) {
     CreateDefaultConfig(kConfigPath);
   }
 
@@ -171,7 +172,7 @@ ReadConfig(
   }
 
   nlohmann::json config;
-  if (boost::filesystem::ifstream config_stream(kConfigPath);
+  if (std::ifstream config_stream(kConfigPath);
       config_stream
   ) {
     config_stream >> config;
@@ -190,7 +191,7 @@ GetConfig(
 
 } // namespace
 
-boost::filesystem::path
+std::filesystem::path
 GetVersionDetectorLibraryPath(
     void
 ) {
@@ -202,14 +203,14 @@ GetVersionDetectorLibraryPath(
     version_detector_path_entry = kDefaultVersionDetectorLibraryValue;
   }
 
-  boost::filesystem::path version_detector_path(
+  std::filesystem::path version_detector_path(
       version_detector_path_entry.get<std::string>()
   );
 
   return version_detector_path;
 }
 
-std::vector<boost::filesystem::path>
+std::vector<std::filesystem::path>
 GetInjectDllsPaths(
     void
 ) {
@@ -224,7 +225,7 @@ GetInjectDllsPaths(
   std::vector inject_dlls_paths_texts =
       inject_dlls_paths_entry.get<std::vector<std::string>>();
 
-  std::vector<boost::filesystem::path> inject_dlls_paths(
+  std::vector<std::filesystem::path> inject_dlls_paths(
       inject_dlls_paths_texts.cbegin(),
       inject_dlls_paths_texts.cend()
   );
