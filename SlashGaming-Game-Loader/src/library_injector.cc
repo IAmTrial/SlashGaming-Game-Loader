@@ -296,9 +296,9 @@ InjectLibraries(
     );
 
     if (is_current_inject_success) {
-      fmt::printf("Successfully injected: %s \n", library_path);
+      fmt::printf(u8"Successfully injected: %s \n", library_path);
     } else {
-      fmt::printf("Failed to inject: %s \n", library_path);
+      fmt::printf(u8"Failed to inject: %s \n", library_path);
     }
 
     is_all_success = is_current_inject_success && is_all_success;

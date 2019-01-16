@@ -42,37 +42,37 @@
 namespace sgexe::config {
 namespace {
 
-const std::filesystem::path kConfigPath = "SlashGaming-Config.json";
+const std::filesystem::path kConfigPath = u8"SlashGaming-Config.json";
 
-constexpr std::string_view kMainEntryKey = "SlashGaming Game Loader";
-constexpr std::string_view kMetaDataKey = "!!!Metadata (Do not modify)!!!";
+constexpr std::string_view kMainEntryKey = u8"SlashGaming Game Loader";
+constexpr std::string_view kMetaDataKey = u8"!!!Metadata (Do not modify)!!!";
 
 // Note that this signifies the last version where the config formatting and
 // entries were updated. These values do not need to change with respect to API
 // file version!
-constexpr std::string_view kMajorVersionAKey = "Major Version A";
+constexpr std::string_view kMajorVersionAKey = u8"Major Version A";
 constexpr int kMajorVersionAValue = 1;
-constexpr std::string_view kMajorVersionBKey = "Major Version B";
+constexpr std::string_view kMajorVersionBKey = u8"Major Version B";
 constexpr int kMajorVersionBValue = 0;
-constexpr std::string_view kMinorVersionAKey = "Minor Version A";
+constexpr std::string_view kMinorVersionAKey = u8"Minor Version A";
 constexpr int kMinorVersionAValue = 0;
-constexpr std::string_view kMinorVersionBKey = "Minor Version B";
+constexpr std::string_view kMinorVersionBKey = u8"Minor Version B";
 constexpr int kMinorVersionBValue = 0;
 
 // Version detector library variable.
-constexpr std::string_view kVersionDetectorLibraryKey = "Version Detector DLL";
+constexpr std::string_view kVersionDetectorLibraryKey = u8"Version Detector DLL";
 constexpr std::string_view kDefaultVersionDetectorLibraryValue =
-    "VersionDetector.dll";
+    u8"VersionDetector.dll";
 
 // Injected libraries variables.
-constexpr std::string_view kInjectDllsKey = "Inject Dlls";
+constexpr std::string_view kInjectDllsKey = u8"Inject Dlls";
 
 void
 CreateDefaultConfig(
     const std::filesystem::path& config_file_path
 ) {
   std::ofstream file_stream(config_file_path);
-  file_stream << "{}" << std::endl;
+  file_stream << u8"{}" << std::endl;
 }
 
 bool
