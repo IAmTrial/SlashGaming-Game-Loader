@@ -28,6 +28,7 @@
  */
 
 #include <windows.h>
+#include <clocale>
 #include <array>
 #include <filesystem>
 #include <iostream>
@@ -50,6 +51,8 @@ main(
     int argc,
     const char* argv[]
 ) {
+  std::setlocale(LC_ALL, "en_US.UTF-8");
+
   // Print the license notice.
   license::PrintLicenseNotice();
   for (int i = 0; i < 79; i++) {
