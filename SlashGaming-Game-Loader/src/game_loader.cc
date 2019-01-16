@@ -35,7 +35,8 @@
 #include <string>
 #include <string_view>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 #include <boost/scope_exit.hpp>
 
 namespace sgexe {
@@ -45,6 +46,8 @@ constexpr std::wstring_view kGameFileNotFoundErrorMessage =
     L"%s could not be found.";
 
 constexpr std::wstring_view kCreateErrorMessage =
+    L"File: %s \n"
+    L"Line: %d \n"
     L"%s could not be started, with error code %x.";
 
 } // namespace
@@ -54,10 +57,10 @@ StartGame(
     const std::filesystem::path& game_file_path
 ) {
   if (!std::filesystem::exists(game_file_path)) {
-    std::wstring full_message = (
-        boost::wformat(kGameFileNotFoundErrorMessage.data())
-            % game_file_path
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kGameFileNotFoundErrorMessage,
+        game_file_path
+    );
 
     MessageBoxW(
         nullptr,
@@ -88,11 +91,13 @@ StartGame(
 
   // Create the desired process.
   if (!is_create_process_success) {
-    std::wstring full_message = (
-        boost::wformat(kCreateErrorMessage.data())
-            % game_file_path.c_str()
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kCreateErrorMessage,
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        game_file_path,
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,
@@ -127,9 +132,14 @@ StartGameSuspended(
     const std::filesystem::path& game_file_path
 ) {
   if (!std::filesystem::exists(game_file_path)) {
+    std::wstring full_message = fmt::sprintf(
+        kGameFileNotFoundErrorMessage,
+        game_file_path
+    );
+
     MessageBoxW(
         nullptr,
-        L"Game.exe could not be found.",
+        full_message.data(),
         L"Game Executable Not Found",
         MB_OK | MB_ICONERROR
     );
@@ -156,11 +166,13 @@ StartGameSuspended(
 
   // Create the desired process.
   if (!is_create_process_success) {
-    std::wstring full_message = (
-        boost::wformat(kCreateErrorMessage.data())
-            % game_file_path.c_str()
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kCreateErrorMessage,
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        game_file_path,
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,

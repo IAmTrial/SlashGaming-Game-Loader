@@ -30,8 +30,9 @@
 #include "license.h"
 
 #include <array>
-#include <iostream>
 #include <string_view>
+
+#include <fmt/printf.h>
 
 namespace sgexe::license {
 namespace {
@@ -65,7 +66,7 @@ PrintLicenseNotice(
     void
 ) {
   for (const auto& line : kLicenseLines) {
-    std::cout << line << std::endl;
+    fmt::printf("%s \n", line);
   }
 }
 

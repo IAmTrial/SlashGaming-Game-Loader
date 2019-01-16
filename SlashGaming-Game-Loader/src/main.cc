@@ -31,11 +31,10 @@
 #include <clocale>
 #include <array>
 #include <filesystem>
-#include <iostream>
 #include <string_view>
 #include <unordered_set>
 
-#include <boost/format.hpp>
+#include <fmt/printf.h>
 #include <boost/scope_exit.hpp>
 #include "config_reader.h"
 #include "extern_import.h"
@@ -56,9 +55,9 @@ main(
   // Print the license notice.
   license::PrintLicenseNotice();
   for (int i = 0; i < 79; i++) {
-    std::cout << '-';
+    fmt::printf(u8"-");
   }
-  std::cout << std::endl;
+  fmt::printf(u8"\n");
 
   // ShowWindow(GetConsoleWindow(), SW_HIDE);
   timechecker::EnforceTimeStamp();
@@ -67,10 +66,10 @@ main(
   std::filesystem::path version_detector_path =
       config::GetVersionDetectorLibraryPath();
   if (!std::filesystem::exists(version_detector_path)) {
-    std::wstring full_message = (
-        boost::wformat(L"The file %s could not be found.")
-            % version_detector_path.c_str()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        L"The file %s could not be found.",
+        version_detector_path
+    );
 
     MessageBoxW(
         nullptr,
@@ -84,7 +83,7 @@ main(
   // Log the current game version (for users).
   HMODULE dll_handle = LoadLibraryW(version_detector_path.c_str());
   std::string_view game_version_text = GetGameVersionText(dll_handle);
-  std::cout << "Game version is: " << game_version_text << std::endl;
+  fmt::printf(u8"Game version is: %s \n", game_version_text);
 
   // Create a new process.
   std::filesystem::path game_executable_path =
@@ -99,9 +98,9 @@ main(
   // Inject the library, after reading all files.
   std::vector inject_libraries_paths = config::GetInjectDllsPaths();
   if (InjectLibraries(inject_libraries_paths, process_info)) {
-    std::cout << "All libraries have been successfully injected." << std::endl;
+    fmt::printf(u8"All libraries have been successfully injected. \n");
   } else {
-    std::cout << "Some or all libraries failed to inject." << std::endl;
+    fmt::printf(u8"Some or all libraries failed to inject. \n");
   }
 
   Sleep(500);

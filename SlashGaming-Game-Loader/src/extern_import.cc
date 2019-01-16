@@ -32,9 +32,11 @@
 #include <windows.h>
 #include <cstdlib>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 
-const char* GetGameExecutableFileName(
+const char*
+GetGameExecutableFileName(
     HMODULE dll_handle
 ) {
   using FuncType = const char*(*)(void);
@@ -46,11 +48,13 @@ const char* GetGameExecutableFileName(
   );
 
   if (func == nullptr) {
-    std::wstring full_message = (
-        boost::wformat(L"GetProcAddress failed in %s, with error code %x.")
-            % __func__
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        L"File: %s \n"
+        L"Line: %d \n"
+        L"GetProcAddress failed in %s, with error code %x.",
+        fmt::to_wstring(__func__).data(),
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,
@@ -65,7 +69,8 @@ const char* GetGameExecutableFileName(
   return func();
 }
 
-const char* GetGameVersionText(
+const char*
+GetGameVersionText(
     HMODULE dll_handle
 ) {
   using FuncType = const char*(*)(void);
@@ -77,7 +82,7 @@ const char* GetGameVersionText(
   );
 
   if (func == nullptr) {
-    return "Unidentified Version";
+    return u8"Unidentified Version";
   }
 
   return func();

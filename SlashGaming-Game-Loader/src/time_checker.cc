@@ -33,14 +33,14 @@
 #include <cstdint>
 #include <charconv>
 #include <chrono>
-#include <iostream>
 #include <ratio>
 #include <regex>
 #include <string_view>
 #include <utility>
 
+#include <fmt/format.h>
+#include <fmt/printf.h>
 #include <boost/bimap.hpp>
-#include <boost/format.hpp>
 
 namespace sgexe::timechecker {
 
@@ -143,14 +143,14 @@ EnforceTimeStamp(
     return;
   }
 
-  std::string full_message_01 = (
-      boost::format(kTimestampMessage01.data())
-          % kAllowedMonthDifference
-          % kCompilationDate
-  ).str();
+  std::string full_message_01 = fmt::sprintf(
+      kTimestampMessage01,
+      kAllowedMonthDifference,
+      kCompilationDate
+  );
 
-  std::cout << full_message_01 << std::endl;
-  std::cout << kTimestampMessage02 << std::endl << std::endl;
+  fmt::printf("%s \n", full_message_01);
+  fmt::printf("%s \n \n", kTimestampMessage02);
 
   if (!IsExecutionPermitted()) {
     MessageBoxW(

@@ -33,13 +33,13 @@
 #include <cstdint>
 #include <array>
 #include <filesystem>
-#include <iostream>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 #include <boost/scope_exit.hpp>
 #include "asm_x86_macro.h"
 
@@ -49,6 +49,8 @@ namespace {
 int valid_execution_flags = 0;
 
 constexpr std::wstring_view kFunctionFailErrorMessage =
+    L"File: %s \n"
+    L"Line: %d \n"
     L"%s failed, with error code %x.";
 
 constexpr std::array<std::uint8_t, 2> virtual_alloc_ex_buffer = {
@@ -177,11 +179,11 @@ InjectLibrary(
   );
 
   if (remote_buf == nullptr) {
-    std::wstring full_message = (
-        boost::wformat(kFunctionFailErrorMessage.data())
-            % "VirtualAllocEx"
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kFunctionFailErrorMessage.data(),
+        L"VirtualAllocEx",
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,
@@ -202,11 +204,11 @@ InjectLibrary(
     );
 
     if (!is_free_success) {
-      std::wstring full_message = (
-          boost::wformat(kFunctionFailErrorMessage.data())
-              % "VirtualFreeEx"
-              % GetLastError()
-      ).str();
+      std::wstring full_message = fmt::sprintf(
+          kFunctionFailErrorMessage.data(),
+          L"VirtualFreeEx",
+          GetLastError()
+      );
 
       MessageBoxW(
           nullptr,
@@ -228,11 +230,11 @@ InjectLibrary(
   );
 
   if (!is_write_success) {
-    std::wstring full_message = (
-        boost::wformat(kFunctionFailErrorMessage.data())
-            % "WriteProcessMemory"
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kFunctionFailErrorMessage.data(),
+        L"WriteProcessMemory",
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,
@@ -256,11 +258,11 @@ InjectLibrary(
   );
 
   if (remote_thread_handle == nullptr) {
-    std::wstring full_message = (
-        boost::wformat(kFunctionFailErrorMessage.data())
-            % "CreateRemoteThread"
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kFunctionFailErrorMessage.data(),
+        L"CreateRemoteThread",
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,
@@ -294,9 +296,9 @@ InjectLibraries(
     );
 
     if (is_current_inject_success) {
-      std::cout << "Successfully injected: " << library_path << std::endl;
+      fmt::printf("Successfully injected: %s \n", library_path);
     } else {
-      std::cout << "Failed to inject: " << library_path << std::endl;
+      fmt::printf("Failed to inject: %s \n", library_path);
     }
 
     is_all_success = is_current_inject_success && is_all_success;
