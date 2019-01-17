@@ -44,6 +44,13 @@ namespace {
 
 const std::filesystem::path kConfigPath = u8"SlashGaming-Config.json";
 
+// Global config entries.
+constexpr std::string_view kGlobalEntryKey = u8"!!!Globals!!!";
+
+constexpr std::string_view kConfigTabWidth = u8"Config Tab Width";
+constexpr int kDefaultConfigTabWidthValue = 4;
+
+// Main config entries.
 constexpr std::string_view kMainEntryKey = u8"SlashGaming Game Loader";
 constexpr std::string_view kMetaDataKey = u8"!!!Metadata (Do not modify)!!!";
 
@@ -85,6 +92,11 @@ AddMissingEntries(
     config_stream >> config;
   } else {
     return false;
+  }
+
+  auto& global_entry = config[kGlobalEntryKey.data()];
+  if (!global_entry.is_object()) {
+    global_entry = {};
   }
 
   auto& main_entry = config[kMainEntryKey.data()];
@@ -138,6 +150,11 @@ AddMissingEntries(
 
   // The user's config is less or equal, so add defaults if missing.
 
+  if (auto& entry = global_entry[kConfigTabWidth.data()];
+      !entry.is_number()) {
+    entry = kDefaultConfigTabWidthValue;
+  }
+
   if (auto& entry = main_entry[kVersionDetectorLibraryKey.data()];
       !entry.is_string()) {
     entry = kDefaultVersionDetectorLibraryValue;
@@ -150,7 +167,9 @@ AddMissingEntries(
 
   if (std::ofstream config_stream(config_path);
       config_stream) {
-    config_stream << std::setw(4) << config << std::endl;
+    config_stream << std::setw(global_entry[kConfigTabWidth.data()])
+        << config
+        << std::endl;
   } else {
     return false;
   }
