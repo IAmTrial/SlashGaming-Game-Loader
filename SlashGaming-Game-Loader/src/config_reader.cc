@@ -226,8 +226,8 @@ GetInjectDllsPaths(
       inject_dlls_paths_entry.get<std::vector<std::string>>();
 
   std::vector<std::filesystem::path> inject_dlls_paths(
-      inject_dlls_paths_texts.cbegin(),
-      inject_dlls_paths_texts.cend()
+      std::make_move_iterator(inject_dlls_paths_texts.begin()),
+      std::make_move_iterator(inject_dlls_paths_texts.end())
   );
 
   return inject_dlls_paths;
