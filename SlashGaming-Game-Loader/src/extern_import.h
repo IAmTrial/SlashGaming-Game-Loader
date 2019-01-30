@@ -31,13 +31,26 @@
 #define SGEXE_EXTERN_IMPORT_H_
 
 #include <windows.h>
+#include <filesystem>
+#include <string>
 
-const char* GetGameExecutableFileName(
+namespace sgexe {
+
+std::filesystem::path
+GetGameExecutableFilePath(
     HMODULE dll_handle
 );
 
-const char* GetGameVersionText(
+std::string
+GetGameName(
     HMODULE dll_handle
 );
+
+std::string
+GetGameVersionText(
+    HMODULE dll_handle
+);
+
+} // namespace sgd2exe
 
 #endif // SGEXE_EXTERN_IMPORT_H_

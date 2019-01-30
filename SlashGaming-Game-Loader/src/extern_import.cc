@@ -31,23 +31,33 @@
 
 #include <windows.h>
 #include <cstdlib>
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <fmt/format.h>
 #include <fmt/printf.h>
 
-const char*
-GetGameExecutableFileName(
+namespace sgexe {
+
+std::filesystem::path
+GetGameExecutableFilePath(
     HMODULE dll_handle
 ) {
-  using FuncType = const char*(*)(void);
-  static FuncType func = reinterpret_cast<FuncType>(
-      GetProcAddress(
-          dll_handle,
-          __func__
-      )
-  );
+  using GetFileNameFuncType = char*(*)(char[]);
+  using GetFileNameSizeFuncType = std::size_t(*)(void);
 
-  if (func == nullptr) {
+  // Initialize the function pointers.
+  static GetFileNameFuncType get_file_name_func =
+      reinterpret_cast<GetFileNameFuncType>(
+          GetProcAddress(
+              dll_handle,
+              "GetGameExecutableFilePath"
+          )
+      );
+
+  if (get_file_name_func == nullptr) {
     std::wstring full_message = fmt::sprintf(
         L"File: %s \n"
         L"Line: %d \n"
@@ -68,24 +78,129 @@ GetGameExecutableFileName(
     std::exit(0);
   }
 
-  return func();
+  static GetFileNameSizeFuncType get_file_name_size_func =
+      reinterpret_cast<GetFileNameSizeFuncType>(
+          GetProcAddress(
+              dll_handle,
+              "GetGameExecutableFilePathSize"
+          )
+      );
+
+  if (get_file_name_size_func == nullptr) {
+    std::wstring full_message = fmt::sprintf(
+        L"File: %s \n"
+        L"Line: %d \n"
+        L"GetProcAddress failed in %s, with error code %x.",
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        fmt::to_wstring(__func__),
+        GetLastError()
+    );
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"GetProcAddress Failed",
+        MB_OK | MB_ICONERROR
+    );
+
+    std::exit(0);
+  }
+
+  // Call the functions.
+  std::unique_ptr buffer = std::make_unique<char[]>(
+      get_file_name_size_func()
+  );
+
+  get_file_name_func(buffer.get());
+
+  return buffer.get();
 }
 
-const char*
+std::string
+GetGameName(
+    HMODULE dll_handle
+) {
+  using GetGameNameFuncType = char*(*)(char*);
+  using GetGameNameSizeFuncType = std::size_t(*)(void);
+
+  // Initialize the function pointers.
+  static GetGameNameFuncType get_name_func =
+      reinterpret_cast<GetGameNameFuncType>(
+          GetProcAddress(
+              dll_handle,
+              "GetGameName"
+          )
+      );
+
+  if (get_name_func == nullptr) {
+    return u8"Unidentified Game";
+  }
+
+  static GetGameNameSizeFuncType get_name_size_func =
+      reinterpret_cast<GetGameNameSizeFuncType>(
+          GetProcAddress(
+              dll_handle,
+              "GetGameNameSize"
+          )
+      );
+
+  if (get_name_size_func == nullptr) {
+    return u8"Unidentified Game";
+  }
+
+  // Call the functions.
+  std::string game_name(
+      get_name_size_func() - 1,
+      '\0'
+  );
+
+  get_name_func(game_name.data());
+
+  return game_name;
+}
+
+std::string
 GetGameVersionText(
     HMODULE dll_handle
 ) {
-  using FuncType = const char*(*)(void);
-  static FuncType func = reinterpret_cast<FuncType>(
-      GetProcAddress(
-          dll_handle,
-          __func__
-      )
-  );
+  using GetTextFuncType = char*(*)(char*);
+  using GetTextSizeFuncType = std::size_t(*)(void);
 
-  if (func == nullptr) {
+  // Initialize the function pointers.
+  static GetTextFuncType get_text_func =
+      reinterpret_cast<GetTextFuncType>(
+          GetProcAddress(
+              dll_handle,
+              "GetGameVersionText"
+          )
+      );
+
+  if (get_text_func == nullptr) {
     return u8"Unidentified Version";
   }
 
-  return func();
+  static GetTextSizeFuncType get_text_size_func =
+      reinterpret_cast<GetTextSizeFuncType>(
+          GetProcAddress(
+              dll_handle,
+              "GetGameVersionTextSize"
+          )
+      );
+
+  if (get_text_size_func == nullptr) {
+    return u8"Unidentified Version";
+  }
+
+  // Call the functions.
+  std::string game_version_text(
+      get_text_size_func() - 1,
+      '\0'
+  );
+
+  get_text_func(game_version_text.data());
+
+  return game_version_text;
 }
+
+} // namespace sgexe

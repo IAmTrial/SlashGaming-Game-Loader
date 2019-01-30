@@ -31,6 +31,7 @@
 #include <clocale>
 #include <array>
 #include <filesystem>
+#include <string>
 #include <string_view>
 #include <unordered_set>
 
@@ -80,14 +81,19 @@ main(
     std::exit(0);
   }
 
-  // Log the current game version (for users).
+  // Log the game and current game version (for users).
   HMODULE dll_handle = LoadLibraryW(version_detector_path.c_str());
-  std::string_view game_version_text = GetGameVersionText(dll_handle);
-  fmt::printf(u8"Game version is: %s \n", game_version_text);
+  std::string game_name = GetGameName(dll_handle);
+  std::string game_version_text = GetGameVersionText(dll_handle);
+  fmt::printf(
+      u8"Loading \"%s\", Version %s \n",
+      game_name,
+      game_version_text
+  );
 
   // Create a new process.
   std::filesystem::path game_executable_path =
-      GetGameExecutableFileName(dll_handle);
+      GetGameExecutableFilePath(dll_handle);
   PROCESS_INFORMATION process_info = StartGame(game_executable_path);
 
   BOOST_SCOPE_EXIT(&process_info) {
