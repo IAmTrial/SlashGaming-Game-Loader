@@ -32,12 +32,15 @@
 #include <windows.h>
 #include <filesystem>
 #include <fstream>
-#include <iomanip>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/rapidjson.h>
 
 namespace sgexe::config {
 namespace {
@@ -86,27 +89,29 @@ bool
 AddMissingEntries(
     const std::filesystem::path& config_path
 ) {
-  nlohmann::json config;
+  rapidjson::Document config;
+
   if (std::ifstream config_stream(config_path);
       config_stream) {
-    config_stream >> config;
+    rapidjson::IStreamWrapper config_reader(config_stream);
+    config.ParseStream(config_reader);
   } else {
     return false;
   }
 
   auto& global_entry = config[kGlobalEntryKey.data()];
-  if (!global_entry.is_object()) {
-    global_entry = {};
+  if (!global_entry.IsObject()) {
+    global_entry.SetObject();
   }
 
   auto& main_entry = config[kMainEntryKey.data()];
-  if (!main_entry.is_object()) {
-    main_entry = {};
+  if (!main_entry.IsObject()) {
+    main_entry.SetObject();
   }
 
   auto& metadata_entry = main_entry[kMetaDataKey.data()];
-  if (!metadata_entry.is_object()) {
-    metadata_entry = {};
+  if (!metadata_entry.IsObject()) {
+    metadata_entry.SetObject();
   }
 
   // Check that the actual config version is less than or equal to the expected
@@ -118,58 +123,60 @@ AddMissingEntries(
   auto& minor_version_a = metadata_entry[kMinorVersionAKey.data()];
   auto& minor_version_b = metadata_entry[kMinorVersionBKey.data()];
 
-  if (!major_version_a.is_number() || major_version_a < kMajorVersionAValue) {
-    major_version_a = kMajorVersionAValue;
-    major_version_b = 0;
-    minor_version_a = 0;
-    minor_version_b = 0;
-  } else if (major_version_a > kMajorVersionAValue) {
+  if (!major_version_a.IsInt() || major_version_a.GetInt() < kMajorVersionAValue) {
+    major_version_a.SetInt(kMajorVersionAValue);
+    major_version_b.SetInt(0);
+    minor_version_a.SetInt(0);
+    minor_version_b.SetInt(0);
+  } else if (major_version_a.GetInt() > kMajorVersionAValue) {
     return true;
   }
 
-  if (!major_version_b.is_number() || major_version_b < kMajorVersionBValue) {
-    major_version_b = kMajorVersionBValue;
-    minor_version_a = 0;
-    minor_version_b = 0;
-  } else if (major_version_b > kMajorVersionBValue) {
+  if (!major_version_b.IsInt() || major_version_b.GetInt() < kMajorVersionBValue) {
+    major_version_b.SetInt(kMajorVersionBValue);
+    minor_version_a.SetInt(0);
+    minor_version_b.SetInt(0);
+  } else if (major_version_b.GetInt() > kMajorVersionBValue) {
     return true;
   }
 
-  if (!minor_version_a.is_number() || minor_version_a < kMinorVersionAValue) {
-    minor_version_a = kMinorVersionAValue;
-    minor_version_b = 0;
-  } else if (minor_version_a > kMinorVersionAValue) {
+  if (!minor_version_a.IsInt() || minor_version_a.GetInt() < kMinorVersionAValue) {
+    minor_version_a.SetInt(kMinorVersionAValue);
+    minor_version_b.SetInt(0);
+  } else if (minor_version_a.GetInt() > kMinorVersionAValue) {
     return true;
   }
 
-  if (!minor_version_b.is_number() || minor_version_b < kMinorVersionBValue) {
-    minor_version_b = kMinorVersionBValue;
-  } else if (minor_version_b > kMinorVersionBValue) {
+  if (!minor_version_b.IsInt() || minor_version_b.GetInt() < kMinorVersionBValue) {
+    minor_version_b.SetInt(kMinorVersionBValue);
+  } else if (minor_version_b.GetInt() > kMinorVersionBValue) {
     return true;
   }
 
   // The user's config is less or equal, so add defaults if missing.
 
   if (auto& entry = global_entry[kConfigTabWidth.data()];
-      !entry.is_number()) {
-    entry = kDefaultConfigTabWidthValue;
+      !entry.IsInt()) {
+    entry.SetInt(kDefaultConfigTabWidthValue);
   }
 
   if (auto& entry = main_entry[kVersionDetectorLibraryKey.data()];
-      !entry.is_string()) {
-    entry = kDefaultVersionDetectorLibraryValue;
+      !entry.IsString()) {
+    entry.SetString(rapidjson::StringRef(kDefaultVersionDetectorLibraryValue.data()));
   }
 
   if (auto& entry = main_entry[kInjectDllsKey.data()];
-      !entry.is_array()) {
-    entry = nlohmann::json::array();
+      !entry.IsArray()) {
+    entry.SetArray();
   }
 
   if (std::ofstream config_stream(config_path);
       config_stream) {
-    config_stream << std::setw(global_entry[kConfigTabWidth.data()])
-        << config
-        << std::endl;
+    rapidjson::OStreamWrapper config_writer(config_stream);
+    rapidjson::PrettyWriter pretty_config_writer(config_writer);
+    pretty_config_writer.SetIndent('\t', global_entry[kConfigTabWidth.data()].GetInt());
+
+    config.Accept(pretty_config_writer);
   } else {
     return false;
   }
@@ -177,7 +184,7 @@ AddMissingEntries(
   return true;
 }
 
-nlohmann::json
+rapidjson::Document
 ReadConfig(
     void
 ) {
@@ -190,21 +197,22 @@ ReadConfig(
     return {};
   }
 
-  nlohmann::json config;
+  rapidjson::Document config;
   if (std::ifstream config_stream(kConfigPath);
       config_stream
   ) {
-    config_stream >> config;
+    rapidjson::IStreamWrapper config_reader(config_stream);
+    config.ParseStream(config_reader);
   }
 
   return config;
 }
 
-nlohmann::json&
+rapidjson::Document&
 GetConfig(
     void
 ) {
-  static nlohmann::json config = ReadConfig();
+  static rapidjson::Document config = ReadConfig();
   return config;
 }
 
@@ -214,16 +222,16 @@ std::filesystem::path
 GetVersionDetectorLibraryPath(
     void
 ) {
-  nlohmann::json& config = GetConfig();
+  rapidjson::Document& config = GetConfig();
 
   auto& version_detector_path_entry =
       config[kMainEntryKey.data()][kVersionDetectorLibraryKey.data()];
-  if (!version_detector_path_entry.is_string()) {
-    version_detector_path_entry = kDefaultVersionDetectorLibraryValue;
+  if (!version_detector_path_entry.IsString()) {
+    version_detector_path_entry.SetString(rapidjson::StringRef(kDefaultVersionDetectorLibraryValue.data()));
   }
 
   std::filesystem::path version_detector_path(
-      version_detector_path_entry.get<std::string>()
+      version_detector_path_entry.GetString()
   );
 
   return version_detector_path;
@@ -233,21 +241,21 @@ std::vector<std::filesystem::path>
 GetInjectDllsPaths(
     void
 ) {
-  nlohmann::json& config = GetConfig();
+  rapidjson::Document& config = GetConfig();
 
   auto& inject_dlls_paths_entry =
       config[kMainEntryKey.data()][kInjectDllsKey.data()];
-  if (!inject_dlls_paths_entry.is_array()) {
-    inject_dlls_paths_entry = nlohmann::json::array();
+  if (!inject_dlls_paths_entry.IsArray()) {
+    inject_dlls_paths_entry.SetArray();
   }
 
-  std::vector inject_dlls_paths_texts =
-      inject_dlls_paths_entry.get<std::vector<std::string>>();
+  auto inject_dlls_paths_texts_entry = inject_dlls_paths_entry.GetArray();
 
-  std::vector<std::filesystem::path> inject_dlls_paths(
-      std::make_move_iterator(inject_dlls_paths_texts.begin()),
-      std::make_move_iterator(inject_dlls_paths_texts.end())
-  );
+  std::vector<std::filesystem::path> inject_dlls_paths;
+
+  for (const auto& raw_dll_path_entry : inject_dlls_paths_texts_entry) {
+    inject_dlls_paths.push_back(raw_dll_path_entry.GetString());
+  }
 
   return inject_dlls_paths;
 }
