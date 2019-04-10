@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <charconv>
 #include <chrono>
+#include <map>
 #include <ratio>
 #include <regex>
 #include <string_view>
@@ -40,7 +41,6 @@
 
 #include <fmt/format.h>
 #include <fmt/printf.h>
-#include <boost/bimap.hpp>
 
 namespace sgexe::timechecker {
 
@@ -48,7 +48,7 @@ using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
 namespace {
 
-using MonthNameAndValueBimapType = boost::bimap<std::string_view, int>;
+using ValueByMonthNameMap = std::map<std::string_view, int>;
 
 constexpr std::string_view kTimestampMessage01 =
     "Timestamp is enforced, meaning that this program will cease "
@@ -58,23 +58,17 @@ constexpr std::string_view kTimestampMessage02 =
     "This means that you have received a version of this "
     "program not meant for public release.";
 
-const boost::bimap<std::string_view, int>&
-GetMonthNameAndValueBimap(
+const ValueByMonthNameMap&
+GetValueByMonthName(
     void
 ) {
-  static const std::array<MonthNameAndValueBimapType::value_type, 12>
-      month_name_and_value_pairs = { {
+  static const ValueByMonthNameMap values_by_month_names = {
           { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 },
           { "May", 4 }, { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 },
           { "Sep", 8 }, { "Oct", 9 }, { "Nov", 10 }, { "Dec", 11 }
-      } };
+      };
 
-  static const MonthNameAndValueBimapType month_name_and_values_bimap(
-      month_name_and_value_pairs.begin(),
-      month_name_and_value_pairs.end()
-  );
-
-  return month_name_and_values_bimap;
+  return values_by_month_names;
 }
 
 MonthsDuration
@@ -89,7 +83,7 @@ GetDaysFromDateString(
   }
 
   // Calculate number of months from epoch time (Jan 1, 1970).
-  int month = GetMonthNameAndValueBimap().left.at(
+  int month = GetValueByMonthName().at(
       matches[1].str()
   );
 
