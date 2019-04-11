@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * SlashGaming Game Loader
+ * Copyright (C) 2018-2019  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -21,42 +21,46 @@
  *  section 7
  *
  *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II (or a modified version of that game and its
- *  libraries), containing parts covered by the terms of Blizzard End User
- *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.  This additional permission is
- *  also extended to any combination of expansions, mods, and remasters of
- *  the game.
+ *  it with any program (or a modified version of that program and its
+ *  libraries), containing parts covered by the terms of an incompatible
+ *  license, the licensors of this Program grant you additional permission
+ *  to convey the resulting work.
  */
 
 #include "game_loader.h"
 
 #include <windows.h>
+#include <cstdlib>
 #include <filesystem>
-#include <iostream>
+#include <string>
+#include <string_view>
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/printf.h>
+#include <boost/scope_exit.hpp>
 
-namespace sgd2gexe {
+namespace sgexe {
 namespace {
 
 constexpr std::wstring_view kGameFileNotFoundErrorMessage =
     L"%s could not be found.";
 
 constexpr std::wstring_view kCreateErrorMessage =
+    L"File: %s \n"
+    L"Line: %d \n"
     L"%s could not be started, with error code %x.";
 
 } // namespace
 
-bool
+PROCESS_INFORMATION
 StartGame(
-    PROCESS_INFORMATION* process_info_out_ptr
+    const std::filesystem::path& game_file_path
 ) {
-  if (!std::filesystem::exists(kGameFilePath)) {
-    std::wstring full_message = (
-        boost::wformat(kGameFileNotFoundErrorMessage.data())
-            % kGameFilePath
-    ).str();
+  if (!std::filesystem::exists(game_file_path)) {
+    std::wstring full_message = fmt::sprintf(
+        kGameFileNotFoundErrorMessage,
+        game_file_path
+    );
 
     MessageBoxW(
         nullptr,
@@ -70,8 +74,10 @@ StartGame(
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
+  PROCESS_INFORMATION process_info;
+
   BOOL is_create_process_success = CreateProcessW(
-      kGameFilePath.c_str(),
+      game_file_path.c_str(),
       GetCommandLineW(),
       nullptr,
       nullptr,
@@ -80,16 +86,18 @@ StartGame(
       nullptr,
       nullptr,
       &startup_info,
-      process_info_out_ptr
+      &process_info
   );
 
   // Create the desired process.
   if (!is_create_process_success) {
-    std::wstring full_message = (
-        boost::wformat(kCreateErrorMessage.data())
-            % kGameFilePath.c_str()
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kCreateErrorMessage,
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        game_file_path,
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,
@@ -101,14 +109,37 @@ StartGame(
   }
 
   // Wait until the process is started.
-  return WaitForInputIdle(process_info_out_ptr->hProcess, INFINITE) == 0;
+  HANDLE open_process_result;
+  do {
+    open_process_result = OpenProcess(
+        PROCESS_QUERY_INFORMATION,
+        FALSE,
+        process_info.dwProcessId
+    );
+
+    Sleep(100);
+  } while (open_process_result == nullptr);
+
+  BOOST_SCOPE_EXIT(&open_process_result) {
+    CloseHandle(open_process_result);
+  } BOOST_SCOPE_EXIT_END
+
+  return process_info;
 }
 
-bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
-  if (!std::filesystem::exists(kGameFilePath)) {
+PROCESS_INFORMATION
+StartGameSuspended(
+    const std::filesystem::path& game_file_path
+) {
+  if (!std::filesystem::exists(game_file_path)) {
+    std::wstring full_message = fmt::sprintf(
+        kGameFileNotFoundErrorMessage,
+        game_file_path
+    );
+
     MessageBoxW(
         nullptr,
-        L"Game.exe could not be found.",
+        full_message.data(),
         L"Game Executable Not Found",
         MB_OK | MB_ICONERROR
     );
@@ -118,8 +149,10 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
   STARTUPINFOW startup_info = { };
   startup_info.cb = sizeof(startup_info);
 
+  PROCESS_INFORMATION process_info;
+
   BOOL is_create_process_success = CreateProcessW(
-      kGameFilePath.c_str(),
+      game_file_path.c_str(),
       GetCommandLineW(),
       nullptr,
       nullptr,
@@ -128,16 +161,18 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
       nullptr,
       nullptr,
       &startup_info,
-      process_info_out_ptr
+      &process_info
   );
 
   // Create the desired process.
   if (!is_create_process_success) {
-    std::wstring full_message = (
-        boost::wformat(kCreateErrorMessage.data())
-            % kGameFilePath.c_str()
-            % GetLastError()
-    ).str();
+    std::wstring full_message = fmt::sprintf(
+        kCreateErrorMessage,
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        game_file_path,
+        GetLastError()
+    );
 
     MessageBoxW(
         nullptr,
@@ -148,7 +183,7 @@ bool StartGameSuspended(PROCESS_INFORMATION* process_info_out_ptr) {
     std::exit(0);
   }
 
-  return true;
+  return process_info;
 }
 
-} // namespace sgd2gexe
+} // namespace sgexe

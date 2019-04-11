@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * SlashGaming Game Loader
+ * Copyright (C) 2018-2019  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -21,28 +21,26 @@
  *  section 7
  *
  *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II (or a modified version of that game and its
- *  libraries), containing parts covered by the terms of Blizzard End User
- *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.  This additional permission is
- *  also extended to any combination of expansions, mods, and remasters of
- *  the game.
+ *  it with any program (or a modified version of that program and its
+ *  libraries), containing parts covered by the terms of an incompatible
+ *  license, the licensors of this Program grant you additional permission
+ *  to convey the resulting work.
  */
 
-#ifndef SGD2GEXE_RESOURCE_RC_
-#define SGD2GEXE_RESOURCE_RC_
+#ifndef SGEXE_RESOURCE_RC_
+#define SGEXE_RESOURCE_RC_
 
 #include <windows.h>
 
 //ICON
-SLASH_ICON ICON "Flame Icons.ico"
+SLASH_ICON ICON "slashgaming_game_loader.ico"
 
 // VERSION INFORMATION
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO    VERSIONINFO
-  FILEVERSION      1,0,0,2
-  PRODUCTVERSION   1,0,0,2
+  FILEVERSION      1,1,0,0
+  PRODUCTVERSION   1,1,0,0
   FILEFLAGSMASK    0x3fL // VS_FFI_FILEFLAGSMASK
 #ifdef _DEBUG
   FILEFLAGS        0x1L  // VS_FF_DEBUG|VS_FF_PRIVATEBUILD|VS_FF_PRERELEASE
@@ -57,19 +55,19 @@ VS_VERSION_INFO    VERSIONINFO
   {
     BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
     {
-      VALUE "Build",            "2018\0"
-      VALUE "Comments",         "Licensed under Affero GPL v3+.\0"
+      VALUE "Build",            "2019\0"
+      VALUE "Comments",         "Licensed under Affero GPL v3+. Loads target process and injects DLLs.\0"
       VALUE "CompanyName",      "SlashGaming\0"
       VALUE "Developer",        "Mir Drualga\0"
-      VALUE "FileDescription",  "Loads Game.exe and injects DLL files.\0"
-      VALUE "InternalName",     "D2 Game Loader\0"
-      VALUE "LegalCopyright",   "Copyright (C) 2018  Mir Drualga\0"
+      VALUE "FileDescription",  "SlashGaming Game Loader\0"
+      VALUE "InternalName",     "SlashGaming Game Loader\0"
+      VALUE "LegalCopyright",   "Copyright (C) 2018-2019  Mir Drualga\0"
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "PrivateBuild",     "\0"
-      VALUE "ProductName",      "SlashGaming Diablo II Game Loader\0"
-      VALUE "ProductVersion",   "1.0.0.2\0"
+      VALUE "ProductName",      "SlashGaming Game Loader\0"
+      VALUE "ProductVersion",   "1.1.0.0\0"
       VALUE "SpecialBuild",     "\0"
-      VALUE "Support",          "reddit.com/r/SlashDiablo\0"
+      VALUE "Support",          "reddit.com/r/SlashGaming\0"
     } // BLOCK "040904E4"
   } // BLOCK "StringFileInfo"
   BLOCK "VarFileInfo"
@@ -78,4 +76,4 @@ VS_VERSION_INFO    VERSIONINFO
   } // BLOCK "VarFileInfo"
 }
 
-#endif // SGD2GEXE_RESOURCE_RC_
+#endif // SGEXE_RESOURCE_RC_

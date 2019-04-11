@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * SlashGaming Game Loader
+ * Copyright (C) 2018-2019  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -21,30 +21,22 @@
  *  section 7
  *
  *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II (or a modified version of that game and its
- *  libraries), containing parts covered by the terms of Blizzard End User
- *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.  This additional permission is
- *  also extended to any combination of expansions, mods, and remasters of
- *  the game.
+ *  it with any program (or a modified version of that program and its
+ *  libraries), containing parts covered by the terms of an incompatible
+ *  license, the licensors of this Program grant you additional permission
+ *  to convey the resulting work.
  */
 
-#ifndef SGD2GEXE_TIME_CHECKER_H_
-#define SGD2GEXE_TIME_CHECKER_H_
+#ifndef SGEXE_LICENSE_H_
+#define SGEXE_LICENSE_H_
 
-#include <string_view>
-
-namespace sgd2gexe::timechecker {
-
-constexpr bool kIsEnforceTimestamp = false;
-constexpr std::string_view kCompilationDate = __DATE__;
-constexpr int kAllowedMonthDifference = 1;
+namespace sgexe::license {
 
 void
-EnforceTimeStamp(
+PrintLicenseNotice(
     void
 );
 
-} // namespace sgd2gexe::timechecker
+} // namespace sgexe
 
-#endif // SGD2GEXE_TIME_CHECKER_H_
+#endif  // SGEXE_LICENSE_H_

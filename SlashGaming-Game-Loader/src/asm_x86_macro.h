@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * SlashGaming Game Loader
+ * Copyright (C) 2018-2019  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -21,22 +21,20 @@
  *  section 7
  *
  *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II (or a modified version of that game and its
- *  libraries), containing parts covered by the terms of Blizzard End User
- *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.  This additional permission is
- *  also extended to any combination of expansions, mods, and remasters of
- *  the game.
+ *  it with any program (or a modified version of that program and its
+ *  libraries), containing parts covered by the terms of an incompatible
+ *  license, the licensors of this Program grant you additional permission
+ *  to convey the resulting work.
  */
 
 /**
  * Warning: This header should never be used in any public interface!
  */
 
-#ifndef SGD2GEXE_ASM_X86_MACRO_H_
-#define SGD2GEXE_ASM_X86_MACRO_H_
+#ifndef SGEXE_ASM_X86_MACRO_H_
+#define SGEXE_ASM_X86_MACRO_H_
 
-#if defined(_MSVC_LANG)
+#if defined(_MSC_VER)
 
 #define ASM_X86(...) \
     __asm { \
@@ -46,12 +44,12 @@
 #else
 
 #define ASM_X86(...) \
-    asm(
+    asm( \
         ".intel_syntax \n" \
-        #__VA_ARGS__ "\n" \
+        #__VA_ARGS__ " \n" \
         ".att_syntax \n" \
-    )
+    );
 
 #endif
 
-#endif // SGD2GEXE_ASM_X86_MACRO_H_
+#endif // SGEXE_ASM_X86_MACRO_H_

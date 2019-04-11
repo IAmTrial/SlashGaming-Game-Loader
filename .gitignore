@@ -3,6 +3,7 @@
 *.so
 *.a
 *.def
+*.res
 
 *.o
 *.obj

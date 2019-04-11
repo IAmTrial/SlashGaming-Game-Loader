@@ -1,8 +1,8 @@
 /**
- * SlashGaming Diablo II Game Loader
- * Copyright (C) 2018  Mir Drualga
+ * SlashGaming Game Loader
+ * Copyright (C) 2018-2019  Mir Drualga
  *
- * This file is part of SlashGaming Diablo II Game Loader.
+ * This file is part of SlashGaming Game Loader.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as published
@@ -21,12 +21,10 @@
  *  section 7
  *
  *  If you modify this Program, or any covered work, by linking or combining
- *  it with Diablo II (or a modified version of that game and its
- *  libraries), containing parts covered by the terms of Blizzard End User
- *  License Agreement, the licensors of this Program grant you additional
- *  permission to convey the resulting work.  This additional permission is
- *  also extended to any combination of expansions, mods, and remasters of
- *  the game.
+ *  it with any program (or a modified version of that program and its
+ *  libraries), containing parts covered by the terms of an incompatible
+ *  license, the licensors of this Program grant you additional permission
+ *  to convey the resulting work.
  */
 
 #include "time_checker.h"
@@ -35,22 +33,22 @@
 #include <cstdint>
 #include <charconv>
 #include <chrono>
-#include <iostream>
+#include <map>
 #include <ratio>
 #include <regex>
 #include <string_view>
 #include <utility>
 
-#include <boost/bimap.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 
-namespace sgd2gexe::timechecker {
+namespace sgexe::timechecker {
 
 using MonthsDuration = std::chrono::duration<intmax_t, std::ratio<2629746>>;
 
 namespace {
 
-using MonthNameAndValueBimapType = boost::bimap<std::string_view, int>;
+using ValueByMonthNameMap = std::map<std::string_view, int>;
 
 constexpr std::string_view kTimestampMessage01 =
     "Timestamp is enforced, meaning that this program will cease "
@@ -60,23 +58,17 @@ constexpr std::string_view kTimestampMessage02 =
     "This means that you have received a version of this "
     "program not meant for public release.";
 
-const boost::bimap<std::string_view, int>&
-GetMonthNameAndValueBimap(
+const ValueByMonthNameMap&
+GetValueByMonthName(
     void
 ) {
-  static const std::array<MonthNameAndValueBimapType::value_type, 12>
-      month_name_and_value_pairs = { {
+  static const ValueByMonthNameMap values_by_month_names = {
           { "Jan", 0 }, { "Feb", 1 }, { "Mar", 2 }, { "Apr", 3 },
           { "May", 4 }, { "Jun", 5 }, { "Jul", 6 }, { "Aug", 7 },
           { "Sep", 8 }, { "Oct", 9 }, { "Nov", 10 }, { "Dec", 11 }
-      } };
+      };
 
-  static const MonthNameAndValueBimapType month_name_and_values_bimap(
-      month_name_and_value_pairs.begin(),
-      month_name_and_value_pairs.end()
-  );
-
-  return month_name_and_values_bimap;
+  return values_by_month_names;
 }
 
 MonthsDuration
@@ -91,13 +83,13 @@ GetDaysFromDateString(
   }
 
   // Calculate number of months from epoch time (Jan 1, 1970).
-  int month = GetMonthNameAndValueBimap().left.at(
+  int month = GetValueByMonthName().at(
       matches[1].str()
   );
 
   std::string year_text = matches[3].str();
   std::size_t year_text_size = year_text.length()
-      * sizeof(decltype(year_text)::value_type);
+      * sizeof(year_text[0]);
 
   std::intmax_t year;
   std::from_chars(
@@ -145,14 +137,14 @@ EnforceTimeStamp(
     return;
   }
 
-  std::string full_message_01 = (
-      boost::format(kTimestampMessage01.data())
-          % kAllowedMonthDifference
-          % kCompilationDate
-  ).str();
+  std::string full_message_01 = fmt::sprintf(
+      kTimestampMessage01,
+      kAllowedMonthDifference,
+      kCompilationDate
+  );
 
-  std::cout << full_message_01 << std::endl;
-  std::cout << kTimestampMessage02 << std::endl << std::endl;
+  fmt::printf("%s \n", full_message_01);
+  fmt::printf("%s \n \n", kTimestampMessage02);
 
   if (!IsExecutionPermitted()) {
     MessageBoxW(
@@ -166,4 +158,4 @@ EnforceTimeStamp(
   }
 }
 
-} // namespace sgd2gexe
+} // namespace sgexe
