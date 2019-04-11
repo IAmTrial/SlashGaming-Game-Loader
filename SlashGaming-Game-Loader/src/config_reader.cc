@@ -36,6 +36,7 @@
 #include <string_view>
 #include <vector>
 
+#include <fmt/printf.h>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/ostreamwrapper.h>
@@ -99,82 +100,157 @@ AddMissingEntries(
     return false;
   }
 
+  // Get the global entry.
+  if (!config.HasMember(kGlobalEntryKey.data())
+      || !config[kGlobalEntryKey.data()].IsObject()) {
+    config.AddMember(
+        rapidjson::StringRef(kGlobalEntryKey.data()),
+        rapidjson::Value(rapidjson::kObjectType),
+        config.GetAllocator()
+    );
+  }
+
   auto& global_entry = config[kGlobalEntryKey.data()];
-  if (!global_entry.IsObject()) {
-    global_entry.SetObject();
+
+  // Get the main entry.
+  if (!config.HasMember(kMainEntryKey.data())
+      || !config[kMainEntryKey.data()].IsObject()) {
+    config.AddMember(
+        rapidjson::StringRef(kMainEntryKey.data()),
+        rapidjson::Value(rapidjson::kObjectType),
+        config.GetAllocator()
+    );
   }
 
   auto& main_entry = config[kMainEntryKey.data()];
-  if (!main_entry.IsObject()) {
-    main_entry.SetObject();
+
+  // Get the metadata entry.
+  if (!main_entry.HasMember(kMetaDataKey.data())
+      || !main_entry[kMetaDataKey.data()].IsObject()) {
+    main_entry.AddMember(
+        rapidjson::StringRef(kMetaDataKey.data()),
+        rapidjson::Value(rapidjson::Value(rapidjson::kObjectType)),
+        config.GetAllocator()
+    );
   }
 
   auto& metadata_entry = main_entry[kMetaDataKey.data()];
-  if (!metadata_entry.IsObject()) {
-    metadata_entry.SetObject();
-  }
 
   // Check that the actual config version is less than or equal to the expected
   // config version. If the actual is larger, then do not add any new entries.
   // If there are any breaking config changes, then the program will most
   // likely crash.
-  auto& major_version_a = metadata_entry[kMajorVersionAKey.data()];
-  auto& major_version_b = metadata_entry[kMajorVersionBKey.data()];
-  auto& minor_version_a = metadata_entry[kMinorVersionAKey.data()];
-  auto& minor_version_b = metadata_entry[kMinorVersionBKey.data()];
-
-  if (!major_version_a.IsInt() || major_version_a.GetInt() < kMajorVersionAValue) {
-    major_version_a.SetInt(kMajorVersionAValue);
-    major_version_b.SetInt(0);
-    minor_version_a.SetInt(0);
-    minor_version_b.SetInt(0);
-  } else if (major_version_a.GetInt() > kMajorVersionAValue) {
+  if (!metadata_entry.HasMember(kMajorVersionAKey.data())
+      || !metadata_entry[kMajorVersionAKey.data()].IsInt()
+      || metadata_entry[kMajorVersionAKey.data()].GetInt() < kMajorVersionAValue) {
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMajorVersionAKey.data()),
+        rapidjson::Value(kMajorVersionAValue),
+        config.GetAllocator()
+    );
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMajorVersionBKey.data()),
+        rapidjson::Value(0),
+        config.GetAllocator()
+    );
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMinorVersionAKey.data()),
+        rapidjson::Value(0),
+        config.GetAllocator()
+    );
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMinorVersionBKey.data()),
+        rapidjson::Value(0),
+        config.GetAllocator()
+    );
+  } else if (metadata_entry[kMajorVersionAKey.data()].GetInt() > kMajorVersionAValue) {
     return true;
   }
 
-  if (!major_version_b.IsInt() || major_version_b.GetInt() < kMajorVersionBValue) {
-    major_version_b.SetInt(kMajorVersionBValue);
-    minor_version_a.SetInt(0);
-    minor_version_b.SetInt(0);
-  } else if (major_version_b.GetInt() > kMajorVersionBValue) {
+  if (!metadata_entry.HasMember(kMajorVersionBKey.data())
+      || !metadata_entry[kMajorVersionBKey.data()].IsInt()
+      || metadata_entry[kMajorVersionBKey.data()].GetInt() < kMajorVersionBValue) {
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMajorVersionBKey.data()),
+        rapidjson::Value(kMajorVersionBValue),
+        config.GetAllocator()
+    );
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMinorVersionAKey.data()),
+        rapidjson::Value(0),
+        config.GetAllocator()
+    );
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMinorVersionBKey.data()),
+        rapidjson::Value(0),
+        config.GetAllocator()
+    );
+  } else if (metadata_entry[kMajorVersionBKey.data()].GetInt() > kMajorVersionBValue) {
     return true;
   }
 
-  if (!minor_version_a.IsInt() || minor_version_a.GetInt() < kMinorVersionAValue) {
-    minor_version_a.SetInt(kMinorVersionAValue);
-    minor_version_b.SetInt(0);
-  } else if (minor_version_a.GetInt() > kMinorVersionAValue) {
+  if (!metadata_entry.HasMember(kMinorVersionAKey.data())
+      || !metadata_entry[kMinorVersionAKey.data()].IsInt()
+      || metadata_entry[kMinorVersionAKey.data()].GetInt() < kMinorVersionAValue) {
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMinorVersionAKey.data()),
+        rapidjson::Value(kMinorVersionAValue),
+        config.GetAllocator()
+    );
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMinorVersionBKey.data()),
+        rapidjson::Value(0),
+        config.GetAllocator()
+    );
+  } else if (metadata_entry[kMinorVersionAKey.data()].GetInt() > kMinorVersionAValue) {
     return true;
   }
 
-  if (!minor_version_b.IsInt() || minor_version_b.GetInt() < kMinorVersionBValue) {
-    minor_version_b.SetInt(kMinorVersionBValue);
-  } else if (minor_version_b.GetInt() > kMinorVersionBValue) {
+  if (!metadata_entry.HasMember(kMinorVersionBKey.data())
+      || !metadata_entry[kMinorVersionBKey.data()].IsInt()
+      || metadata_entry[kMinorVersionBKey.data()].GetInt() < kMinorVersionBValue) {
+    metadata_entry.AddMember(
+        rapidjson::StringRef(kMinorVersionBKey.data()),
+        rapidjson::Value(kMinorVersionBValue),
+        config.GetAllocator()
+    );
+  } else if (metadata_entry[kMinorVersionBKey.data()].GetInt() > kMinorVersionBValue) {
     return true;
   }
 
   // The user's config is less or equal, so add defaults if missing.
-
-  if (auto& entry = global_entry[kConfigTabWidth.data()];
-      !entry.IsInt()) {
-    entry.SetInt(kDefaultConfigTabWidthValue);
+  if (!global_entry.HasMember(kConfigTabWidth.data())
+      || !global_entry[kConfigTabWidth.data()].IsInt()) {
+    global_entry.AddMember(
+        rapidjson::StringRef(kConfigTabWidth.data()),
+        rapidjson::Value(kDefaultConfigTabWidthValue),
+        config.GetAllocator()
+    );
   }
 
-  if (auto& entry = main_entry[kVersionDetectorLibraryKey.data()];
-      !entry.IsString()) {
-    entry.SetString(rapidjson::StringRef(kDefaultVersionDetectorLibraryValue.data()));
+  if (!main_entry.HasMember(kVersionDetectorLibraryKey.data())
+      || !main_entry[kVersionDetectorLibraryKey.data()].IsString()) {
+    main_entry.AddMember(
+        rapidjson::StringRef(kVersionDetectorLibraryKey.data()),
+        rapidjson::Value(rapidjson::StringRef(kDefaultVersionDetectorLibraryValue.data())),
+        config.GetAllocator()
+    );
   }
 
-  if (auto& entry = main_entry[kInjectDllsKey.data()];
-      !entry.IsArray()) {
-    entry.SetArray();
+  if (!main_entry.HasMember(kInjectDllsKey.data())
+      || !main_entry[kInjectDllsKey.data()].IsArray()) {
+    main_entry.AddMember(
+        rapidjson::StringRef(kInjectDllsKey.data()),
+        rapidjson::Value(rapidjson::kArrayType),
+        config.GetAllocator()
+    );
   }
 
   if (std::ofstream config_stream(config_path);
       config_stream) {
     rapidjson::OStreamWrapper config_writer(config_stream);
     rapidjson::PrettyWriter pretty_config_writer(config_writer);
-    pretty_config_writer.SetIndent('\t', global_entry[kConfigTabWidth.data()].GetInt());
+    pretty_config_writer.SetIndent(' ', global_entry[kConfigTabWidth.data()].GetInt());
 
     config.Accept(pretty_config_writer);
   } else {
