@@ -94,7 +94,7 @@ main(
   // Create a new process.
   std::filesystem::path game_executable_path =
       GetGameExecutableFilePath(dll_handle);
-  PROCESS_INFORMATION process_info = StartGame(game_executable_path);
+  PROCESS_INFORMATION process_info = StartGameSuspended(game_executable_path);
 
   BOOST_SCOPE_EXIT(&process_info) {
     CloseHandle(process_info.hProcess);
@@ -108,6 +108,9 @@ main(
   } else {
     fmt::printf(u8"Some or all libraries failed to inject. \n");
   }
+
+  // Resume process.
+  ResumeThread(process_info.hThread);
 
   Sleep(500);
 
