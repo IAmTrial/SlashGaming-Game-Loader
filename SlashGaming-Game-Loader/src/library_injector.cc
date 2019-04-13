@@ -275,7 +275,48 @@ InjectLibrary(
     return false;
   }
 
-  WaitForSingleObject(remote_thread_handle, INFINITE);
+  DWORD wait_return_value = WaitForSingleObject(remote_thread_handle, INFINITE);
+  if (wait_return_value == 0xFFFFFFFF) {
+    std::wstring full_message = fmt::sprintf(
+        kFunctionFailErrorMessage.data(),
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        L"WaitForSingleObject",
+        GetLastError()
+    );
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"WaitForSingleObject Failed",
+        MB_OK | MB_ICONERROR
+    );
+    return false;
+  }
+
+  DWORD thread_exit_code;
+  BOOL is_get_exit_code_thread_success = GetExitCodeThread(
+      remote_thread_handle,
+      &thread_exit_code
+  );
+
+  if (!is_get_exit_code_thread_success) {
+    std::wstring full_message = fmt::sprintf(
+        kFunctionFailErrorMessage.data(),
+        fmt::to_wstring(__FILE__),
+        __LINE__,
+        L"GetExitCodeThread",
+        GetLastError()
+    );
+
+    MessageBoxW(
+        nullptr,
+        full_message.data(),
+        L"GetExitCodeThread Failed",
+        MB_OK | MB_ICONERROR
+    );
+    return false;
+  }
 
   return true;
 }
