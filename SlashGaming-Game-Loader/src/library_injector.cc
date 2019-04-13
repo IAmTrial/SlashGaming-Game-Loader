@@ -260,6 +260,8 @@ InjectLibrary(
   if (remote_thread_handle == nullptr) {
     std::wstring full_message = fmt::sprintf(
         kFunctionFailErrorMessage.data(),
+        fmt::to_wstring(__FILE__),
+        __LINE__,
         L"CreateRemoteThread",
         GetLastError()
     );
