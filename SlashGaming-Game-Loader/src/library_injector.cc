@@ -42,6 +42,7 @@
 #include <fmt/printf.h>
 #include <boost/scope_exit.hpp>
 #include "asm_x86_macro.h"
+#include "wide_macro.h"
 
 namespace sgexe {
 namespace {
@@ -51,6 +52,7 @@ int valid_execution_flags = 0;
 constexpr std::wstring_view kFunctionFailErrorMessage =
     L"File: %s \n"
     L"Line: %d \n"
+    L"\n"
     L"%s failed, with error code %x.";
 
 constexpr std::array<std::uint8_t, 2> virtual_alloc_ex_buffer = {
@@ -180,7 +182,9 @@ InjectLibrary(
 
   if (remote_buf == nullptr) {
     std::wstring full_message = fmt::sprintf(
-        kFunctionFailErrorMessage.data(),
+        kFunctionFailErrorMessage,
+        __FILEW__,
+        __LINE__,
         L"VirtualAllocEx",
         GetLastError()
     );
@@ -205,7 +209,9 @@ InjectLibrary(
 
     if (!is_free_success) {
       std::wstring full_message = fmt::sprintf(
-          kFunctionFailErrorMessage.data(),
+          kFunctionFailErrorMessage,
+          __FILEW__,
+          __LINE__,
           L"VirtualFreeEx",
           GetLastError()
       );
@@ -232,6 +238,8 @@ InjectLibrary(
   if (!is_write_success) {
     std::wstring full_message = fmt::sprintf(
         kFunctionFailErrorMessage.data(),
+        __FILEW__,
+        __LINE__,
         L"WriteProcessMemory",
         GetLastError()
     );
@@ -260,7 +268,7 @@ InjectLibrary(
   if (remote_thread_handle == nullptr) {
     std::wstring full_message = fmt::sprintf(
         kFunctionFailErrorMessage.data(),
-        fmt::to_wstring(__FILE__),
+        __FILEW__,
         __LINE__,
         L"CreateRemoteThread",
         GetLastError()
@@ -279,7 +287,7 @@ InjectLibrary(
   if (wait_return_value == 0xFFFFFFFF) {
     std::wstring full_message = fmt::sprintf(
         kFunctionFailErrorMessage.data(),
-        fmt::to_wstring(__FILE__),
+        __FILEW__,
         __LINE__,
         L"WaitForSingleObject",
         GetLastError()
@@ -303,7 +311,7 @@ InjectLibrary(
   if (!is_get_exit_code_thread_success) {
     std::wstring full_message = fmt::sprintf(
         kFunctionFailErrorMessage.data(),
-        fmt::to_wstring(__FILE__),
+        __FILEW__,
         __LINE__,
         L"GetExitCodeThread",
         GetLastError()

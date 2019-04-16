@@ -38,6 +38,7 @@
 #include <fmt/format.h>
 #include <fmt/printf.h>
 #include <boost/scope_exit.hpp>
+#include "wide_macro.h"
 
 namespace sgexe {
 namespace {
@@ -48,6 +49,7 @@ constexpr std::wstring_view kGameFileNotFoundErrorMessage =
 constexpr std::wstring_view kCreateErrorMessage =
     L"File: %s \n"
     L"Line: %d \n"
+    L"\n"
     L"%s could not be started, with error code %x.";
 
 } // namespace
@@ -93,7 +95,7 @@ StartGame(
   if (!is_create_process_success) {
     std::wstring full_message = fmt::sprintf(
         kCreateErrorMessage,
-        fmt::to_wstring(__FILE__),
+        __FILEW__,
         __LINE__,
         game_file_path,
         GetLastError()
@@ -168,7 +170,7 @@ StartGameSuspended(
   if (!is_create_process_success) {
     std::wstring full_message = fmt::sprintf(
         kCreateErrorMessage,
-        fmt::to_wstring(__FILE__),
+        __FILEW__,
         __LINE__,
         game_file_path,
         GetLastError()
