@@ -218,9 +218,10 @@ AddMissingEntries(
     return true;
   }
 
-  // The user's config is less or equal, so add defaults if missing.
+  // The user's config version is less or equal, so add defaults if missing.
   if (!global_entry.HasMember(kConfigTabWidth.data())
-      || !global_entry[kConfigTabWidth.data()].IsInt()) {
+      || !global_entry[kConfigTabWidth.data()].IsInt()
+      || global_entry[kConfigTabWidth.data()].GetInt() < 0) {
     global_entry.AddMember(
         rapidjson::StringRef(kConfigTabWidth.data()),
         rapidjson::Value(kDefaultConfigTabWidthValue),
