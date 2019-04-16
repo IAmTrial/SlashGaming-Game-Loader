@@ -38,8 +38,18 @@
 
 #include <fmt/format.h>
 #include <fmt/printf.h>
+#include "wide_macro.h"
 
 namespace sgexe {
+namespace {
+
+constexpr std::wstring_view kFunctionFailErrorMessage =
+    L"File: %s \n"
+    L"Line: %d \n"
+    L"\n"
+    L"%s failed to get %s, with error code %x.";
+
+} // namespace
 
 std::filesystem::path
 GetGameExecutableFilePath(
@@ -59,12 +69,11 @@ GetGameExecutableFilePath(
 
   if (get_file_name_func == nullptr) {
     std::wstring full_message = fmt::sprintf(
-        L"File: %s \n"
-        L"Line: %d \n"
-        L"GetProcAddress failed in %s, with error code %x.",
-        fmt::to_wstring(__FILE__),
+        kFunctionFailErrorMessage,
+        __FILEW__,
         __LINE__,
-        fmt::to_wstring(__func__),
+        L"GetProcAddress",
+        L"GetGameExecutableFilePath",
         GetLastError()
     );
 
@@ -88,12 +97,11 @@ GetGameExecutableFilePath(
 
   if (get_file_name_size_func == nullptr) {
     std::wstring full_message = fmt::sprintf(
-        L"File: %s \n"
-        L"Line: %d \n"
-        L"GetProcAddress failed in %s, with error code %x.",
-        fmt::to_wstring(__FILE__),
+        kFunctionFailErrorMessage,
+        __FILEW__,
         __LINE__,
-        fmt::to_wstring(__func__),
+        L"GetProcAddress",
+        L"GetGameExecutableFilePathSize",
         GetLastError()
     );
 
