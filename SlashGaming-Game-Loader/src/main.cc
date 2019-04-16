@@ -46,13 +46,7 @@
 
 namespace sgexe {
 
-extern "C" int
-main(
-    int argc,
-    const char* argv[]
-) {
-  std::setlocale(LC_ALL, "en_US.UTF-8");
-
+extern "C" int main(int argc, const char* argv[]) {
   // Print the license notice.
   license::PrintLicenseNotice();
   for (int i = 0; i < 79; i++) {
