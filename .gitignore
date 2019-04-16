@@ -8,6 +8,14 @@
 *.o
 *.obj
 
+*.cfg
+*.json
+
+*.aps
+*.log
+*.tlog
+*.vcxproj.FileListAbsolute.txt
+
 *.cbp
 *.res
 *.layout
