@@ -58,13 +58,13 @@ constexpr std::string_view kMetaDataKey = u8"!!!Metadata (Do not modify)!!!";
 // entries were updated. These values do not need to change with respect to API
 // file version!
 constexpr std::string_view kMajorVersionAKey = u8"Major Version A";
-constexpr int kMajorVersionAValue = 1;
+constexpr int kMajorVersionA = 1;
 constexpr std::string_view kMajorVersionBKey = u8"Major Version B";
-constexpr int kMajorVersionBValue = 0;
+constexpr int kMajorVersionB = 0;
 constexpr std::string_view kMinorVersionAKey = u8"Minor Version A";
-constexpr int kMinorVersionAValue = 0;
+constexpr int kMinorVersionA = 0;
 constexpr std::string_view kMinorVersionBKey = u8"Minor Version B";
-constexpr int kMinorVersionBValue = 0;
+constexpr int kMinorVersionB = 0;
 
 // Version detector library variable.
 constexpr std::string_view kVersionDetectorLibraryKey = u8"Version Detector DLL";
@@ -118,11 +118,11 @@ bool AddMissingConfigEntries(
       kMajorVersionAKey
   );
 
-  if (major_version_a < kMajorVersionAValue) {
-    major_version_a = kMajorVersionAValue;
+  if (major_version_a < kMajorVersionA) {
+    major_version_a = kMajorVersionA;
 
     config_reader.SetDeepInt(
-        kMajorVersionAValue,
+        kMajorVersionA,
         kMainEntryKey,
         kMetaDataKey,
         kMajorVersionAKey
@@ -148,7 +148,7 @@ bool AddMissingConfigEntries(
         kMetaDataKey,
         kMinorVersionBKey
     );
-  } else if (major_version_a > kMajorVersionAValue) {
+  } else if (major_version_a > kMajorVersionA) {
     return true;
   }
 
@@ -158,11 +158,11 @@ bool AddMissingConfigEntries(
       kMajorVersionBKey
   );
 
-  if (major_version_b < kMajorVersionBValue) {
-    major_version_b = kMajorVersionBValue;
+  if (major_version_b < kMajorVersionB) {
+    major_version_b = kMajorVersionB;
 
     config_reader.SetDeepInt(
-        kMajorVersionBValue,
+        kMajorVersionB,
         kMainEntryKey,
         kMetaDataKey,
         kMajorVersionBKey
@@ -181,7 +181,7 @@ bool AddMissingConfigEntries(
         kMetaDataKey,
         kMinorVersionBKey
     );
-  } else if (major_version_b > kMajorVersionBValue) {
+  } else if (major_version_b > kMajorVersionB) {
     return true;
   }
 
@@ -192,11 +192,11 @@ bool AddMissingConfigEntries(
       kMinorVersionAKey
   );
 
-  if (minor_version_a < kMinorVersionAValue) {
-    minor_version_a = kMinorVersionAValue;
+  if (minor_version_a < kMinorVersionA) {
+    minor_version_a = kMinorVersionA;
 
     config_reader.SetDeepInt(
-        kMinorVersionAValue,
+        kMinorVersionA,
         kMainEntryKey,
         kMetaDataKey,
         kMinorVersionAKey
@@ -208,7 +208,7 @@ bool AddMissingConfigEntries(
         kMetaDataKey,
         kMinorVersionBKey
     );
-  } else if (minor_version_a > kMinorVersionAValue) {
+  } else if (minor_version_a > kMinorVersionA) {
     return true;
   }
 
@@ -219,16 +219,16 @@ bool AddMissingConfigEntries(
       kMinorVersionBKey
   );
 
-  if (minor_version_b < kMinorVersionBValue) {
-    minor_version_b = kMinorVersionBValue;
+  if (minor_version_b < kMinorVersionB) {
+    minor_version_b = kMinorVersionB;
 
     config_reader.SetDeepInt(
-        kMinorVersionBValue,
+        kMinorVersionB,
         kMainEntryKey,
         kMetaDataKey,
         kMinorVersionBKey
     );
-  } else if (minor_version_b > kMinorVersionBValue) {
+  } else if (minor_version_b > kMinorVersionB) {
     return true;
   }
 
