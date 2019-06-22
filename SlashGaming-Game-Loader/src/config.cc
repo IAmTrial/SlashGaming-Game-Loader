@@ -27,7 +27,7 @@
  *  to convey the resulting work.
  */
 
-#include "config_reader.h"
+#include "config.h"
 
 #include <windows.h>
 #include <filesystem>

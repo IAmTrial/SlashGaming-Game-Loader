@@ -27,8 +27,8 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_CONFIG_READER_H_
-#define SGEXE_CONFIG_READER_H_
+#ifndef SGEXE_CONFIG_H_
+#define SGEXE_CONFIG_H_
 
 #include <filesystem>
 #include <vector>
@@ -47,4 +47,4 @@ GetInjectDllsPaths(
 
 } // namespace sgexe
 
-#endif // SGEXE_CONFIG_READER_H_
+#endif // SGEXE_CONFIG_H_

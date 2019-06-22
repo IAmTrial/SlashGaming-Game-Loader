@@ -37,7 +37,7 @@
 
 #include <fmt/printf.h>
 #include <boost/scope_exit.hpp>
-#include "config_reader.h"
+#include "config.h"
 #include "extern_import.h"
 #include "game_loader.h"
 #include "library_injector.h"
