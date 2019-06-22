@@ -35,15 +35,11 @@
 
 namespace sgexe::config {
 
-std::filesystem::path
-GetVersionDetectorLibraryPath(
-    void
-);
+const std::filesystem::path&
+GetVersionDetectorLibraryPath();
 
-std::vector<std::filesystem::path>
-GetInjectDllsPaths(
-    void
-);
+const std::vector<std::filesystem::path>&
+GetInjectDllsPaths();
 
 } // namespace sgexe
 
