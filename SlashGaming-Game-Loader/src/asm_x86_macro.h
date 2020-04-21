@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -31,8 +31,8 @@
  * Warning: This header should never be used in any public interface!
  */
 
-#ifndef SGEXE_ASM_X86_MACRO_H_
-#define SGEXE_ASM_X86_MACRO_H_
+#ifndef SGGL_ASM_X86_MACRO_H_
+#define SGGL_ASM_X86_MACRO_H_
 
 #if defined(_MSC_VER)
 
@@ -41,15 +41,21 @@
       __VA_ARGS__ \
     }
 
+#define ASM_X86_FUNC(name) name
+
+#define ASM_X86_LABEL(name) name:
+
 #else
 
 #define ASM_X86(...) \
-    asm( \
-        ".intel_syntax \n" \
-        #__VA_ARGS__ " \n" \
-        ".att_syntax \n" \
+    __asm( \
+        #__VA_ARGS__ \
     );
+
+#define ASM_X86_FUNC(name) _##name
+
+#define ASM_X86_LABEL(name) ASM_X86(name:)
 
 #endif
 
-#endif // SGEXE_ASM_X86_MACRO_H_
+#endif /* SGGL_ASM_X86_MACRO_H_ */
