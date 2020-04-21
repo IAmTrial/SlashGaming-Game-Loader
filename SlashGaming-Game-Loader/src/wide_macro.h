@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,19 +27,21 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_FILEW_MACRO_H_
-#define SGEXE_FILEW_MACRO_H_
+#ifndef SGGL_WIDE_MACRO_H_
+#define SGGL_WIDE_MACRO_H_
 
-#ifndef _CRT_WIDE_
-#define _CRT_WIDE_(s) L##s
-#endif /* _CRT_WIDE_ */
+#ifndef MAPI_CAT
+#define MAPI_CAT(a, b) a##b
+#endif /* MAPI_CAT */
 
-#ifndef _CRT_WIDE
-#define _CRT_WIDE(s) _CRT_WIDE_(s)
-#endif /* _CRT_WIDE */
+#ifndef MAPI_WIDE_LIT
+#define MAPI_WIDE_LIT(s) MAPI_CAT(L, s)
+#endif /* MAPI_WIDE_LIT */
 
 #ifndef __FILEW__
-#define __FILEW__ _CRT_WIDE(__FILE__)
+#if !defined(_MSC_VER)
+#define __FILEW__ MAPI_WIDE_LIT(__FILE__)
+#endif /* defined(_MSC_VER) */
 #endif /* __FILEW__ */
 
-#endif /* SGEXE_FILEW_MACRO_H_ */
+#endif /* SGGL_WIDE_MACRO_H_ */
