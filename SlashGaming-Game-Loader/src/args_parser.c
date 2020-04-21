@@ -35,11 +35,11 @@
 #include <wchar.h>
 #include <windows.h>
 
-int ValidateArgs(int argc, wchar_t** argv) {
+int ValidateArgs(int argc, const wchar_t* const* argv) {
   return argc >= 2;
 }
 
-void ParseArgs(struct Args* args, int argc, wchar_t** argv) {
+void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
   int i;
   size_t total_args_len;
 
@@ -49,27 +49,25 @@ void ParseArgs(struct Args* args, int argc, wchar_t** argv) {
   wcscpy(args->game_path, argv[1]);
 
   if (argc == 2) {
-    args->cmd_args[0] = '\0';
+    args->cmd_args[0] = L'\0';
 
     return;
   }
 
-  /* Determine the length of the args. */
-  total_args_len = 0;
+  /* Copy the library to inject. */
+  wcscpy(args->library_to_inject, argv[2]);
 
-  for (i = 1; i < argc; i += 1) {
-    total_args_len += wcslen(argv[i]);
+  if (argc == 3) {
+    args->cmd_args[0] = L'\0';
+
+    return;
   }
-
-  total_args_len += argc - 2;
 
   /* Copy the args */
-  args->cmd_args[0] = L'\0';
+  wcscpy(args->cmd_args, argv[1]);
 
-  for (i = 1; i < argc; i += 1) {
-    wcscat(args->cmd_args, argv[i]);
+  for (i = 3; i < argc; i += 1) {
     wcscat(args->cmd_args, L" ");
+    wcscat(args->cmd_args, argv[i]);
   }
-
-  args->cmd_args[total_args_len] = L'\0';
 }

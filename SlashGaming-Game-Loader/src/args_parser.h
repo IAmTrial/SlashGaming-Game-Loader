@@ -36,10 +36,11 @@
 
 struct Args {
   wchar_t game_path[MAX_PATH];
+  wchar_t library_to_inject[MAX_PATH];
   wchar_t cmd_args[SHRT_MAX + 1];
 };
 
-int ValidateArgs(int argc, wchar_t** argv);
-void ParseArgs(struct Args* args, int argc, wchar_t** argv);
+int ValidateArgs(int argc, const wchar_t* const* argv);
+void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv);
 
 #endif /* SGGL_ARGS_PARSER_H_ */
