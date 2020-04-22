@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,27 +27,23 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_LIBRARY_INJECTOR_H_
-#define SGEXE_LIBRARY_INJECTOR_H_
+#ifndef SGGL_LIBRARY_INJECTOR_H_
+#define SGGL_LIBRARY_INJECTOR_H_
 
+#include <stddef.h>
+#include <wchar.h>
 #include <windows.h>
-#include <filesystem>
-#include <vector>
 
-namespace sgexe {
-
-bool
-InjectLibrary(
-    const std::filesystem::path& library_path,
-    const PROCESS_INFORMATION& process_info
+int InjectLibraryToProcess(
+    const wchar_t* library_to_inject,
+    const PROCESS_INFORMATION* process_info
 );
 
-bool
-InjectLibraries(
-    const std::vector<std::filesystem::path>& libraries_paths,
-    const PROCESS_INFORMATION& process_info
+int InjectLibrariesToProcesses(
+    const wchar_t** libraries_to_inject,
+    size_t num_libraries,
+    const PROCESS_INFORMATION* processes_infos,
+    size_t num_instances
 );
 
-} // namespace sgexe
-
-#endif // SGEXE_LIBRARY_INJECTOR_H_
+#endif /* SGGL_LIBRARY_INJECTOR_H_ */
