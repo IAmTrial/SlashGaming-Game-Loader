@@ -45,8 +45,6 @@ static void ShowMessageCreateProcessError(
     const struct Args* args,
     DWORD last_error
 ) {
-  wchar_t full_error_message[ERROR_MESSAGE_LEN + 1];
-
   switch (last_error) {
     case 0x2: {
       MessageBoxW(
@@ -60,7 +58,7 @@ static void ShowMessageCreateProcessError(
 
     default: {
       ExitOnWindowsFunctionFailureWithLastError(
-          "CreateProcess",
+          L"CreateProcess",
           last_error
       );
     }
@@ -179,10 +177,6 @@ void StartGameSuspended(
       wcscat(full_cmd_line, L" ");
       wcscat(full_cmd_line, args->game_args);
     }
-
-    printf("%ls \n", args->game_path);
-    printf("%ls \n", args->game_args);
-    printf("%ls \n\n", full_cmd_line);
 
     is_create_process_success = CreateProcessW(
         args->game_path,
