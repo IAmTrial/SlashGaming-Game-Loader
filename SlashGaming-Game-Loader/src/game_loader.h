@@ -44,4 +44,4 @@ void StartGameSuspended(
     const struct Args* args
 );
 
-#endif // SGGL_GAME_LOADER_H_
+#endif /* SGGL_GAME_LOADER_H_ */
