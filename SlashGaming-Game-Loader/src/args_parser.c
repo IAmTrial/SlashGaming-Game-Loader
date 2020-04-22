@@ -35,39 +35,101 @@
 #include <wchar.h>
 #include <windows.h>
 
+static void AddLibrary(struct Args* args, const wchar_t* arg) {
+  /* Resize if needed. */
+  if (args->num_libraries == args->libraries_capacity) {
+    args->libraries_capacity *= 2;
+    args->libraries_to_inject = realloc(
+        args->libraries_to_inject,
+        args->libraries_capacity * sizeof(args->libraries_to_inject[0])
+    );
+  }
+
+  /* Add the library to the list of libraries. */
+  args->libraries_to_inject[args->num_libraries] = arg;
+  args->num_libraries += 1;
+}
+
 int ValidateArgs(int argc, const wchar_t* const* argv) {
-  return argc >= 2;
+  int i;
+  int is_game_path_found = 0;
+  int is_game_args_found = 0;
+
+  if (argc < 3) {
+    return 0;
+  }
+
+  for (i = 1; i < argc; i += 1) {
+    if (wcscmp(argv[i], L"--game") == 0
+        || wcscmp(argv[i], L"-g") == 0) {
+      if (i >= argc - 1) {
+        return 0;
+      }
+
+      if (is_game_path_found) {
+        return 0;
+      }
+
+      is_game_path_found = 1;
+      i += 1;
+    } else if (wcscmp(argv[i], L"--gameargs") == 0
+        || wcscmp(argv[i], L"-a") == 0) {
+      if (i >= argc - 1) {
+        return 0;
+      }
+
+      if (is_game_args_found) {
+        return 0;
+      }
+
+      is_game_args_found = 1;
+      i += 1;
+    } else if (wcscmp(argv[i], L"--inject") == 0
+        || wcscmp(argv[i], L"-i") == 0) {
+      if (i >= argc - 1) {
+        return 0;
+      }
+      i += 1;
+    }
+  }
+
+  return is_game_path_found;
 }
 
 void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
   int i;
-  size_t total_args_len;
 
-  assert(argc >= 2);
+  assert(argc >= 3);
 
-  /* Copy the game path of the game executable. */
-  wcscpy(args->game_path, argv[1]);
+  args->libraries_capacity = 4;
+  args->num_libraries = 0;
+  args->libraries_to_inject = malloc(
+      args->libraries_capacity * sizeof(args->libraries_to_inject[0])
+  );
 
-  if (argc == 2) {
-    args->cmd_args[0] = L'\0';
+  for (i = 1; i < argc; i += 1) {
+    if (wcscmp(argv[i], L"--game") == 0
+        || wcscmp(argv[i], L"-g") == 0) {
+      /* Point to the game path of the game executable. */
+      args->game_path = argv[i + 1];
+      i += 1;
+    } else if (wcscmp(argv[i], L"--gameargs") == 0
+        || wcscmp(argv[i], L"-a") == 0) {
+      /* Point to the game args */
+      args->game_args = argv[i + 1];
+      i += 1;
+    } else if (wcscmp(argv[i], L"--inject") == 0
+        || wcscmp(argv[i], L"-i") == 0) {
+      /* Manage all points to libraries that will be injected. */
+      AddLibrary(args, argv[i + 1]);
 
-    return;
+      i += 1;
+    }
   }
+}
 
-  /* Copy the library to inject. */
-  wcscpy(args->library_to_inject, argv[2]);
-
-  if (argc == 3) {
-    args->cmd_args[0] = L'\0';
-
-    return;
-  }
-
-  /* Copy the args */
-  wcscpy(args->cmd_args, argv[1]);
-
-  for (i = 3; i < argc; i += 1) {
-    wcscat(args->cmd_args, L" ");
-    wcscat(args->cmd_args, argv[i]);
-  }
+void DestructArgs(struct Args* args) {
+  free(args->libraries_to_inject);
+  args->num_libraries = 0;
+  args->libraries_capacity = 0;
 }

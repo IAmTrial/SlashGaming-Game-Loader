@@ -31,16 +31,21 @@
 #define SGGL_ARGS_PARSER_H_
 
 #include <limits.h>
+#include <stddef.h>
 #include <wchar.h>
 #include <windows.h>
 
 struct Args {
-  wchar_t game_path[MAX_PATH];
-  wchar_t library_to_inject[MAX_PATH];
-  wchar_t cmd_args[SHRT_MAX + 1];
+  const wchar_t* game_path;
+  const wchar_t* game_args;
+
+  const wchar_t** libraries_to_inject;
+  size_t libraries_capacity;
+  size_t num_libraries;
 };
 
 int ValidateArgs(int argc, const wchar_t* const* argv);
 void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv);
+void DestructArgs(struct Args* args);
 
 #endif /* SGGL_ARGS_PARSER_H_ */
