@@ -33,12 +33,51 @@
 
 #include "wide_macro.h"
 
-const wchar_t* kCreateProcessErrorFormat =
+static const wchar_t* kCreateProcessErrorFormat =
     L"%ls could not be started, with error code %x.";
 
 enum CONSTANT {
   ERROR_MESSAGE_LEN = 512
 };
+
+static void ShowMessageCreateProcessError(
+    const struct Args* args,
+    DWORD last_error
+) {
+  wchar_t full_error_message[ERROR_MESSAGE_LEN + 1];
+
+  switch (last_error) {
+    case 0x2: {
+      MessageBoxW(
+          NULL,
+          L"File could not be found.",
+          L"Could Not Start Game",
+          MB_OK | MB_ICONERROR
+      );
+      break;
+    }
+
+    default: {
+      swprintf(
+          full_error_message,
+          ERROR_MESSAGE_LEN,
+          kCreateProcessErrorFormat,
+          args->game_path,
+          last_error
+      );
+
+      MessageBoxW(
+          NULL,
+          full_error_message,
+          L"Could Not Start Game",
+          MB_OK | MB_ICONERROR
+      );
+      break;
+    }
+  }
+
+  exit(0);
+}
 
 void StartGame(
     PROCESS_INFORMATION* processes_infos,
@@ -52,22 +91,31 @@ void StartGame(
   HANDLE open_process_result;
 
   BOOL is_create_process_success;
-  wchar_t full_error_message[ERROR_MESSAGE_LEN + 1];
 
   STARTUPINFOW startup_info;
+  memset(&startup_info, 0, sizeof(startup_info));
   startup_info.cb = sizeof(startup_info);
 
-  full_cmd_line_len = wcslen(args->game_path) + wcslen(args->game_args) + 1;
+  full_cmd_line_len = wcslen(args->game_path);
+
+  if (args->game_args != NULL) {
+    full_cmd_line_len += wcslen(args->game_args) + 1;
+  }
+
   full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
 
   /* Create the desired processes. */
-  for (i = 0; i < args->num_instances; i += 1) {/*
+  for (i = 0; i < args->num_instances; i += 1) {
+    /*
     * CreateProcessW can modify the cmd line string, so a copy must be
     * made every time an instance is needs to be made.
     */
     wcscpy(full_cmd_line, args->game_path);
-    wcscat(full_cmd_line, L" ");
-    wcscat(full_cmd_line, args->game_args);
+
+    if (args->game_args != NULL) {
+      wcscat(full_cmd_line, L" ");
+      wcscat(full_cmd_line, args->game_args);
+    }
 
     is_create_process_success = CreateProcessW(
         args->game_path,
@@ -83,22 +131,7 @@ void StartGame(
     );
 
     if (!is_create_process_success) {
-      swprintf(
-          full_error_message,
-          ERROR_MESSAGE_LEN,
-          kCreateProcessErrorFormat,
-          args->game_path,
-          GetLastError()
-      );
-
-      MessageBoxW(
-          NULL,
-          full_error_message,
-          L"Could Not Start Game",
-          MB_OK | MB_ICONERROR
-      );
-
-      exit(0);
+      ShowMessageCreateProcessError(args, GetLastError());
     }
   }
 
@@ -116,6 +149,9 @@ void StartGame(
 
     CloseHandle(open_process_result);
   }
+
+free_full_cmd_line:
+  free(full_cmd_line);
 }
 
 void StartGameSuspended(
@@ -128,12 +164,17 @@ void StartGameSuspended(
   size_t full_cmd_line_len;
 
   BOOL is_create_process_success;
-  wchar_t full_error_message[ERROR_MESSAGE_LEN + 1];
 
   STARTUPINFOW startup_info;
+  memset(&startup_info, 0, sizeof(startup_info));
   startup_info.cb = sizeof(startup_info);
 
-  full_cmd_line_len = wcslen(args->game_path) + wcslen(args->game_args) + 1;
+  full_cmd_line_len = wcslen(args->game_path);
+
+  if (args->game_args != NULL) {
+    full_cmd_line_len += wcslen(args->game_args) + 1;
+  }
+
   full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
 
   /* Create the desired processes. */
@@ -143,8 +184,15 @@ void StartGameSuspended(
     * made every time an instance is needs to be made.
     */
     wcscpy(full_cmd_line, args->game_path);
-    wcscat(full_cmd_line, L" ");
-    wcscat(full_cmd_line, args->game_args);
+
+    if (args->game_args != NULL) {
+      wcscat(full_cmd_line, L" ");
+      wcscat(full_cmd_line, args->game_args);
+    }
+
+    printf("%ls \n", args->game_path);
+    printf("%ls \n", args->game_args);
+    printf("%ls \n\n", full_cmd_line);
 
     is_create_process_success = CreateProcessW(
         args->game_path,
@@ -160,22 +208,10 @@ void StartGameSuspended(
     );
 
     if (!is_create_process_success) {
-      swprintf(
-          full_error_message,
-          ERROR_MESSAGE_LEN,
-          kCreateProcessErrorFormat,
-          args->game_path,
-          GetLastError()
-      );
-
-      MessageBoxW(
-          NULL,
-          full_error_message,
-          L"Could Not Start Game",
-          MB_OK | MB_ICONERROR
-      );
-
-      exit(0);
+      ShowMessageCreateProcessError(args, GetLastError());
     }
   }
+
+free_full_cmd_line:
+  free(full_cmd_line);
 }
