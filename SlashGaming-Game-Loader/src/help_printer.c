@@ -34,7 +34,7 @@
 #include <string.h>
 
 enum CONSTANTS {
-  ARG_OPTION_LEN = 23,
+  ARG_OPTION_LEN = 28,
   DESCRIPTION_LEN = 72 - ARG_OPTION_LEN - 2
 };
 
@@ -62,14 +62,18 @@ static void PrintContinuedLine(
 void PrintHelp(const wchar_t* current_program) {
   wprintf(L"Usage: %ls [options] \n", current_program);
   printf("Options: \n");
+
   PrintArgHelp("-g, --game <program>", "Game to execute");
+
   PrintArgHelp(
       "-a, --gameargs <args>",
-      "Command line arguments to pass to the game"
+      "Command line arguments to pass to the"
   );
+  PrintContinuedLine("game");
+
   PrintArgHelp(
-      "-i, --inject <library>",
-      "Path of library to inject (this option can be"
+      "-l, --library <library>",
+      "Path of library to inject (this option"
   );
-  PrintContinuedLine("repeated for multiple libraries)");
+  PrintContinuedLine("can be repeated for multiple libraries)");
 }

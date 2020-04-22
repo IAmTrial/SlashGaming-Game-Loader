@@ -84,8 +84,8 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
 
       is_game_args_found = 1;
       i += 1;
-    } else if (wcscmp(argv[i], L"--inject") == 0
-        || wcscmp(argv[i], L"-i") == 0) {
+    } else if (wcscmp(argv[i], L"--library") == 0
+        || wcscmp(argv[i], L"-l") == 0) {
       if (i >= argc - 1) {
         return 0;
       }
@@ -118,8 +118,8 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
       /* Point to the game args */
       args->game_args = argv[i + 1];
       i += 1;
-    } else if (wcscmp(argv[i], L"--inject") == 0
-        || wcscmp(argv[i], L"-i") == 0) {
+    } else if (wcscmp(argv[i], L"--library") == 0
+        || wcscmp(argv[i], L"-l") == 0) {
       /* Manage all points to libraries that will be injected. */
       AddLibrary(args, argv[i + 1]);
 
