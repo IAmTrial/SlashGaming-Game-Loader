@@ -33,6 +33,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <wctype.h>
 #include <windows.h>
 
 static void AddLibrary(struct Args* args, const wchar_t* arg) {
@@ -51,18 +52,20 @@ static void AddLibrary(struct Args* args, const wchar_t* arg) {
 }
 
 int ValidateArgs(int argc, const wchar_t* const* argv) {
-  int i;
+  int arg_i;
+  size_t str_i;
   int is_game_path_found = 0;
   int is_game_args_found = 0;
+  int is_num_instances_found = 0;
 
   if (argc < 3) {
     return 0;
   }
 
-  for (i = 1; i < argc; i += 1) {
-    if (wcscmp(argv[i], L"--game") == 0
-        || wcscmp(argv[i], L"-g") == 0) {
-      if (i >= argc - 1) {
+  for (arg_i = 1; arg_i < argc; arg_i += 1) {
+    if (wcscmp(argv[arg_i], L"--game") == 0
+        || wcscmp(argv[arg_i], L"-g") == 0) {
+      if (arg_i >= argc - 1) {
         return 0;
       }
 
@@ -71,10 +74,10 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
       }
 
       is_game_path_found = 1;
-      i += 1;
-    } else if (wcscmp(argv[i], L"--gameargs") == 0
-        || wcscmp(argv[i], L"-a") == 0) {
-      if (i >= argc - 1) {
+      arg_i += 1;
+    } else if (wcscmp(argv[arg_i], L"--gameargs") == 0
+        || wcscmp(argv[arg_i], L"-a") == 0) {
+      if (arg_i >= argc - 1) {
         return 0;
       }
 
@@ -83,13 +86,31 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
       }
 
       is_game_args_found = 1;
-      i += 1;
-    } else if (wcscmp(argv[i], L"--library") == 0
-        || wcscmp(argv[i], L"-l") == 0) {
-      if (i >= argc - 1) {
+      arg_i += 1;
+    } else if (wcscmp(argv[arg_i], L"--library") == 0
+        || wcscmp(argv[arg_i], L"-l") == 0) {
+      if (arg_i >= argc - 1) {
         return 0;
       }
-      i += 1;
+
+      arg_i += 1;
+    } else if (wcscmp(argv[arg_i], L"--num-instances") == 0
+        || wcscmp(argv[arg_i], L"-n") == 0) {
+      if (arg_i >= argc - 1) {
+        return 0;
+      }
+
+      if (is_num_instances_found) {
+        return 0;
+      }
+
+      for (str_i = 0; argv[arg_i + 1][str_i] != L'\0'; str_i += 1) {
+        if (!iswdigit(argv[arg_i + 1][str_i])) {
+          return 0;
+        }
+      }
+
+      is_num_instances_found = 1;
     }
   }
 
@@ -97,7 +118,7 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
 }
 
 void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
-  int i;
+  int arg_i;
 
   assert(argc >= 3);
 
@@ -107,23 +128,46 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
       args->libraries_capacity * sizeof(args->libraries_to_inject[0])
   );
 
-  for (i = 1; i < argc; i += 1) {
-    if (wcscmp(argv[i], L"--game") == 0
-        || wcscmp(argv[i], L"-g") == 0) {
-      /* Point to the game path of the game executable. */
-      args->game_path = argv[i + 1];
-      i += 1;
-    } else if (wcscmp(argv[i], L"--gameargs") == 0
-        || wcscmp(argv[i], L"-a") == 0) {
-      /* Point to the game args */
-      args->game_args = argv[i + 1];
-      i += 1;
-    } else if (wcscmp(argv[i], L"--library") == 0
-        || wcscmp(argv[i], L"-l") == 0) {
-      /* Manage all points to libraries that will be injected. */
-      AddLibrary(args, argv[i + 1]);
+  args->num_instances = 1;
 
-      i += 1;
+  for (arg_i = 1; arg_i < argc; arg_i += 1) {
+    if (wcscmp(argv[arg_i], L"--game") == 0
+        || wcscmp(argv[arg_i], L"-g") == 0) {
+      /* Point to the game path of the game executable. */
+      args->game_path = argv[arg_i + 1];
+      arg_i += 1;
+    } else if (wcscmp(argv[arg_i], L"--gameargs") == 0
+        || wcscmp(argv[arg_i], L"-a") == 0) {
+      /* Point to the game args */
+      args->game_args = argv[arg_i + 1];
+      arg_i += 1;
+    } else if (wcscmp(argv[arg_i], L"--library") == 0
+        || wcscmp(argv[arg_i], L"-l") == 0) {
+      /* Manage all points to libraries that will be injected. */
+      AddLibrary(args, argv[arg_i + 1]);
+
+      arg_i += 1;
+    } else if (wcscmp(argv[arg_i], L"--num-instances") == 0
+        || wcscmp(argv[arg_i], L"-n") == 0) {
+      /* Determine number of instances to open. */
+      args->num_instances = wcstoul(argv[arg_i + 1], NULL, 10);
+
+      /*
+      * Check that the number of instances to open is at least 1.
+      */
+      args->num_instances = (args->num_instances >= 1)
+          ? args->num_instances
+          : 1;
+
+      /*
+      * Prevent opening more than 8 instances at once. Doing so
+      * prevents the user from accidental resource hogging.
+      */
+      args->num_instances = (args->num_instances <= 8)
+          ? args->num_instances
+          : 8;
+
+      arg_i += 1;
     }
   }
 }

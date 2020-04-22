@@ -42,6 +42,8 @@ struct Args {
   const wchar_t** libraries_to_inject;
   size_t libraries_capacity;
   size_t num_libraries;
+
+  size_t num_instances;
 };
 
 int ValidateArgs(int argc, const wchar_t* const* argv);

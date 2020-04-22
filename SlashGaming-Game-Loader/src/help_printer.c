@@ -34,12 +34,12 @@
 #include <string.h>
 
 enum CONSTANTS {
-  ARG_OPTION_LEN = 28,
+  ARG_OPTION_LEN = 36,
   DESCRIPTION_LEN = 72 - ARG_OPTION_LEN - 2
 };
 
-const char* kFormatString = "  %-23s %s \n";
-const char* kFormatContinueString = "%25c %s \n";
+const char* kFormatString = "  %-34s %s \n";
+const char* kFormatContinueString = "%36c %s \n";
 
 static void PrintArgHelp(
     const char* arg_option,
@@ -67,13 +67,19 @@ void PrintHelp(const wchar_t* current_program) {
 
   PrintArgHelp(
       "-a, --gameargs <args>",
-      "Command line arguments to pass to the"
+      "Command line arguments to pass to"
   );
-  PrintContinuedLine("game");
+  PrintContinuedLine("the game");
 
   PrintArgHelp(
       "-l, --library <library>",
-      "Path of library to inject (this option"
+      "Path of library to inject (this"
   );
-  PrintContinuedLine("can be repeated for multiple libraries)");
+  PrintContinuedLine("option can be repeated for");
+  PrintContinuedLine("multiple libraries)");
+
+  PrintArgHelp(
+      "-n, --num-instances <count>",
+      "Number of instances to open"
+  );
 }
