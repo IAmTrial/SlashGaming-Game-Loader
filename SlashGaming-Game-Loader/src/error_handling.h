@@ -30,6 +30,7 @@
 #ifndef SGGL_ERROR_HANDLING_H_
 #define SGGL_ERROR_HANDLING_H_
 
+#include <wchar.h>
 #include <windows.h>
 
 void ExitOnGeneralFailure(
