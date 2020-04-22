@@ -31,6 +31,7 @@
 
 #include <wchar.h>
 
+#include "error_handling.h"
 #include "wide_macro.h"
 
 static const wchar_t* kCreateProcessErrorFormat =
@@ -58,21 +59,10 @@ static void ShowMessageCreateProcessError(
     }
 
     default: {
-      swprintf(
-          full_error_message,
-          ERROR_MESSAGE_LEN,
-          kCreateProcessErrorFormat,
-          args->game_path,
+      ExitOnWindowsFunctionFailureWithLastError(
+          "CreateProcess",
           last_error
       );
-
-      MessageBoxW(
-          NULL,
-          full_error_message,
-          L"Could Not Start Game",
-          MB_OK | MB_ICONERROR
-      );
-      break;
     }
   }
 
