@@ -89,7 +89,8 @@ int wmain(int argc, const wchar_t** argv) {
 
   /* Create the new processes. */
   processes_infos = malloc(args.num_instances * sizeof(processes_infos[0]));
-  StartGame(processes_infos, &args);
+  memset(processes_infos, 0, args.num_instances * sizeof(processes_infos[0]));
+  StartGameSuspended(processes_infos, &args);
 
   /* Inject the library, after reading all files. */
   is_inject_libraries_success = InjectLibrariesToProcesses(
