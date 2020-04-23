@@ -108,6 +108,9 @@ int wmain(int argc, const wchar_t** argv) {
   /* Resume process. */
   for (i = 0; i < args.num_instances; i += 1) {
     ResumeThread(processes_infos[i].hThread);
+
+    CloseHandle(processes_infos[i].hProcess);
+    CloseHandle(processes_infos[i].hThread);
   }
 
   Sleep(500);
