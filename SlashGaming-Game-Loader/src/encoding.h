@@ -42,4 +42,14 @@ char* ConvertWideToUtf8(
     const wchar_t* wide_string
 );
 
+wchar_t* ConvertMultibyteToWide(
+    wchar_t* wide_string,
+    const char* multibyte_string
+);
+
+char* ConvertWideToMultibyte(
+    char* multibyte_string,
+    const wchar_t* wide_string
+);
+
 #endif /* SGGL_ENCODING_H_ */

@@ -160,3 +160,76 @@ char* ConvertWideToUtf8(
 
   return utf8_string;
 }
+
+wchar_t* ConvertMultibyteToWide(
+    wchar_t* wide_string,
+    const char* multibyte_string
+) {
+  size_t wide_string_len;
+  size_t wide_string_size;
+  mbstate_t mbstate;
+
+  /* Determine the length of the new string. */
+  memset(&mbstate, 0, sizeof(mbstate_t));
+  wide_string_len = mbsrtowcs(NULL, &multibyte_string, 0, &mbstate);
+  wide_string_size = (wide_string_len + 1) * sizeof(wide_string[0]);
+
+  if (wide_string == NULL) {
+    wide_string = malloc(wide_string_size);
+
+    if (wide_string == NULL) {
+      ExitOnAllocationFailure();
+    }
+  }
+
+  /* Convert multibyte string to wide string. */
+  memset(&mbstate, 0, sizeof(mbstate_t));
+
+  mbsrtowcs(
+      wide_string,
+      &multibyte_string,
+      wide_string_size,
+      &mbstate
+  );
+
+  wide_string[wide_string_len] = L'\0';
+
+  return wide_string;
+}
+
+char* ConvertWideToMultibyte(
+    char* multibyte_string,
+    const wchar_t* wide_string
+) {
+  size_t multibyte_string_len;
+  size_t multibyte_string_size;
+  mbstate_t mbstate;
+
+  /* Determine the length of the new string. */
+  memset(&mbstate, 0, sizeof(mbstate_t));
+  multibyte_string_len = wcsrtombs(NULL, &wide_string, 0, &mbstate);
+  multibyte_string_size =
+      (multibyte_string_len + 1) * sizeof(multibyte_string[0]);
+
+  if (multibyte_string == NULL) {
+    multibyte_string = malloc(multibyte_string_size);
+
+    if (multibyte_string == NULL) {
+      ExitOnAllocationFailure();
+    }
+  }
+
+  /* Convert wide string to multibyte string. */
+  memset(&mbstate, 0, sizeof(mbstate_t));
+
+  wcsrtombs(
+      multibyte_string,
+      &wide_string,
+      multibyte_string_size,
+      &mbstate
+  );
+
+  multibyte_string[multibyte_string_len] = '\0';
+
+  return multibyte_string;
+}
