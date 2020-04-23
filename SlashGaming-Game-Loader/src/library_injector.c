@@ -36,13 +36,14 @@
 #include "asm_x86_macro.h"
 #include "error_handling.h"
 
-int valid_execution_flags = 0;
 
-unsigned char virtual_alloc_ex_buffer[] = {
+static int valid_execution_flags = 0;
+
+static unsigned char virtual_alloc_ex_buffer[] = {
     0xEB, 0xFE
 };
 
-__declspec(naked) int __cdecl InjectLibraries_Stub(int* flags) {
+__declspec(naked) static int __cdecl InjectLibraries_Stub(int* flags) {
   ASM_X86(push eax)
   ASM_X86(push ecx)
   ASM_X86(push edx)
@@ -84,7 +85,7 @@ __declspec(naked) int __cdecl InjectLibraries_Stub(int* flags) {
   ASM_X86(ret)
 }
 
-__declspec(naked) int __cdecl VirtualAllocEx_Stub(int* flags) {
+__declspec(naked) static int __cdecl VirtualAllocEx_Stub(int* flags) {
   ASM_X86(push eax)
   ASM_X86(push ecx)
   ASM_X86(push edx)
