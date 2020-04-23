@@ -96,7 +96,7 @@ void StartGame(
   for (i = 0; i < args->num_instances; i += 1) {
     /*
     * CreateProcessW can modify the cmd line string, so a copy must be
-    * made every time an instance is needs to be made.
+    * made every time an instance needs to be made.
     */
     wcscpy(full_cmd_line, args->game_path);
 
@@ -169,7 +169,7 @@ void StartGameSuspended(
   for (i = 0; i < args->num_instances; i += 1) {
     /*
     * CreateProcessW can modify the cmd line string, so a copy must be
-    * made every time an instance is needs to be made.
+    * made every time an instance needs to be made.
     */
     wcscpy(full_cmd_line, args->game_path);
 
