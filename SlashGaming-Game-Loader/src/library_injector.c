@@ -30,6 +30,7 @@
 #include "library_injector.h"
 
 #include <stddef.h>
+#include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
 
@@ -148,6 +149,7 @@ int InjectLibrary(
   DWORD wait_return_value;
   DWORD thread_exit_code;
   BOOL is_get_exit_code_thread_success;
+  DWORD last_error;
 
   buffer_size = (wcslen(library_to_inject) + 1)
       * sizeof(library_to_inject[0]);
@@ -165,9 +167,15 @@ int InjectLibrary(
   );
 
   if (remote_buf == NULL) {
+    last_error = GetLastError();
+
+    if (last_error == 0x78) {
+      return last_error;
+    }
+
     ExitOnWindowsFunctionFailureWithLastError(
         L"VirtualAllocEx",
-        GetLastError()
+        last_error
     );
   }
 
@@ -255,6 +263,7 @@ int InjectLibrariesToProcesses(
 
   int is_all_success = 1;
   int is_current_inject_success;
+  int current_inject_result;
   LPVOID remote_buf;
   size_t virtual_alloc_ex_buffer_total_size;
 
@@ -268,23 +277,36 @@ int InjectLibrariesToProcesses(
   );
 
   for (library_i = 0; library_i < num_libraries; library_i += 1) {
+    is_current_inject_success = 1;
+
     for (process_i = 0; process_i < num_instances; process_i += 1) {
-      is_current_inject_success = InjectLibrary(
+      current_inject_result = InjectLibrary(
           libraries_to_inject[library_i],
           &processes_infos[process_i]
       );
 
-      if (is_current_inject_success) {
-        wprintf(
-            L"Successfully injected: %ls \n",
-            libraries_to_inject[library_i]
-        );
-      } else {
-        wprintf(L"Failed to inject: %ls \n", libraries_to_inject[library_i]);
+      if (current_inject_result == 0x78) {
+        printf("VirtualAllocEx missing in this system! \n");
+        printf("This might mean you are running this in Windows 95/98/ME. \n");
+        printf("Such systems are missing features required for external \n");
+        printf("injection. \n\n");
+
+        return 0;
       }
 
-      is_all_success = is_current_inject_success && is_all_success;
+      is_current_inject_success = current_inject_result && is_current_inject_success;
     }
+
+    if (current_inject_result) {
+      wprintf(
+          L"Successfully injected: %ls \n",
+          libraries_to_inject[library_i]
+      );
+    } else {
+      wprintf(L"Failed to inject: %ls \n", libraries_to_inject[library_i]);
+    }
+
+    is_all_success = is_current_inject_success && is_all_success;
   }
 
 #ifdef FLAG_VIRTUAL_ALLOC_EX
