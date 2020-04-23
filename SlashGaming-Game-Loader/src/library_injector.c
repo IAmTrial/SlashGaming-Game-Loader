@@ -34,15 +34,16 @@
 #include <windows.h>
 
 #include "asm_x86_macro.h"
+#include "encoding.h"
 #include "error_handling.h"
 
-int valid_execution_flags = 0;
+static int valid_execution_flags = 0;
 
-unsigned char virtual_alloc_ex_buffer[] = {
+static unsigned char virtual_alloc_ex_buffer[] = {
     0xEB, 0xFE
 };
 
-__declspec(naked) int __cdecl InjectLibraries_Stub(int* flags) {
+__declspec(naked) static int __cdecl InjectLibraries_Stub(int* flags) {
   ASM_X86(push eax)
   ASM_X86(push ecx)
   ASM_X86(push edx)
@@ -84,7 +85,7 @@ __declspec(naked) int __cdecl InjectLibraries_Stub(int* flags) {
   ASM_X86(ret)
 }
 
-__declspec(naked) int __cdecl VirtualAllocEx_Stub(int* flags) {
+__declspec(naked) static int __cdecl VirtualAllocEx_Stub(int* flags) {
   ASM_X86(push eax)
   ASM_X86(push ecx)
   ASM_X86(push edx)
@@ -133,6 +134,49 @@ __declspec(naked) int __cdecl VirtualAllocEx_Stub(int* flags) {
   ASM_X86(ret)
 }
 
+static LPTHREAD_START_ROUTINE GetLoadLibraryFuncPtr(void) {
+  HANDLE kernel_module_handle;
+  FARPROC load_library_func_ptr;
+
+  /* Grab LoadLibraryW function pointer from the kernel. */
+  kernel_module_handle = GetModuleHandleW(L"kernel32.dll");
+  load_library_func_ptr = GetProcAddress(
+      kernel_module_handle,
+      "LoadLibraryW"
+  );
+
+  if (load_library_func_ptr != NULL) {
+    return (LPTHREAD_START_ROUTINE) load_library_func_ptr;
+  }
+
+  /* Since LoadLibraryW cannot be found, return LoadLibraryA. */
+  return (LPTHREAD_START_ROUTINE) &LoadLibraryA;
+}
+
+static void* GetLoadLibraryParam(
+    LPTHREAD_START_ROUTINE load_library_func_ptr,
+    const wchar_t* library_path
+) {
+  wchar_t* library_path_wide;
+
+  /*
+  * The function pointer is LoadLibraryW, so return a copy of the
+  * library path.
+  */
+  if (load_library_func_ptr != (LPTHREAD_START_ROUTINE) &LoadLibraryA) {
+    library_path_wide = malloc(
+        (wcslen(library_path) + 1) * sizeof(library_path[0])
+    );
+
+    wcscpy(library_path_wide, library_path);
+
+    return library_path_wide;
+  }
+
+  /* Otherwise, convert to multibyte text. */
+  return ConvertWideToMultibyte(NULL, library_path_wide);
+}
+
 int InjectLibrary(
     const wchar_t* library_to_inject,
     const PROCESS_INFORMATION* process_info
@@ -146,9 +190,21 @@ int InjectLibrary(
   DWORD wait_return_value;
   DWORD thread_exit_code;
   BOOL is_get_exit_code_thread_success;
+  LPTHREAD_START_ROUTINE load_libarary_ptr;
+  void* load_library_param;
 
-  buffer_size = (wcslen(library_to_inject) + 1)
-      * sizeof(library_to_inject[0]);
+  /* Determine which LoadLibrary function to run, and which param. */
+  load_libarary_ptr = GetLoadLibraryFuncPtr();
+  load_library_param = GetLoadLibraryParam(
+      load_libarary_ptr,
+      library_to_inject
+  );
+
+  if (load_libarary_ptr == (LPTHREAD_START_ROUTINE) LoadLibraryA) {
+    buffer_size = (strlen(load_library_param) + 1) * sizeof(char);
+  } else {
+    buffer_size = (wcslen(load_library_param) + 1) * sizeof(wchar_t);
+  }
 
   /* Store the library path into the target process. */
 #ifdef FLAG_VIRTUAL_ALLOC_EX
@@ -173,7 +229,7 @@ int InjectLibrary(
   is_write_process_memory_success = WriteProcessMemory(
       process_info->hProcess,
       remote_buf,
-      library_to_inject,
+      load_library_param,
       buffer_size,
       NULL
   );
@@ -190,7 +246,7 @@ int InjectLibrary(
       process_info->hProcess,
       NULL,
       0,
-      (LPTHREAD_START_ROUTINE) LoadLibraryW,
+      (LPTHREAD_START_ROUTINE) load_libarary_ptr,
       remote_buf,
       0,
       &remote_thread_id
@@ -237,6 +293,9 @@ virtual_free:
         GetLastError()
     );
   }
+
+free_load_library_param:
+  free(load_library_param);
 
   return 1;
 }
