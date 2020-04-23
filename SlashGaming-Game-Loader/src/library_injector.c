@@ -36,6 +36,7 @@
 #include "asm_x86_macro.h"
 #include "error_handling.h"
 
+static LPTHREAD_START_ROUTINE LoadLibraryWFuncPtr;
 
 static int valid_execution_flags = 0;
 
@@ -191,7 +192,7 @@ int InjectLibrary(
       process_info->hProcess,
       NULL,
       0,
-      (LPTHREAD_START_ROUTINE) LoadLibraryW,
+      (LPTHREAD_START_ROUTINE) LoadLibraryWFuncPtr,
       remote_buf,
       0,
       &remote_thread_id
@@ -260,6 +261,11 @@ int InjectLibrariesToProcesses(
 #ifdef FLAG_INJECT_LIBRARIES
   InjectLibraries_Stub(&valid_execution_flags);
 #endif /* FLAG_INJECT_LIBRARIES */
+
+  LoadLibraryWFuncPtr = (LPTHREAD_START_ROUTINE) GetProcAddress(
+      GetModuleHandleW(L"kernel32.dll"),
+      "LoadLibraryW"
+  );
 
   for (library_i = 0; library_i < num_libraries; library_i += 1) {
     for (process_i = 0; process_i < num_instances; process_i += 1) {
