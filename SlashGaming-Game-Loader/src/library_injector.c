@@ -174,7 +174,7 @@ static void* GetLoadLibraryParam(
   }
 
   /* Otherwise, convert to multibyte text. */
-  return ConvertWideToMultibyte(NULL, library_path_wide);
+  return ConvertWideToMultibyte(NULL, library_path);
 }
 
 int InjectLibrary(
