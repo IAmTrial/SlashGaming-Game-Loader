@@ -158,7 +158,7 @@ int InjectLibrary(
       process_info->hProcess,
       NULL,
       buffer_size,
-      MEM_COMMIT,
+      MEM_COMMIT | MEM_RESERVE,
       PAGE_READWRITE
   );
 
