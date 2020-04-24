@@ -39,6 +39,12 @@ int InjectLibraryToProcess(
     const PROCESS_INFORMATION* process_info
 );
 
+int InjectLibraryToProcessN(
+    const wchar_t* library_to_inject,
+    size_t library_to_inject_len,
+    const PROCESS_INFORMATION* process_info
+);
+
 int InjectLibrariesToProcesses(
     const wchar_t** libraries_to_inject,
     size_t num_libraries,

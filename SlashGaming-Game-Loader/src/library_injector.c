@@ -136,8 +136,20 @@ __declspec(naked) static int __cdecl VirtualAllocEx_Stub(int* flags) {
   ASM_X86(ret)
 }
 
-int InjectLibrary(
+int InjectLibraryToProcess(
     const wchar_t* library_to_inject,
+    const PROCESS_INFORMATION* process_info
+) {
+  return InjectLibraryToProcessN(
+      library_to_inject,
+      wcslen(library_to_inject),
+      process_info
+  );
+}
+
+int InjectLibraryToProcessN(
+    const wchar_t* library_to_inject,
+    size_t library_to_inject_len,
     const PROCESS_INFORMATION* process_info
 ) {
   size_t buffer_size;
@@ -152,7 +164,7 @@ int InjectLibrary(
   BOOL is_close_handle_success;
   DWORD last_error;
 
-  buffer_size = (wcslen(library_to_inject) + 1)
+  buffer_size = (library_to_inject_len + 1)
       * sizeof(library_to_inject[0]);
 
   /* Store the library path into the target process. */
@@ -278,6 +290,9 @@ int InjectLibrariesToProcesses(
   LPVOID remote_buf;
   size_t virtual_alloc_ex_buffer_total_size;
 
+  const wchar_t* library_to_inject;
+  size_t library_to_inject_len;
+
 #ifdef FLAG_INJECT_LIBRARIES
   InjectLibraries_Stub(&valid_execution_flags);
 #endif /* FLAG_INJECT_LIBRARIES */
@@ -290,9 +305,13 @@ int InjectLibrariesToProcesses(
   for (library_i = 0; library_i < num_libraries; library_i += 1) {
     is_current_inject_success = 1;
 
+    library_to_inject = libraries_to_inject[library_i];
+    library_to_inject_len = wcslen(library_to_inject);
+
     for (process_i = 0; process_i < num_instances; process_i += 1) {
-      current_inject_result = InjectLibrary(
-          libraries_to_inject[library_i],
+      current_inject_result = InjectLibraryToProcessN(
+          library_to_inject,
+          library_to_inject_len,
           &processes_infos[process_i]
       );
 
