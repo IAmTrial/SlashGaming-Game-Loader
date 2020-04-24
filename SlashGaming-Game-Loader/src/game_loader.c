@@ -49,6 +49,27 @@ static void InitCommandLine(wchar_t* cmd_line, const struct Args* args) {
   }
 }
 
+static wchar_t* AllocateCommandLine(const struct Args* args) {
+  wchar_t* full_cmd_line;
+  size_t full_cmd_line_len;
+
+  /* Add 2 due to surrounding quotes. */
+  full_cmd_line_len = wcslen(args->game_path) + 2;
+
+  if (args->game_args != NULL) {
+    /* Add 1 due to space. */
+    full_cmd_line_len += wcslen(args->game_args) + 1;
+  }
+
+  full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
+
+  if (full_cmd_line == NULL) {
+    ExitOnAllocationFailure();
+  }
+
+  return full_cmd_line;
+}
+
 static void ShowMessageCreateProcessError(
     const struct Args* args,
     DWORD last_error
@@ -78,30 +99,14 @@ void StartGame(
     const struct Args* args
 ) {
   size_t i;
-
   wchar_t* full_cmd_line;
-  size_t full_cmd_line_len;
-
   HANDLE open_process_result;
-
   BOOL is_create_process_success;
 
   STARTUPINFOW startup_info = { 0 };
   startup_info.cb = sizeof(startup_info);
 
-  /* Add 2 due to surrounding quotes. */
-  full_cmd_line_len = wcslen(args->game_path) + 2;
-
-  if (args->game_args != NULL) {
-    /* Add 1 due to space. */
-    full_cmd_line_len += wcslen(args->game_args) + 1;
-  }
-
-  full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
-
-  if (full_cmd_line == NULL) {
-    ExitOnAllocationFailure();
-  }
+  full_cmd_line = AllocateCommandLine(args);
 
   /* Create the desired processes. */
   for (i = 0; i < args->num_instances; i += 1) {
@@ -153,28 +158,13 @@ void StartGameSuspended(
     const struct Args* args
 ) {
   size_t i;
-
   wchar_t* full_cmd_line;
-  size_t full_cmd_line_len;
-
   BOOL is_create_process_success;
 
   STARTUPINFOW startup_info = { 0 };
   startup_info.cb = sizeof(startup_info);
 
-  /* Add 2 due to surrounding quotes. */
-  full_cmd_line_len = wcslen(args->game_path) + 2;
-
-  if (args->game_args != NULL) {
-    /* Add 1 due to space. */
-    full_cmd_line_len += wcslen(args->game_args) + 1;
-  }
-
-  full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
-
-  if (full_cmd_line == NULL) {
-    ExitOnAllocationFailure();
-  }
+  full_cmd_line = AllocateCommandLine(args);
 
   /* Create the desired processes. */
   for (i = 0; i < args->num_instances; i += 1) {
