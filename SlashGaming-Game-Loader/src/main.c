@@ -33,6 +33,7 @@
 #include <windows.h>
 
 #include "args_parser.h"
+#include "error_handling.h"
 #include "game_loader.h"
 #include "help_printer.h"
 #include "library_injector.h"
@@ -43,6 +44,7 @@ int wmain(int argc, const wchar_t** argv) {
   struct Args args;
   PROCESS_INFORMATION* processes_infos;
   int is_inject_libraries_success;
+  BOOL is_close_handle_success;
 
   memset(&args, 0, sizeof(args));
 
@@ -110,14 +112,30 @@ int wmain(int argc, const wchar_t** argv) {
   for (i = 0; i < args.num_instances; i += 1) {
     ResumeThread(processes_infos[i].hThread);
 
-    CloseHandle(processes_infos[i].hProcess);
-    CloseHandle(processes_infos[i].hThread);
-  }
+    /* Close process and thread handles. */
+    is_close_handle_success = CloseHandle(processes_infos[i].hProcess);
 
-  Sleep(500);
+    if (!is_close_handle_success) {
+      ExitOnWindowsFunctionFailureWithLastError(
+          L"CloseHandle",
+          GetLastError()
+      );
+    }
+
+    is_close_handle_success = CloseHandle(processes_infos[i].hThread);
+
+    if (!is_close_handle_success) {
+      ExitOnWindowsFunctionFailureWithLastError(
+          L"CloseHandle",
+          GetLastError()
+      );
+    }
+  }
 
 free_args:
   DestructArgs(&args);
+
+  Sleep(500);
 
   return 0;
 }
