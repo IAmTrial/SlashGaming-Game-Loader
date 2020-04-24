@@ -54,11 +54,11 @@ static wchar_t* AllocateCommandLine(const struct Args* args) {
   size_t full_cmd_line_len;
 
   /* Add 2 due to surrounding quotes. */
-  full_cmd_line_len = wcslen(args->game_path) + 2;
+  full_cmd_line_len = args->game_path_len + 2;
 
   if (args->game_args != NULL) {
     /* Add 1 due to space. */
-    full_cmd_line_len += wcslen(args->game_args) + 1;
+    full_cmd_line_len += args->game_args_len + 1;
   }
 
   full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));

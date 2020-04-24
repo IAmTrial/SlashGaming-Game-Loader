@@ -136,6 +136,7 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
 
 void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
   int arg_i;
+  size_t arg_value_len;
 
   assert(argc >= 3);
 
@@ -155,27 +156,37 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
     if (wcscmp(argv[arg_i], L"--game") == 0
         || wcscmp(argv[arg_i], L"-g") == 0) {
       /* Treat empty args as if there were no args. */
-      if (wcslen(argv[arg_i + 1]) <= 0) {
+      arg_value_len = wcslen(argv[arg_i + 1]);
+
+      if (arg_value_len <= 0) {
         continue;
       }
 
       /* Point to the game path of the game executable. */
       args->game_path = argv[arg_i + 1];
+      args->game_path_len = arg_value_len;
+
       arg_i += 1;
     } else if (wcscmp(argv[arg_i], L"--gameargs") == 0
         || wcscmp(argv[arg_i], L"-a") == 0) {
       /* Treat empty args as if there were no args. */
-      if (wcslen(argv[arg_i + 1]) <= 0) {
+      arg_value_len = wcslen(argv[arg_i + 1]);
+
+      if (arg_value_len <= 0) {
         continue;
       }
 
       /* Point to the game args */
       args->game_args = argv[arg_i + 1];
+      args->game_args_len = arg_value_len;
+
       arg_i += 1;
     } else if (wcscmp(argv[arg_i], L"--library") == 0
         || wcscmp(argv[arg_i], L"-l") == 0) {
       /* Treat empty args as if there were no args. */
-      if (wcslen(argv[arg_i + 1]) <= 0) {
+      arg_value_len = wcslen(argv[arg_i + 1]);
+
+      if (arg_value_len <= 0) {
         continue;
       }
 
@@ -186,7 +197,9 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
     } else if (wcscmp(argv[arg_i], L"--num-instances") == 0
         || wcscmp(argv[arg_i], L"-n") == 0) {
       /* Treat empty args as if there were no args. */
-      if (wcslen(argv[arg_i + 1]) <= 0) {
+      arg_value_len = wcslen(argv[arg_i + 1]);
+
+      if (arg_value_len <= 0) {
         continue;
       }
 

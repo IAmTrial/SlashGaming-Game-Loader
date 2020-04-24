@@ -37,7 +37,10 @@
 
 struct Args {
   const wchar_t* game_path;
+  size_t game_path_len;
+
   const wchar_t* game_args;
+  size_t game_args_len;
 
   const wchar_t** libraries_to_inject;
   size_t libraries_capacity;
