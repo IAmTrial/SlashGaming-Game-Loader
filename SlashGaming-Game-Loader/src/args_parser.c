@@ -227,7 +227,15 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
 }
 
 void DestructArgs(struct Args* args) {
+  args->game_path = NULL;
+  args->game_path_len = 0;
+
+  args->game_args = NULL;
+  args->game_args_len = 0;
+
   free(args->libraries_to_inject);
   args->num_libraries = 0;
   args->libraries_capacity = 0;
+
+  args->num_instances = 0;
 }
