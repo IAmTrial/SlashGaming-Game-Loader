@@ -36,14 +36,25 @@
 #include <wctype.h>
 #include <windows.h>
 
+static void ResizeLibraries(struct Args* args) {
+  const wchar_t** realloc_libraries_to_inject;
+
+  args->libraries_capacity = (args->libraries_capacity > 0)
+      ? args->libraries_capacity * 2
+      : 4;
+
+  realloc_libraries_to_inject = realloc(
+      args->libraries_to_inject,
+      args->libraries_capacity * sizeof(args->libraries_to_inject[0])
+  );
+
+  args->libraries_to_inject = realloc_libraries_to_inject;
+}
+
 static void AddLibrary(struct Args* args, const wchar_t* arg) {
   /* Resize if needed. */
   if (args->num_libraries == args->libraries_capacity) {
-    args->libraries_capacity *= 2;
-    args->libraries_to_inject = realloc(
-        args->libraries_to_inject,
-        args->libraries_capacity * sizeof(args->libraries_to_inject[0])
-    );
+    ResizeLibraries(args);
   }
 
   /* Add the library to the list of libraries. */
