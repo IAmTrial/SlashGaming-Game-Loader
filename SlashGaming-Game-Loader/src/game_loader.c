@@ -41,6 +41,18 @@ enum CONSTANT {
   ERROR_MESSAGE_LEN = 512
 };
 
+static void InitCommandLine(wchar_t* cmd_line, const struct Args* args) {
+  /* Surround the game path in quotes to handle paths with whitespace. */
+  wcscpy(cmd_line, L"\"");
+  wcscat(cmd_line, args->game_path);
+  wcscat(cmd_line, L"\"");
+
+  if (args->game_args != NULL) {
+    wcscat(cmd_line, L" ");
+    wcscat(cmd_line, args->game_args);
+  }
+}
+
 static void ShowMessageCreateProcessError(
     const struct Args* args,
     DWORD last_error
@@ -97,12 +109,7 @@ void StartGame(
     * CreateProcessW can modify the cmd line string, so a copy must be
     * made every time an instance needs to be made.
     */
-    wcscpy(full_cmd_line, args->game_path);
-
-    if (args->game_args != NULL) {
-      wcscat(full_cmd_line, L" ");
-      wcscat(full_cmd_line, args->game_args);
-    }
+    InitCommandLine(full_cmd_line, args);
 
     is_create_process_success = CreateProcessW(
         args->game_path,
@@ -169,12 +176,7 @@ void StartGameSuspended(
     * CreateProcessW can modify the cmd line string, so a copy must be
     * made every time an instance needs to be made.
     */
-    wcscpy(full_cmd_line, args->game_path);
-
-    if (args->game_args != NULL) {
-      wcscat(full_cmd_line, L" ");
-      wcscat(full_cmd_line, args->game_args);
-    }
+    InitCommandLine(full_cmd_line, args);
 
     is_create_process_success = CreateProcessW(
         args->game_path,
