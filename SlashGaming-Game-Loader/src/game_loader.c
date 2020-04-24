@@ -95,9 +95,11 @@ void StartGame(
   STARTUPINFOW startup_info = { 0 };
   startup_info.cb = sizeof(startup_info);
 
-  full_cmd_line_len = wcslen(args->game_path);
+  /* Add 2 due to surrounding quotes. */
+  full_cmd_line_len = wcslen(args->game_path) + 2;
 
   if (args->game_args != NULL) {
+    /* Add 1 due to space. */
     full_cmd_line_len += wcslen(args->game_args) + 1;
   }
 
@@ -162,9 +164,11 @@ void StartGameSuspended(
   STARTUPINFOW startup_info = { 0 };
   startup_info.cb = sizeof(startup_info);
 
-  full_cmd_line_len = wcslen(args->game_path);
+  /* Add 2 due to surrounding quotes. */
+  full_cmd_line_len = wcslen(args->game_path) + 2;
 
   if (args->game_args != NULL) {
+    /* Add 1 due to space. */
     full_cmd_line_len += wcslen(args->game_args) + 1;
   }
 
