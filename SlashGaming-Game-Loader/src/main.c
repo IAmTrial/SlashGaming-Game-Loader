@@ -78,21 +78,21 @@ int wmain(int argc, const wchar_t** argv) {
   if (args.num_libraries > 0) {
     printf("Libraries to inject: \n");
 
-    wprintf(L"%ls", args.libraries_to_inject[0]);
-
-    for (i = 1; i < args.num_libraries; i += 1) {
-      wprintf(L", %ls", args.libraries_to_inject[i]);
+    for (i = 0; i < args.num_libraries; i += 1) {
+      wprintf(L"%ls \n", args.libraries_to_inject[i]);
     }
 
-    printf("\n\n");
+    printf("\n");
   }
 
-  printf("Number of instances to open: %d \n\n", args.num_instances);
+  printf("Number of instances to open: %d \n", args.num_instances);
 
   /* Create the new processes. */
   processes_infos = malloc(args.num_instances * sizeof(processes_infos[0]));
   memset(processes_infos, 0, args.num_instances * sizeof(processes_infos[0]));
   StartGameSuspended(processes_infos, &args);
+
+  printf("%u game instance(s) have been opened. \n\n", args.num_instances);
 
   /* Inject the library, after reading all files. */
   is_inject_libraries_success = InjectLibrariesToProcesses(
@@ -103,12 +103,14 @@ int wmain(int argc, const wchar_t** argv) {
   );
 
   if (is_inject_libraries_success) {
-    printf("All libraries have been successfully injected. \n");
+    printf("All libraries have been successfully injected. \n\n");
   } else {
-    printf("Some or all libraries failed to inject. \n");
+    printf("Some or all libraries failed to inject. \n\n");
   }
 
   /* Resume process. */
+  printf("Resuming processes... \n\n");
+
   for (i = 0; i < args.num_instances; i += 1) {
     ResumeThread(processes_infos[i].hThread);
 
@@ -134,6 +136,8 @@ int wmain(int argc, const wchar_t** argv) {
 
 free_args:
   DestructArgs(&args);
+
+  printf("Done. \n\n");
 
 #ifdef NDEBUG
   Sleep(500);

@@ -297,9 +297,9 @@ int InjectLibrariesToProcesses(
       );
 
       if (current_inject_result == 0x78) {
-        printf("VirtualAllocEx missing in this system! \n");
-        printf("This might mean you are running this in Windows 95/98/ME. \n");
-        printf("Such systems are missing features required for external \n");
+        printf("VirtualAllocEx missing in this system! This might mean \n");
+        printf("that you are running this in Windows 95/98/ME. Such \n");
+        printf("systems are missing features required for external DLL \n");
         printf("injection. \n\n");
 
         return 0;
@@ -319,6 +319,8 @@ int InjectLibrariesToProcesses(
 
     is_all_success = is_current_inject_success && is_all_success;
   }
+
+  printf("\n");
 
 #ifdef FLAG_VIRTUAL_ALLOC_EX
   VirtualAllocEx_Stub(&valid_execution_flags);
