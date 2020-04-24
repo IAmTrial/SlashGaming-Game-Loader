@@ -149,6 +149,7 @@ int InjectLibrary(
   DWORD wait_return_value;
   DWORD thread_exit_code;
   BOOL is_get_exit_code_thread_success;
+  BOOL is_close_handle_success;
   DWORD last_error;
 
   buffer_size = (wcslen(library_to_inject) + 1)
@@ -229,6 +230,16 @@ int InjectLibrary(
   if (!is_get_exit_code_thread_success) {
     ExitOnWindowsFunctionFailureWithLastError(
         L"GetExitCodeThread",
+        GetLastError()
+    );
+  }
+
+close_remote_thread_handle:
+  is_close_handle_success = CloseHandle(remote_thread_handle);
+
+  if (!is_close_handle_success) {
+    ExitOnWindowsFunctionFailureWithLastError(
+        L"CloseHandle",
         GetLastError()
     );
   }
