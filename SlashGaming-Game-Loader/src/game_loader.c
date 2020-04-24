@@ -37,10 +37,6 @@
 static const wchar_t* kCreateProcessErrorFormat =
     L"%ls could not be started, with error code %x.";
 
-enum CONSTANT {
-  ERROR_MESSAGE_LEN = 512
-};
-
 static void InitCommandLine(wchar_t* cmd_line, const struct Args* args) {
   /* Surround the game path in quotes to handle paths with whitespace. */
   wcscpy(cmd_line, L"\"");
@@ -59,11 +55,9 @@ static void ShowMessageCreateProcessError(
 ) {
   switch (last_error) {
     case 0x2: {
-      MessageBoxW(
-          NULL,
-          L"File could not be found.",
-          L"Could Not Start Game",
-          MB_OK | MB_ICONERROR
+      ExitOnGeneralFailure(
+          L"Game executable could not be found.",
+          L"Could Not Start Game"
       );
       break;
     }
