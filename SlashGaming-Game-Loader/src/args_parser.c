@@ -36,6 +36,8 @@
 #include <wctype.h>
 #include <windows.h>
 
+#include "error_handling.h"
+
 static void ResizeLibraries(struct Args* args) {
   const wchar_t** realloc_libraries_to_inject;
 
@@ -47,6 +49,10 @@ static void ResizeLibraries(struct Args* args) {
       args->libraries_to_inject,
       args->libraries_capacity * sizeof(args->libraries_to_inject[0])
   );
+
+  if (realloc_libraries_to_inject == NULL) {
+    ExitOnAllocationFailure();
+  }
 
   args->libraries_to_inject = realloc_libraries_to_inject;
 }
@@ -138,6 +144,10 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
   args->libraries_to_inject = malloc(
       args->libraries_capacity * sizeof(args->libraries_to_inject[0])
   );
+
+  if (args->libraries_to_inject == NULL) {
+    ExitOnAllocationFailure();
+  }
 
   args->num_instances = 1;
 

@@ -89,6 +89,11 @@ int wmain(int argc, const wchar_t** argv) {
 
   /* Create the new processes. */
   processes_infos = malloc(args.num_instances * sizeof(processes_infos[0]));
+
+  if (processes_infos == NULL) {
+    ExitOnAllocationFailure();
+  }
+
   memset(processes_infos, 0, args.num_instances * sizeof(processes_infos[0]));
   StartGameSuspended(processes_infos, &args);
 

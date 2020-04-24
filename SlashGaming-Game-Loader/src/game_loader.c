@@ -99,6 +99,10 @@ void StartGame(
 
   full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
 
+  if (full_cmd_line == NULL) {
+    ExitOnAllocationFailure();
+  }
+
   /* Create the desired processes. */
   for (i = 0; i < args->num_instances; i += 1) {
     /*
@@ -167,6 +171,10 @@ void StartGameSuspended(
   }
 
   full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
+
+  if (full_cmd_line == NULL) {
+    ExitOnAllocationFailure();
+  }
 
   /* Create the desired processes. */
   for (i = 0; i < args->num_instances; i += 1) {
