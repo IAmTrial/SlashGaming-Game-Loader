@@ -135,7 +135,11 @@ int wmain(int argc, const wchar_t** argv) {
 free_args:
   DestructArgs(&args);
 
+#ifdef NDEBUG
   Sleep(500);
+#else
+  getc(stdin);
+#endif /* NDEBUG */
 
   return 0;
 }
