@@ -80,8 +80,7 @@ void StartGame(
 
   BOOL is_create_process_success;
 
-  STARTUPINFOW startup_info;
-  memset(&startup_info, 0, sizeof(startup_info));
+  STARTUPINFOW startup_info = { 0 };
   startup_info.cb = sizeof(startup_info);
 
   full_cmd_line_len = wcslen(args->game_path);
@@ -153,8 +152,7 @@ void StartGameSuspended(
 
   BOOL is_create_process_success;
 
-  STARTUPINFOW startup_info;
-  memset(&startup_info, 0, sizeof(startup_info));
+  STARTUPINFOW startup_info = { 0 };
   startup_info.cb = sizeof(startup_info);
 
   full_cmd_line_len = wcslen(args->game_path);
