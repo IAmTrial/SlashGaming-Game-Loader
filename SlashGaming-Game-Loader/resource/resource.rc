@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,8 +27,8 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_RESOURCE_RC_
-#define SGEXE_RESOURCE_RC_
+#ifndef SGGL_RESOURCE_RC_
+#define SGGL_RESOURCE_RC_
 
 #include <windows.h>
 
@@ -39,8 +39,8 @@ SLASH_ICON ICON "slashgaming_game_loader.ico"
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO    VERSIONINFO
-  FILEVERSION      1,1,0,0
-  PRODUCTVERSION   1,1,0,0
+  FILEVERSION      1,2,0,0
+  PRODUCTVERSION   1,2,0,0
   FILEFLAGSMASK    0x3fL // VS_FFI_FILEFLAGSMASK
 #ifdef _DEBUG
   FILEFLAGS        0x1L  // VS_FF_DEBUG|VS_FF_PRIVATEBUILD|VS_FF_PRERELEASE
@@ -55,17 +55,17 @@ VS_VERSION_INFO    VERSIONINFO
   {
     BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
     {
-      VALUE "Build",            "2019\0"
+      VALUE "Build",            "2020\0"
       VALUE "Comments",         "Licensed under Affero GPL v3+. Loads target process and injects DLLs.\0"
       VALUE "CompanyName",      "SlashGaming\0"
       VALUE "Developer",        "Mir Drualga\0"
       VALUE "FileDescription",  "SlashGaming Game Loader\0"
       VALUE "InternalName",     "SlashGaming Game Loader\0"
-      VALUE "LegalCopyright",   "Copyright (C) 2018-2019  Mir Drualga\0"
+      VALUE "LegalCopyright",   "Copyright (C) 2018-2020  Mir Drualga\0"
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "PrivateBuild",     "\0"
       VALUE "ProductName",      "SlashGaming Game Loader\0"
-      VALUE "ProductVersion",   "1.1.0.0\0"
+      VALUE "ProductVersion",   "1.2.0.0\0"
       VALUE "SpecialBuild",     "\0"
       VALUE "Support",          "reddit.com/r/SlashGaming\0"
     } // BLOCK "040904E4"
@@ -76,4 +76,4 @@ VS_VERSION_INFO    VERSIONINFO
   } // BLOCK "VarFileInfo"
 }
 
-#endif // SGEXE_RESOURCE_RC_
+#endif // SGGL_RESOURCE_RC_

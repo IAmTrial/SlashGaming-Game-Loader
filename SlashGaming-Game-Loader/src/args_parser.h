@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,20 +27,30 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_CONFIG_H_
-#define SGEXE_CONFIG_H_
+#ifndef SGGL_ARGS_PARSER_H_
+#define SGGL_ARGS_PARSER_H_
 
-#include <filesystem>
-#include <vector>
+#include <limits.h>
+#include <stddef.h>
+#include <wchar.h>
+#include <windows.h>
 
-namespace sgexe::config {
+struct Args {
+  const wchar_t* game_path;
+  size_t game_path_len;
 
-const std::filesystem::path&
-GetVersionDetectorLibraryPath();
+  const wchar_t* game_args;
+  size_t game_args_len;
 
-const std::vector<std::filesystem::path>&
-GetInjectDllsPaths();
+  const wchar_t** libraries_to_inject;
+  size_t libraries_capacity;
+  size_t num_libraries;
 
-} // namespace sgexe
+  size_t num_instances;
+};
 
-#endif // SGEXE_CONFIG_H_
+int ValidateArgs(int argc, const wchar_t* const* argv);
+void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv);
+void DestructArgs(struct Args* args);
+
+#endif /* SGGL_ARGS_PARSER_H_ */

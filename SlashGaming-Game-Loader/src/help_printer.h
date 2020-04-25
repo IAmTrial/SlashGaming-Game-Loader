@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,22 +27,11 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_TIME_CHECKER_H_
-#define SGEXE_TIME_CHECKER_H_
+#ifndef SGGL_HELP_PRINTER_H_
+#define SGGL_HELP_PRINTER_H_
 
-#include <string_view>
+#include <wchar.h>
 
-namespace sgexe::timechecker {
+void PrintHelp(const wchar_t* current_program);
 
-constexpr bool kIsEnforceTimestamp = false;
-constexpr std::string_view kCompilationDate = __DATE__;
-constexpr int kAllowedMonthDifference = 1;
-
-void
-EnforceTimeStamp(
-    void
-);
-
-} // namespace sgexe::timechecker
-
-#endif // SGEXE_TIME_CHECKER_H_
+#endif /* SGGL_HELP_PRINTER_H_ */

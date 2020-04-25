@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,24 +27,21 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_GAME_LOADER_H_
-#define SGEXE_GAME_LOADER_H_
+#ifndef SGGL_GAME_LOADER_H_
+#define SGGL_GAME_LOADER_H_
 
 #include <windows.h>
-#include <filesystem>
 
-namespace sgexe {
+#include "args_parser.h"
 
-PROCESS_INFORMATION
-StartGame(
-    const std::filesystem::path& game_executable
+void StartGame(
+    PROCESS_INFORMATION* processes_infos,
+    const struct Args* args
 );
 
-PROCESS_INFORMATION
-StartGameSuspended(
-    const std::filesystem::path& game_executable
+void StartGameSuspended(
+    PROCESS_INFORMATION* processes_infos,
+    const struct Args* args
 );
 
-} // namespace sgexe
-
-#endif // SGEXE_GAME_LOADER_H_
+#endif /* SGGL_GAME_LOADER_H_ */

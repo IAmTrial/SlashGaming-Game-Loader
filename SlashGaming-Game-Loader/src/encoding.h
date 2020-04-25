@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,30 +27,29 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_EXTERN_IMPORT_H_
-#define SGEXE_EXTERN_IMPORT_H_
+#ifndef SGGL_ENCODING_H_
+#define SGGL_ENCODING_H_
 
-#include <windows.h>
-#include <filesystem>
-#include <string>
+#include <wchar.h>
 
-namespace sgexe {
-
-std::filesystem::path
-GetGameExecutableFilePath(
-    HMODULE dll_handle
+wchar_t* ConvertUtf8ToWide(
+    wchar_t* wide_string,
+    const char* utf8_string
 );
 
-std::string
-GetGameName(
-    HMODULE dll_handle
+char* ConvertWideToUtf8(
+    char* utf8_string,
+    const wchar_t* wide_string
 );
 
-std::string
-GetGameVersionText(
-    HMODULE dll_handle
+wchar_t* ConvertMultibyteToWide(
+    wchar_t* wide_string,
+    const char* multibyte_string
 );
 
-} // namespace sgd2exe
+char* ConvertWideToMultibyte(
+    char* multibyte_string,
+    const wchar_t* wide_string
+);
 
-#endif // SGEXE_EXTERN_IMPORT_H_
+#endif /* SGGL_ENCODING_H_ */

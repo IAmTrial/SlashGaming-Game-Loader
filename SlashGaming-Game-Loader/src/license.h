@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,16 +27,9 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_LICENSE_H_
-#define SGEXE_LICENSE_H_
+#ifndef SGGL_LICENSE_H_
+#define SGGL_LICENSE_H_
 
-namespace sgexe::license {
+void PrintLicenseNotice(void);
 
-void
-PrintLicenseNotice(
-    void
-);
-
-} // namespace sgexe
-
-#endif  // SGEXE_LICENSE_H_
+#endif  /* SGGL_LICENSE_H_ */

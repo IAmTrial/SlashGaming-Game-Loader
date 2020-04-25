@@ -1,6 +1,6 @@
 /**
  * SlashGaming Game Loader
- * Copyright (C) 2018-2019  Mir Drualga
+ * Copyright (C) 2018-2020  Mir Drualga
  *
  * This file is part of SlashGaming Game Loader.
  *
@@ -27,19 +27,22 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGEXE_FILEW_MACRO_H_
-#define SGEXE_FILEW_MACRO_H_
+#ifndef SGGL_ERROR_HANDLING_H_
+#define SGGL_ERROR_HANDLING_H_
 
-#ifndef _CRT_WIDE_
-#define _CRT_WIDE_(s) L##s
-#endif /* _CRT_WIDE_ */
+#include <wchar.h>
+#include <windows.h>
 
-#ifndef _CRT_WIDE
-#define _CRT_WIDE(s) _CRT_WIDE_(s)
-#endif /* _CRT_WIDE */
+void ExitOnGeneralFailure(
+    const wchar_t* message,
+    const wchar_t* caption
+);
 
-#ifndef __FILEW__
-#define __FILEW__ _CRT_WIDE(__FILE__)
-#endif /* __FILEW__ */
+void ExitOnAllocationFailure(void);
 
-#endif /* SGEXE_FILEW_MACRO_H_ */
+void ExitOnWindowsFunctionFailureWithLastError(
+    const wchar_t* function_name,
+    DWORD last_error
+);
+
+#endif /* SGGL_ERROR_HANDLING_H_ */

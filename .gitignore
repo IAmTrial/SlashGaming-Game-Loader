@@ -22,9 +22,13 @@
 *.depend
 
 *.sln
+*.ncb
+*.suo
+*.vcproj
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*.user
 
 *.json
 *.zip
