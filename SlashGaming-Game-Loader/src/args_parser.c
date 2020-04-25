@@ -174,7 +174,6 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
 
 void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
   int arg_i;
-  size_t arg_value_len;
 
   assert(argc >= 3);
 
