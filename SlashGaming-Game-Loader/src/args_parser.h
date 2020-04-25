@@ -47,6 +47,8 @@ struct Args {
   size_t num_libraries;
 
   size_t num_instances;
+
+  const wchar_t* knowledge_library_path;
 };
 
 int ValidateArgs(int argc, const wchar_t* const* argv);
