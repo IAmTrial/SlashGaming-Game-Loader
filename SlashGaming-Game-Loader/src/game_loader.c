@@ -32,7 +32,6 @@
 #include <wchar.h>
 
 #include "error_handling.h"
-#include "wide_macro.h"
 
 static const wchar_t* kCreateProcessErrorFormat =
     L"%ls could not be started, with error code %x.";
