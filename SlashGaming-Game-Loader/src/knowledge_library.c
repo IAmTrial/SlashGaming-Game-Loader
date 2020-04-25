@@ -29,6 +29,8 @@
 
 #include "knowledge_library.h"
 
+#include <stdio.h>
+
 #include "error_handling.h"
 
 static HMODULE knowledge_library;
@@ -48,7 +50,18 @@ typedef void (*CleanupFunctionType)(const PROCESS_INFORMATION*, size_t);
 static CleanupFunctionType cleanup;
 
 void Knowledge_Init(const wchar_t* knowledge_library_path) {
+  if (knowledge_library_path == NULL) {
+    return;
+  }
+
   knowledge_library = LoadLibraryW(knowledge_library_path);
+
+  if (knowledge_library == NULL) {
+    ExitOnWindowsFunctionFailureWithLastError(
+        L"LoadLibraryW",
+        GetLastError()
+    );
+  }
 
   print_game_info_func_ptr = (PrintGameInfoFunctionType) GetProcAddress(
       knowledge_library,
@@ -56,10 +69,7 @@ void Knowledge_Init(const wchar_t* knowledge_library_path) {
   );
 
   if (print_game_info_func_ptr == NULL) {
-    wprintf(
-        "Unable to load Knowledge_PrintGameInfo from %ls \n",
-        knowledge_library_path
-    );
+    printf("Unable to load Knowledge_PrintGameInfo. \n");
   }
 
   inject_libraries_to_processes =
@@ -69,10 +79,7 @@ void Knowledge_Init(const wchar_t* knowledge_library_path) {
       );
 
   if (inject_libraries_to_processes == NULL) {
-    wprintf(
-        "Unable to load Knowledge_InjectLibrariesToProcesses from %ls \n",
-        knowledge_library_path
-    );
+    printf("Unable to load Knowledge_InjectLibrariesToProcesses. \n");
   }
 
   cleanup = (CleanupFunctionType) GetProcAddress(
@@ -81,10 +88,7 @@ void Knowledge_Init(const wchar_t* knowledge_library_path) {
   );
 
   if (cleanup == NULL) {
-    wprintf(
-        "Unable to load Knowledge_Cleanup from %ls \n",
-        knowledge_library_path
-    );
+    printf("Unable to load Knowledge_Cleanup. \n");
   }
 }
 

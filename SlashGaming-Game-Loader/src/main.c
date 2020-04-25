@@ -71,7 +71,12 @@ int wmain(int argc, const wchar_t** argv) {
 
   /* Initialize Knowledge library, if specified. */
   if (args.knowledge_library_path != NULL) {
-    Knowledge_Init();
+    wprintf(
+        L"Loading Knowledge library from %ls \n",
+        args.knowledge_library_path
+    );
+    Knowledge_Init(args.knowledge_library_path);
+    printf("\n");
   }
 
   /* Print out the game info, handled by Knowledge. */

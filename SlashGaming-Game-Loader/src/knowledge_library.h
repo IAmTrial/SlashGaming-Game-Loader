@@ -34,7 +34,7 @@
 #include <wchar.h>
 #include <windows.h>
 
-void Knowledge_Init(void);
+void Knowledge_Init(const wchar_t* knowledge_library_path);
 void Knowledge_Deinit(void);
 
 void Knowledge_PrintGameInfo(
