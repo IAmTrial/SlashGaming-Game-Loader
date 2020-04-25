@@ -34,22 +34,22 @@
 #include <wchar.h>
 #include <windows.h>
 
-void Knowledge_Init(const wchar_t* knowledge_library_path);
-void Knowledge_Deinit(void);
-
-void Knowledge_PrintGameInfo(
+void Knowledge_Init(
+    const wchar_t* knowledge_library_path,
     const wchar_t* game_path,
     size_t game_path_len
 );
 
-int Knowledge_InjectLibrariesToProcesses(
-    const wchar_t** libraries_to_inject,
-    size_t num_libraries,
+void Knowledge_Deinit(
     const PROCESS_INFORMATION* processes_infos,
     size_t num_instances
 );
 
-void Knowledge_Cleanup(
+void Knowledge_PrintGameInfo(void);
+
+int Knowledge_InjectLibrariesToProcesses(
+    const wchar_t** libraries_to_inject,
+    size_t num_libraries,
     const PROCESS_INFORMATION* processes_infos,
     size_t num_instances
 );

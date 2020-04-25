@@ -35,7 +35,13 @@
 
 static HMODULE knowledge_library;
 
-typedef void (*PrintGameInfoFunctionType)(const wchar_t*, size_t);
+typedef void (*InitFunctionType)(const wchar_t*, size_t);
+static InitFunctionType init_func_ptr;
+
+typedef void (*DeinitFunctionType)(const PROCESS_INFORMATION*, size_t);
+static DeinitFunctionType deinit_func_ptr;
+
+typedef void (*PrintGameInfoFunctionType)(void);
 static PrintGameInfoFunctionType print_game_info_func_ptr;
 
 typedef int (*InjectLibrariesToProcessesFunctionType)(
@@ -44,12 +50,14 @@ typedef int (*InjectLibrariesToProcessesFunctionType)(
     const PROCESS_INFORMATION*,
     size_t
 );
-static InjectLibrariesToProcessesFunctionType inject_libraries_to_processes;
+static InjectLibrariesToProcessesFunctionType
+inject_libraries_to_processes_func_ptr;
 
-typedef void (*CleanupFunctionType)(const PROCESS_INFORMATION*, size_t);
-static CleanupFunctionType cleanup;
-
-void Knowledge_Init(const wchar_t* knowledge_library_path) {
+void Knowledge_Init(
+    const wchar_t* knowledge_library_path,
+    const wchar_t* game_path,
+    size_t game_path_len
+) {
   if (knowledge_library_path == NULL) {
     return;
   }
@@ -63,6 +71,25 @@ void Knowledge_Init(const wchar_t* knowledge_library_path) {
     );
   }
 
+  /* Load all of the Knowledge functions. */
+  init_func_ptr = (InitFunctionType) GetProcAddress(
+      knowledge_library,
+      "Knowledge_Init"
+  );
+
+  if (init_func_ptr == NULL) {
+    printf("Unable to load Knowledge_Init. \n");
+  }
+
+  deinit_func_ptr = (DeinitFunctionType) GetProcAddress(
+      knowledge_library,
+      "Knowledge_Deinit"
+  );
+
+  if (deinit_func_ptr == NULL) {
+    printf("Unable to load Knowledge_Deinit. \n");
+  }
+
   print_game_info_func_ptr = (PrintGameInfoFunctionType) GetProcAddress(
       knowledge_library,
       "Knowledge_PrintGameInfo"
@@ -72,32 +99,38 @@ void Knowledge_Init(const wchar_t* knowledge_library_path) {
     printf("Unable to load Knowledge_PrintGameInfo. \n");
   }
 
-  inject_libraries_to_processes =
+  inject_libraries_to_processes_func_ptr =
       (InjectLibrariesToProcessesFunctionType) GetProcAddress(
           knowledge_library,
           "Knowledge_InjectLibrariesToProcesses"
       );
 
-  if (inject_libraries_to_processes == NULL) {
+  if (inject_libraries_to_processes_func_ptr == NULL) {
     printf("Unable to load Knowledge_InjectLibrariesToProcesses. \n");
   }
 
-  cleanup = (CleanupFunctionType) GetProcAddress(
-      knowledge_library,
-      "Knowledge_Cleanup"
-  );
-
-  if (cleanup == NULL) {
-    printf("Unable to load Knowledge_Cleanup. \n");
+  /* Call Knowledge's init function if it exists. */
+  if (init_func_ptr != NULL) {
+    init_func_ptr(game_path, game_path_len);
   }
 }
 
-void Knowledge_Deinit(void) {
+void Knowledge_Deinit(
+    const PROCESS_INFORMATION* processes_infos,
+    size_t num_instances
+) {
   BOOL free_library_result;
 
+  /* Call Knowledge's deinit function if it exists. */
+  if (deinit_func_ptr != NULL) {
+    deinit_func_ptr(processes_infos, num_instances);
+  }
+
+  /* Set all of the function pointers to NULL. */
+  init_func_ptr = NULL;
+  deinit_func_ptr = NULL;
   print_game_info_func_ptr = NULL;
-  inject_libraries_to_processes = NULL;
-  cleanup = NULL;
+  inject_libraries_to_processes_func_ptr = NULL;
 
   if (knowledge_library == NULL) {
     return;
@@ -113,15 +146,12 @@ void Knowledge_Deinit(void) {
   }
 }
 
-void Knowledge_PrintGameInfo(
-    const wchar_t* game_path,
-    size_t game_path_len
-) {
+void Knowledge_PrintGameInfo(void) {
   if (print_game_info_func_ptr == NULL) {
     return;
   }
 
-  print_game_info_func_ptr(game_path, game_path_len);
+  print_game_info_func_ptr();
 }
 
 int Knowledge_InjectLibrariesToProcesses(
@@ -130,25 +160,14 @@ int Knowledge_InjectLibrariesToProcesses(
     const PROCESS_INFORMATION* processes_infos,
     size_t num_instances
 ) {
-  if (inject_libraries_to_processes == NULL) {
+  if (inject_libraries_to_processes_func_ptr == NULL) {
     return 0;
   }
 
-  return inject_libraries_to_processes(
+  return inject_libraries_to_processes_func_ptr(
       libraries_to_inject,
       num_libraries,
       processes_infos,
       num_instances
   );
-}
-
-void Knowledge_Cleanup(
-    const PROCESS_INFORMATION* processes_infos,
-    size_t num_instances
-) {
-  if (cleanup == NULL) {
-    return;
-  }
-
-  cleanup(processes_infos, num_instances);
 }

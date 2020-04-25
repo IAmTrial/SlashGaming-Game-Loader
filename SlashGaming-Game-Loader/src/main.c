@@ -75,12 +75,16 @@ int wmain(int argc, const wchar_t** argv) {
         L"Loading Knowledge library from %ls \n",
         args.knowledge_library_path
     );
-    Knowledge_Init(args.knowledge_library_path);
+    Knowledge_Init(
+        args.knowledge_library_path,
+        args.game_path,
+        args.game_args_len
+    );
     printf("\n");
   }
 
   /* Print out the game info, handled by Knowledge. */
-  Knowledge_PrintGameInfo(args.game_path, args.game_path_len);
+  Knowledge_PrintGameInfo();
 
   /* Print out parsed args to standard out. */
   printf("Now loading game from path... \n");
@@ -148,7 +152,8 @@ int wmain(int argc, const wchar_t** argv) {
   }
 
   /* Before closing handles, have Knowledge cleanup anything it needs to. */
-  Knowledge_Cleanup(processes_infos, args.num_instances);
+knowledge_deinit:
+  Knowledge_Deinit(processes_infos, args.num_instances);
 
   /* Close process and thread handles. */
   for (i = 0; i < args.num_instances; i += 1) {
