@@ -39,8 +39,8 @@ wchar_t* ConvertUtf8ToWide(
     wchar_t* wide_string,
     const char* utf8_string
 ) {
-  size_t num_wide_chars;
-  size_t converted_chars;
+  int num_wide_chars;
+  int converted_chars;
 
   // Determine the number of characters needed.
   num_wide_chars = MultiByteToWideChar(
@@ -100,8 +100,8 @@ char* ConvertWideToUtf8(
     char* utf8_string,
     const wchar_t* wide_string
 ) {
-  size_t num_utf8_chars;
-  size_t converted_chars;
+  int num_utf8_chars;
+  int converted_chars;
 
   // Determine the number of characters needed.
   num_utf8_chars = WideCharToMultiByte(
