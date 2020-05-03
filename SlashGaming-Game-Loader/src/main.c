@@ -78,7 +78,7 @@ int wmain(int argc, const wchar_t** argv) {
     Knowledge_Init(
         args.knowledge_library_path,
         args.game_path,
-        args.game_args_len
+        args.game_path_len
     );
     printf("\n");
   }
