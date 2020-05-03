@@ -58,6 +58,8 @@ void Knowledge_Init(
     const wchar_t* game_path,
     size_t game_path_len
 ) {
+  DWORD last_error;
+
   if (knowledge_library_path == NULL) {
     return;
   }
@@ -65,9 +67,15 @@ void Knowledge_Init(
   knowledge_library = LoadLibraryW(knowledge_library_path);
 
   if (knowledge_library == NULL) {
+    last_error = GetLastError();
+
+    if (last_error == 0x7E) {
+      return;
+    }
+
     ExitOnWindowsFunctionFailureWithLastError(
         L"LoadLibraryW",
-        GetLastError()
+        last_error
     );
   }
 
