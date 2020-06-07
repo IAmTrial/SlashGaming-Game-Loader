@@ -39,6 +39,9 @@
 
 static LPTHREAD_START_ROUTINE LoadLibraryWFuncPtr;
 
+typedef BOOL (WINAPI *VirtualFreeExFuncType)(HANDLE, void*, DWORD, DWORD);
+static VirtualFreeExFuncType VirtualFreeExFuncPtr;
+
 static int valid_execution_flags = 0;
 
 static unsigned char virtual_alloc_ex_buffer[] = {
@@ -257,7 +260,7 @@ close_remote_thread_handle:
   }
 
 virtual_free:
-  is_virtual_free_success = VirtualFreeEx(
+  is_virtual_free_success = VirtualFreeExFuncPtr(
       process_info->hProcess,
       remote_buf,
       0,
@@ -300,6 +303,11 @@ int InjectLibrariesToProcesses(
   LoadLibraryWFuncPtr = (LPTHREAD_START_ROUTINE) GetProcAddress(
       GetModuleHandleW(L"kernel32.dll"),
       "LoadLibraryW"
+  );
+
+  VirtualFreeExFuncPtr = (VirtualFreeExFuncType) GetProcAddress(
+      GetModuleHandleW(L"kernel32.dll"),
+      "VirtualFreeEx"
   );
 
   for (library_i = 0; library_i < num_libraries; library_i += 1) {
