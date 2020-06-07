@@ -35,18 +35,87 @@
 
 #include "error_handling.h"
 
-wchar_t* ConvertUtf8ToWide(
+static char* ConvertWideToChar(
+    char* char_string,
+    const wchar_t* wide_string,
+    unsigned int code_page
+) {
+  int num_chars;
+  int converted_chars;
+
+  /* Determine the number of characters needed. */
+  num_chars = WideCharToMultiByte(
+      code_page,
+      0,
+      wide_string,
+      -1,
+      char_string,
+      0,
+      NULL,
+      NULL
+  );
+
+  if (num_chars == 0) {
+    ExitOnWindowsFunctionFailureWithLastError(
+        L"WideCharToMultiByte",
+        GetLastError()
+    );
+  }
+
+  /* Allocate space if the char string is NULL. */
+  if (char_string == NULL) {
+    char_string = (char*) malloc(
+        num_chars * sizeof(char_string[0])
+    );
+
+    if (char_string == NULL) {
+      ExitOnAllocationFailure();
+    }
+  }
+
+  /*
+  * Convert the wide string to char string. Check that there was no failure.
+  */
+  converted_chars = WideCharToMultiByte(
+      code_page,
+      0,
+      wide_string,
+      -1,
+      char_string,
+      num_chars,
+      NULL,
+      NULL
+  );
+
+  if (converted_chars == 0) {
+    ExitOnWindowsFunctionFailureWithLastError(
+        L"WideCharToMultiByte",
+        GetLastError()
+    );
+  } else if (converted_chars < num_chars) {
+    ExitOnGeneralFailure(
+        L"The number of converted characters is less than the intended "
+        L"count.",
+        L"String Conversion Failed"
+    );
+  }
+
+  return char_string;
+}
+
+static wchar_t* ConvertCharToWide(
     wchar_t* wide_string,
-    const char* utf8_string
+    const char* char_string,
+    unsigned int code_page
 ) {
   int num_wide_chars;
   int converted_chars;
 
-  // Determine the number of characters needed.
+  /* Determine the number of characters needed. */
   num_wide_chars = MultiByteToWideChar(
-      CP_UTF8,
+      code_page,
       0,
-      utf8_string,
+      char_string,
       -1,
       wide_string,
       0
@@ -59,7 +128,7 @@ wchar_t* ConvertUtf8ToWide(
     );
   }
 
-  // Allocate space if the wide_string is NULL.
+  /* Allocate space if the wide_string is NULL. */
   if (wide_string == NULL) {
     wide_string = (wchar_t*) malloc(
         num_wide_chars * sizeof(wide_string[0])
@@ -70,11 +139,13 @@ wchar_t* ConvertUtf8ToWide(
     }
   }
 
-  // Convert the UTF-8 string to wide string. Check that there was no failure.
+  /*
+  * Convert the UTF-8 string to wide string. Check that there was no failure.
+  */
   converted_chars = MultiByteToWideChar(
-      CP_UTF8,
+      code_page,
       0,
-      utf8_string,
+      char_string,
       -1,
       wide_string,
       num_wide_chars
@@ -96,140 +167,46 @@ wchar_t* ConvertUtf8ToWide(
   return wide_string;
 }
 
+wchar_t* ConvertUtf8ToWide(
+    wchar_t* wide_string,
+    const char* utf8_string
+) {
+  return ConvertCharToWide(
+      wide_string,
+      utf8_string,
+      CP_UTF8
+  );
+}
+
 char* ConvertWideToUtf8(
     char* utf8_string,
     const wchar_t* wide_string
 ) {
-  int num_utf8_chars;
-  int converted_chars;
-
-  // Determine the number of characters needed.
-  num_utf8_chars = WideCharToMultiByte(
-      CP_UTF8,
-      0,
-      wide_string,
-      -1,
+  return ConvertWideToChar(
       utf8_string,
-      0,
-      NULL,
-      NULL
-  );
-
-  if (num_utf8_chars == 0) {
-    ExitOnWindowsFunctionFailureWithLastError(
-        L"WideCharToMultiByte",
-        GetLastError()
-    );
-  }
-
-  // Allocate space if the UTF-8 string is NULL.
-  if (utf8_string == NULL) {
-    utf8_string = (char*) malloc(
-        num_utf8_chars * sizeof(utf8_string[0])
-    );
-
-    if (utf8_string == NULL) {
-      ExitOnAllocationFailure();
-    }
-  }
-
-  // Convert the UTF-8 string to wide string. Check that there was no failure.
-  converted_chars = WideCharToMultiByte(
-      CP_UTF8,
-      0,
       wide_string,
-      -1,
-      utf8_string,
-      num_utf8_chars,
-      NULL,
-      NULL
+      CP_UTF8
   );
-
-  if (converted_chars == 0) {
-    ExitOnWindowsFunctionFailureWithLastError(
-        L"WideCharToMultiByte",
-        GetLastError()
-    );
-  } else if (converted_chars < num_utf8_chars) {
-    ExitOnGeneralFailure(
-        L"The number of converted characters is less than the intended "
-        L"count.",
-        L"String Conversion Failed"
-    );
-  }
-
-  return utf8_string;
 }
 
 wchar_t* ConvertMultibyteToWide(
     wchar_t* wide_string,
     const char* multibyte_string
 ) {
-  size_t wide_string_len;
-  size_t wide_string_size;
-  mbstate_t mbstate;
-
-  /* Determine the length of the new string. */
-  memset(&mbstate, 0, sizeof(mbstate_t));
-  wide_string_len = mbsrtowcs(NULL, &multibyte_string, 0, &mbstate);
-  wide_string_size = (wide_string_len + 1) * sizeof(wide_string[0]);
-
-  if (wide_string == NULL) {
-    wide_string = malloc(wide_string_size);
-
-    if (wide_string == NULL) {
-      ExitOnAllocationFailure();
-    }
-  }
-
-  /* Convert multibyte string to wide string. */
-  memset(&mbstate, 0, sizeof(mbstate_t));
-
-  mbsrtowcs(
+  return ConvertCharToWide(
       wide_string,
-      &multibyte_string,
-      wide_string_size,
-      &mbstate
+      multibyte_string,
+      CP_ACP
   );
-
-  wide_string[wide_string_len] = L'\0';
-
-  return wide_string;
 }
 
 char* ConvertWideToMultibyte(
     char* multibyte_string,
     const wchar_t* wide_string
 ) {
-  size_t multibyte_string_len;
-  size_t multibyte_string_size;
-  mbstate_t mbstate;
-
-  /* Determine the length of the new string. */
-  memset(&mbstate, 0, sizeof(mbstate_t));
-  multibyte_string_len = wcsrtombs(NULL, &wide_string, 0, &mbstate);
-  multibyte_string_size =
-      (multibyte_string_len + 1) * sizeof(multibyte_string[0]);
-
-  if (multibyte_string == NULL) {
-    multibyte_string = malloc(multibyte_string_size);
-
-    if (multibyte_string == NULL) {
-      ExitOnAllocationFailure();
-    }
-  }
-
-  /* Convert wide string to multibyte string. */
-  memset(&mbstate, 0, sizeof(mbstate_t));
-
-  wcsrtombs(
+  return ConvertWideToChar(
       multibyte_string,
-      &wide_string,
-      multibyte_string_size,
-      &mbstate
+      wide_string,
+      CP_ACP
   );
-
-  multibyte_string[multibyte_string_len] = '\0';
-
-  return multibyte_string;
 }
