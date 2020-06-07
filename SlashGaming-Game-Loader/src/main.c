@@ -62,6 +62,8 @@ int wmain(int argc, const wchar_t** argv) {
   /* Validate args. */
   if (!ValidateArgs(argc, argv)) {
     PrintHelp(argv[0]);
+    printf("\nPress enter to exit... \n");
+    getc(stdin);
 
     return 0;
   }
