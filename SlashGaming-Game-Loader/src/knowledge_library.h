@@ -27,32 +27,31 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGGL_ARGS_PARSER_H_
-#define SGGL_ARGS_PARSER_H_
+#ifndef SGGL_KNOWLEDGE_LIBRARY_H_
+#define SGGL_KNOWLEDGE_LIBRARY_H_
 
-#include <limits.h>
 #include <stddef.h>
 #include <wchar.h>
 #include <windows.h>
 
-struct Args {
-  const wchar_t* game_path;
-  size_t game_path_len;
+void Knowledge_Init(
+    const wchar_t* knowledge_library_path,
+    const wchar_t* game_path,
+    size_t game_path_len
+);
 
-  const wchar_t* game_args;
-  size_t game_args_len;
+void Knowledge_Deinit(
+    const PROCESS_INFORMATION* processes_infos,
+    size_t num_instances
+);
 
-  const wchar_t** libraries_to_inject;
-  size_t libraries_capacity;
-  size_t num_libraries;
+void Knowledge_PrintGameInfo(void);
 
-  size_t num_instances;
+int Knowledge_InjectLibrariesToProcesses(
+    const wchar_t** libraries_to_inject,
+    size_t num_libraries,
+    const PROCESS_INFORMATION* processes_infos,
+    size_t num_instances
+);
 
-  const wchar_t* knowledge_library_path;
-};
-
-int ValidateArgs(int argc, const wchar_t* const* argv);
-void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv);
-void DestructArgs(struct Args* args);
-
-#endif /* SGGL_ARGS_PARSER_H_ */
+#endif /* SGGL_KNOWLEDGE_LIBRARY_H_ */

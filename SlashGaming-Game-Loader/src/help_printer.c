@@ -72,6 +72,12 @@ void PrintHelp(const wchar_t* current_program) {
   PrintContinuedLine("the game");
 
   PrintArgHelp(
+      "-k, --knowledge <library>",
+      "Path of Knowledge extension"
+  );
+  PrintContinuedLine("library");
+
+  PrintArgHelp(
       "-l, --library <library>",
       "Path of library to inject (this"
   );

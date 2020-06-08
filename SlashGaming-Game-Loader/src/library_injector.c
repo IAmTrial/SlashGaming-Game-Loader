@@ -39,6 +39,14 @@
 
 static LPTHREAD_START_ROUTINE LoadLibraryWFuncPtr;
 
+typedef BOOL (WINAPI *VirtualFreeExFuncType)(HANDLE, void*, DWORD, DWORD);
+static VirtualFreeExFuncType VirtualFreeExFuncPtr;
+
+typedef void* (WINAPI *VirtualAllocExFuncType)(
+    HANDLE, void*, DWORD, DWORD, DWORD
+);
+static VirtualAllocExFuncType VirtualAllocExFuncPtr;
+
 static int valid_execution_flags = 0;
 
 static unsigned char virtual_alloc_ex_buffer[] = {
@@ -171,7 +179,7 @@ int InjectLibraryToProcessN(
 #ifdef FLAG_VIRTUAL_ALLOC_EX
   VirtualAllocEx_Stub(&valid_execution_flags);
 #endif /* FLAG_VIRTUAL_ALLOC_EX */
-  remote_buf = VirtualAllocEx(
+  remote_buf = VirtualAllocExFuncPtr(
       process_info->hProcess,
       NULL,
       buffer_size,
@@ -257,7 +265,7 @@ close_remote_thread_handle:
   }
 
 virtual_free:
-  is_virtual_free_success = VirtualFreeEx(
+  is_virtual_free_success = VirtualFreeExFuncPtr(
       process_info->hProcess,
       remote_buf,
       0,
@@ -300,6 +308,16 @@ int InjectLibrariesToProcesses(
   LoadLibraryWFuncPtr = (LPTHREAD_START_ROUTINE) GetProcAddress(
       GetModuleHandleW(L"kernel32.dll"),
       "LoadLibraryW"
+  );
+
+  VirtualFreeExFuncPtr = (VirtualFreeExFuncType) GetProcAddress(
+      GetModuleHandleW(L"kernel32.dll"),
+      "VirtualFreeEx"
+  );
+
+  VirtualAllocExFuncPtr = (VirtualAllocExFuncType) GetProcAddress(
+      GetModuleHandleW(L"kernel32.dll"),
+      "VirtualAllocEx"
   );
 
   for (library_i = 0; library_i < num_libraries; library_i += 1) {
@@ -350,7 +368,7 @@ int InjectLibrariesToProcesses(
         sizeof(virtual_alloc_ex_buffer) * sizeof(virtual_alloc_ex_buffer[0]);
 
     /* Store the library path into the target process. */
-    remote_buf = VirtualAllocEx(
+    remote_buf = VirtualAllocExFuncPtr(
         processes_infos[0].hProcess,
         NULL,
         virtual_alloc_ex_buffer_total_size,

@@ -36,6 +36,7 @@
 #include "error_handling.h"
 #include "game_loader.h"
 #include "help_printer.h"
+#include "knowledge_library.h"
 #include "library_injector.h"
 #include "license.h"
 
@@ -45,6 +46,8 @@ int wmain(int argc, const wchar_t** argv) {
   PROCESS_INFORMATION* processes_infos;
   int is_inject_libraries_success;
   BOOL is_close_handle_success;
+
+  int is_knowledge_override_inject;
 
   memset(&args, 0, sizeof(args));
 
@@ -59,12 +62,31 @@ int wmain(int argc, const wchar_t** argv) {
   /* Validate args. */
   if (!ValidateArgs(argc, argv)) {
     PrintHelp(argv[0]);
+    printf("\nPress enter to exit... \n");
+    getc(stdin);
 
     return 0;
   }
 
   /* Parse args. */
   ParseArgs(&args, argc, argv);
+
+  /* Initialize Knowledge library, if specified. */
+  if (args.knowledge_library_path != NULL) {
+    wprintf(
+        L"Loading Knowledge library from %ls \n",
+        args.knowledge_library_path
+    );
+    Knowledge_Init(
+        args.knowledge_library_path,
+        args.game_path,
+        args.game_path_len
+    );
+    printf("\n");
+  }
+
+  /* Print out the game info, handled by Knowledge. */
+  Knowledge_PrintGameInfo();
 
   /* Print out parsed args to standard out. */
   printf("Now loading game from path... \n");
@@ -100,12 +122,23 @@ int wmain(int argc, const wchar_t** argv) {
   printf("%u game instance(s) have been opened. \n\n", args.num_instances);
 
   /* Inject the library, after reading all files. */
-  is_inject_libraries_success = InjectLibrariesToProcesses(
+  is_knowledge_override_inject = Knowledge_InjectLibrariesToProcesses(
       args.libraries_to_inject,
       args.num_libraries,
       processes_infos,
       args.num_instances
   );
+
+  if (!is_knowledge_override_inject) {
+    is_inject_libraries_success = InjectLibrariesToProcesses(
+        args.libraries_to_inject,
+        args.num_libraries,
+        processes_infos,
+        args.num_instances
+    );
+  } else {
+    is_inject_libraries_success = is_knowledge_override_inject;
+  }
 
   if (is_inject_libraries_success) {
     printf("All libraries have been successfully injected. \n\n");
@@ -113,13 +146,19 @@ int wmain(int argc, const wchar_t** argv) {
     printf("Some or all libraries failed to inject. \n\n");
   }
 
-  /* Resume process. */
+  /* Resume processes. */
   printf("Resuming processes... \n\n");
 
   for (i = 0; i < args.num_instances; i += 1) {
     ResumeThread(processes_infos[i].hThread);
+  }
 
-    /* Close process and thread handles. */
+  /* Before closing handles, have Knowledge cleanup anything it needs to. */
+knowledge_deinit:
+  Knowledge_Deinit(processes_infos, args.num_instances);
+
+  /* Close process and thread handles. */
+  for (i = 0; i < args.num_instances; i += 1) {
     is_close_handle_success = CloseHandle(processes_infos[i].hProcess);
 
     if (!is_close_handle_success) {
