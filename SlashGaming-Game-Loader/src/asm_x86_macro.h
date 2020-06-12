@@ -41,6 +41,21 @@
       __VA_ARGS__ \
     }
 
+#define ASM_X86_01(a) \
+    __asm { \
+      a \
+    }
+
+#define ASM_X86_02(a, b) \
+    __asm { \
+      a, b \
+    }
+
+#define ASM_X86_03(a, b, c) \
+    __asm { \
+      a, b, c \
+    }
+
 #define ASM_X86_FUNC(name) name
 
 #define ASM_X86_LABEL(name) name:
