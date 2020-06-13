@@ -36,9 +36,19 @@
 
 #if defined(_MSC_VER)
 
-#define ASM_X86(...) \
+#define ASM_X86_01(a) \
     __asm { \
-      __VA_ARGS__ \
+      a \
+    }
+
+#define ASM_X86_02(a, b) \
+    __asm { \
+      a, b \
+    }
+
+#define ASM_X86_03(a, b, c) \
+    __asm { \
+      a, b, c \
     }
 
 #define ASM_X86_FUNC(name) name
@@ -47,9 +57,19 @@
 
 #else
 
-#define ASM_X86(...) \
+#define ASM_X86_01(a) \
     __asm( \
-        #__VA_ARGS__ \
+        #a \
+    );
+
+#define ASM_X86_02(a, b) \
+    __asm( \
+        #a ", " #b \
+    );
+
+#define ASM_X86_03(a, b, c) \
+    __asm( \
+        #a ", " #b ", " #c \
     );
 
 #define ASM_X86_FUNC(name) _##name
