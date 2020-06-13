@@ -3,14 +3,42 @@
 *.so
 *.a
 *.def
+*.res
 
 *.o
+*.obj
+
+*.cfg
+*.json
+
+*.aps
+*.log
+*.tlog
+*.vcxproj.FileListAbsolute.txt
 
 *.cbp
 *.res
 *.layout
 *.depend
 
+*.sln
+*.ncb
+*.suo
+*.vcproj
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.user
+
 *.json
 *.zip
 *.7z
+
+*.log
+*.tlog
+*.idb
+*.pdb
+
+.vs/
+Debug/
+Release/
