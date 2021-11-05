@@ -1,5 +1,5 @@
 # SlashGaming Game Loader
-Copyright (C) 2018-2020  Mir Drualga
+Copyright (C) 2018-2021  Mir Drualga
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
