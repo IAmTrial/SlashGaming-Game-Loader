@@ -52,7 +52,7 @@ int wmain(int argc, const wchar_t** argv) {
   memset(&args, 0, sizeof(args));
 
   /* Print the license notice. */
-  PrintLicenseNotice();
+  License_PrintText();
 
   for (i = 0; i < 79; i += 1) {
     printf("-");
