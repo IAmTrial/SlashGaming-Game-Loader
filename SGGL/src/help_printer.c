@@ -32,6 +32,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
+#include <shlwapi.h>
 
 enum CONSTANTS {
   ARG_OPTION_LEN = 36,
@@ -59,9 +61,13 @@ static void PrintContinuedLine(
   printf(kFormatContinueString, ' ', description);
 }
 
-void PrintHelp(const wchar_t* current_program) {
-  wprintf(L"Usage: %ls [options] \n", current_program);
-  printf("Options: \n");
+/**
+ * External
+ */
+
+void Help_PrintText(const wchar_t* program_path) {
+  wprintf(L"Usage: %ls [options]\n", PathFindFileNameW(program_path));
+  printf("Options:\n");
 
   PrintArgHelp("-g, --game <program>", "Game to execute");
 
