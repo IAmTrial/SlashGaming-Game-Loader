@@ -71,6 +71,6 @@ set(SOURCE_FILES
 
 # Output DLL
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES})
