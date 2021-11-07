@@ -13,6 +13,15 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Additional permissions under GNU Affero General Public License version 3
+# section 7
+#
+# If you modify this Program, or any covered work, by linking or combining
+# it with any program (or a modified version of that program and its
+# libraries), containing parts covered by the terms of an incompatible
+# license, the licensors of this Program grant you additional permission
+# to convey the resulting work.
 
 cmake_minimum_required(VERSION 3.10)
 
