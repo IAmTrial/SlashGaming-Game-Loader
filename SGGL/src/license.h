@@ -30,6 +30,20 @@
 #ifndef SGGL_LICENSE_H_
 #define SGGL_LICENSE_H_
 
-void PrintLicenseNotice(void);
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+enum {
+  License_kTextCount = 19,
+};
+
+extern const char* const License_kText[License_kTextCount];
+
+void License_PrintText(void);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 
 #endif  /* SGGL_LICENSE_H_ */

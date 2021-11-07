@@ -32,7 +32,11 @@
 #include <stddef.h>
 #include <stdio.h>
 
-static const char* kLicenseLines[] = {
+/**
+ * External
+ */
+
+const char* const License_kText[] = {
     "SlashGaming Game Loader",
     "Copyright (C) 2018-2021  Mir Drualga",
     "",
@@ -54,13 +58,10 @@ static const char* kLicenseLines[] = {
     "information."
 };
 
-static const size_t kLicenseLinesCount =
-    sizeof(kLicenseLines) / sizeof(kLicenseLines[0]);
-
-void PrintLicenseNotice(void) {
+void License_PrintText(void) {
   size_t i;
 
-  for (i = 0; i < kLicenseLinesCount; i += 1) {
-    printf("%s \n", kLicenseLines[i]);
+  for (i = 0; i < License_kTextCount; ++i) {
+    puts(License_kText[i]);
   }
 }
