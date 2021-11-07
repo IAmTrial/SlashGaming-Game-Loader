@@ -69,7 +69,7 @@ set(SOURCE_FILES
     "src/license.h"
 )
 
-# Output DLL
+# Output EXE
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
