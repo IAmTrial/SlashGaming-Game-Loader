@@ -29,63 +29,64 @@
 
 #include "help_printer.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
+#include <shlwapi.h>
 
-enum CONSTANTS {
-  ARG_OPTION_LEN = 36,
-  DESCRIPTION_LEN = 72 - ARG_OPTION_LEN - 2
+#include <mdc/std/assert.h>
+#include <mdc/std/wchar.h>
+
+enum {
+  kArgOptionLength = 36,
+  kDescriptionLength = 72 - kArgOptionLength - 2
 };
 
-const char* kFormatString = "  %-34s %s \n";
-const char* kFormatContinueString = "%36c %s \n";
+#define FORMAT_STRING L"  %-34s %s\n"
+#define FORMAT_CONTINUE_STRING L"%36c %s\n"
 
 static void PrintArgHelp(
-    const char* arg_option,
-    const char* description
-) {
-  assert(strlen(arg_option) < ARG_OPTION_LEN);
-  assert(strlen(description) < DESCRIPTION_LEN);
+    const wchar_t* arg_option,
+    const wchar_t* description) {
+  assert(wcslen(arg_option) < kArgOptionLength);
+  assert(wcslen(description) < kDescriptionLength);
 
-  printf(kFormatString, arg_option, description);
+  wprintf(FORMAT_STRING, arg_option, description);
 }
 
-static void PrintContinuedLine(
-    const char* description
-) {
-  assert(strlen(description) < DESCRIPTION_LEN);
+static void PrintContinuedLine(const wchar_t* description) {
+  assert(wcslen(description) < kDescriptionLength);
 
-  printf(kFormatContinueString, ' ', description);
+  wprintf(FORMAT_CONTINUE_STRING, L' ', description);
 }
 
-void PrintHelp(const wchar_t* current_program) {
-  wprintf(L"Usage: %ls [options] \n", current_program);
-  printf("Options: \n");
+/**
+ * External
+ */
 
-  PrintArgHelp("-g, --game <program>", "Game to execute");
+void Help_PrintText(const wchar_t* program_path) {
+  wprintf(L"Usage: %ls [options]\n", PathFindFileNameW(program_path));
+  wprintf(L"Options:\n");
 
-  PrintArgHelp(
-      "-a, --gameargs <args>",
-      "Command line arguments to pass to"
-  );
-  PrintContinuedLine("the game");
+  PrintArgHelp(L"-g, --game <program>", L"Game to execute");
 
   PrintArgHelp(
-      "-k, --knowledge <library>",
-      "Path of Knowledge extension"
-  );
-  PrintContinuedLine("library");
+      L"-a, --gameargs <args>",
+      L"Command line arguments to pass to");
+  PrintContinuedLine(L"the game");
 
   PrintArgHelp(
-      "-l, --library <library>",
-      "Path of library to inject (this"
-  );
-  PrintContinuedLine("option can be repeated for");
-  PrintContinuedLine("multiple libraries)");
+      L"-k, --knowledge <library>",
+      L"Path of Knowledge extension");
+  PrintContinuedLine(L"library");
 
   PrintArgHelp(
-      "-n, --num-instances <count>",
-      "Number of instances to open"
-  );
+      L"-l, --library <library>",
+      L"Path of library to inject (this");
+  PrintContinuedLine(L"option can be repeated for");
+  PrintContinuedLine(L"multiple libraries)");
+
+  PrintArgHelp(
+      L"-n, --num-instances <count>",
+      L"Number of instances to open");
 }

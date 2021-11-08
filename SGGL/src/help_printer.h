@@ -30,8 +30,16 @@
 #ifndef SGGL_HELP_PRINTER_H_
 #define SGGL_HELP_PRINTER_H_
 
-#include <wchar.h>
+#include <mdc/std/wchar.h>
 
-void PrintHelp(const wchar_t* current_program);
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+void Help_PrintText(const wchar_t* program_path);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 
 #endif /* SGGL_HELP_PRINTER_H_ */
