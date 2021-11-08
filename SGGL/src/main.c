@@ -42,6 +42,8 @@
 
 int wmain(int argc, const wchar_t** argv) {
   size_t i;
+
+  size_t num_libraries;
   struct Args args;
   PROCESS_INFORMATION* processes_infos;
   int is_inject_libraries_success;
@@ -60,7 +62,7 @@ int wmain(int argc, const wchar_t** argv) {
   printf("\n");
 
   /* Validate args. */
-  if (!ValidateArgs(argc, argv)) {
+  if (!Args_IsValid(argc, argv, &num_libraries)) {
     Help_PrintText(argv[0]);
     printf("\nPress enter to exit... \n");
     getc(stdin);
@@ -69,7 +71,7 @@ int wmain(int argc, const wchar_t** argv) {
   }
 
   /* Parse args. */
-  ParseArgs(&args, argc, argv);
+  Args_InitFromArgv(&args, argc, argv, num_libraries);
 
   /* Initialize Knowledge library, if specified. */
   if (args.knowledge_library_path != NULL) {
@@ -97,11 +99,11 @@ int wmain(int argc, const wchar_t** argv) {
     wprintf(L"%ls \n\n", args.game_args);
   }
 
-  if (args.num_libraries > 0) {
+  if (args.inject_library_paths_count > 0) {
     printf("Libraries to inject: \n");
 
-    for (i = 0; i < args.num_libraries; i += 1) {
-      wprintf(L"%ls \n", args.libraries_to_inject[i]);
+    for (i = 0; i < args.inject_library_paths_count; i += 1) {
+      wprintf(L"%ls \n", args.inject_library_paths[i]);
     }
 
     printf("\n");
@@ -123,16 +125,16 @@ int wmain(int argc, const wchar_t** argv) {
 
   /* Inject the library, after reading all files. */
   is_knowledge_override_inject = Knowledge_InjectLibrariesToProcesses(
-      args.libraries_to_inject,
-      args.num_libraries,
+      args.inject_library_paths,
+      args.inject_library_paths_count,
       processes_infos,
       args.num_instances
   );
 
   if (!is_knowledge_override_inject) {
     is_inject_libraries_success = InjectLibrariesToProcesses(
-        args.libraries_to_inject,
-        args.num_libraries,
+        args.inject_library_paths,
+        args.inject_library_paths_count,
         processes_infos,
         args.num_instances
     );
@@ -179,7 +181,7 @@ knowledge_deinit:
   }
 
 free_args:
-  DestructArgs(&args);
+  Args_Deinit(&args);
 
   printf("Done. \n\n");
 

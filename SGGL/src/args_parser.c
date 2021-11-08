@@ -36,37 +36,9 @@
 #include <wctype.h>
 #include <windows.h>
 
-#include "error_handling.h"
-
-static void ResizeLibraries(struct Args* args) {
-  const wchar_t** realloc_libraries_to_inject;
-
-  args->libraries_capacity = (args->libraries_capacity > 0)
-      ? args->libraries_capacity * 2
-      : 4;
-
-  realloc_libraries_to_inject = realloc(
-      args->libraries_to_inject,
-      args->libraries_capacity * sizeof(args->libraries_to_inject[0])
-  );
-
-  if (realloc_libraries_to_inject == NULL) {
-    ExitOnAllocationFailure();
-  }
-
-  args->libraries_to_inject = realloc_libraries_to_inject;
-}
-
-static void AddLibrary(struct Args* args, const wchar_t* arg) {
-  /* Resize if needed. */
-  if (args->num_libraries == args->libraries_capacity) {
-    ResizeLibraries(args);
-  }
-
-  /* Add the library to the list of libraries. */
-  args->libraries_to_inject[args->num_libraries] = arg;
-  args->num_libraries += 1;
-}
+#include <mdc/error/exit_on_error.h>
+#include <mdc/malloc/malloc.h>
+#include <mdc/wchar_t/filew.h>
 
 /**
  * External
@@ -74,10 +46,12 @@ static void AddLibrary(struct Args* args, const wchar_t* arg) {
 
 int Args_IsValid(
     int argc,
-    const wchar_t* const* argv) {
+    const wchar_t* const* argv,
+    size_t* num_libraries) {
   int i_arg;
   size_t i_str;
   size_t arg_value_len;
+  size_t temp_num_libraries;
   int is_game_path_found = 0;
   int is_game_args_found = 0;
   int is_num_instances_found = 0;
@@ -86,6 +60,12 @@ int Args_IsValid(
   if (argc < 3) {
     return 0;
   }
+
+  if (num_libraries == NULL) {
+    num_libraries = &temp_num_libraries;
+  }
+
+  *num_libraries = 0;
 
   for (i_arg = 1; i_arg < argc; ++i_arg) {
     if (wcscmp(argv[i_arg], L"--game") == 0
@@ -136,6 +116,8 @@ int Args_IsValid(
         return 0;
       }
 
+      ++(*num_libraries);
+
       ++i_arg;
     } else if (wcscmp(argv[i_arg], L"--num-instances") == 0
         || wcscmp(argv[i_arg], L"-n") == 0) {
@@ -181,19 +163,18 @@ int Args_IsValid(
 void Args_InitFromArgv(
     struct Args* args,
     int argc,
-    const wchar_t* const* argv) {
+    const wchar_t* const* argv,
+    size_t num_libraries) {
   int i_arg;
 
   assert(argc >= 3);
 
-  args->libraries_capacity = 4;
-  args->num_libraries = 0;
-  args->libraries_to_inject = malloc(
-      args->libraries_capacity * sizeof(args->libraries_to_inject[0])
-  );
-
-  if (args->libraries_to_inject == NULL) {
-    ExitOnAllocationFailure();
+  args->inject_library_paths_count = 0;
+  args->inject_library_paths = Mdc_malloc(
+      num_libraries * sizeof(args->inject_library_paths[0]));
+  if (args->inject_library_paths == NULL) {
+    Mdc_Error_ExitOnMemoryAllocError(__FILEW__, __LINE__);
+    goto bad_return;
   }
 
   args->num_instances = 1;
@@ -216,7 +197,13 @@ void Args_InitFromArgv(
     } else if (wcscmp(argv[i_arg], L"--library") == 0
         || wcscmp(argv[i_arg], L"-l") == 0) {
       /* Manage all points to libraries that will be injected. */
-      AddLibrary(args, argv[i_arg + 1]);
+      const wchar_t** inject_library_path;
+
+      inject_library_path = &args->inject_library_paths[
+          args->inject_library_paths_count];
+      *inject_library_path = argv[i_arg + 1];
+
+      args->inject_library_paths_count += 1;
 
       ++i_arg;
     } else if (wcscmp(argv[i_arg], L"--num-instances") == 0
@@ -248,18 +235,19 @@ void Args_InitFromArgv(
       ++i_arg;
     }
   }
+
+  return;
+
+bad_return:
+  return;
 }
 
 void Args_Deinit(struct Args* args) {
   args->game_path = NULL;
-  args->game_path_len = 0;
-
   args->game_args = NULL;
-  args->game_args_len = 0;
 
-  free(args->libraries_to_inject);
-  args->num_libraries = 0;
-  args->libraries_capacity = 0;
+  Mdc_free(args->inject_library_paths);
+  args->inject_library_paths_count = 0;
 
   args->num_instances = 0;
 

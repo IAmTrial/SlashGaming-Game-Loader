@@ -47,21 +47,24 @@ struct Args {
   const wchar_t* game_args;
   size_t game_args_len;
 
-  const wchar_t** libraries_to_inject;
-  size_t libraries_capacity;
-  size_t num_libraries;
+  const wchar_t** inject_library_paths;
+  size_t inject_library_paths_count;
 
   size_t num_instances;
 
   const wchar_t* knowledge_library_path;
 };
 
-int Args_IsValid(int argc, const wchar_t* const* argv);
+int Args_IsValid(
+    int argc,
+    const wchar_t* const* argv,
+    size_t* num_libraries);
 
 void Args_InitFromArgv(
     struct Args* args,
     int argc,
-    const wchar_t* const* argv);
+    const wchar_t* const* argv,
+    size_t num_libraries);
 void Args_Deinit(struct Args* args);
 
 #ifdef __cplusplus
