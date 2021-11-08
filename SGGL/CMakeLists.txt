@@ -83,3 +83,9 @@ set(SOURCE_FILES
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME}
+    libMDCc
+    shlwapi
+)
+add_dependencies(${PROJECT_NAME} libMDCc)
