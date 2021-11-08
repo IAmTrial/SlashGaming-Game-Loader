@@ -29,36 +29,35 @@
 
 #include "help_printer.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
 #include <shlwapi.h>
 
-enum CONSTANTS {
-  ARG_OPTION_LEN = 36,
-  DESCRIPTION_LEN = 72 - ARG_OPTION_LEN - 2
+#include <mdc/std/assert.h>
+#include <mdc/std/wchar.h>
+
+enum {
+  kArgOptionLength = 36,
+  kDescriptionLength = 72 - kArgOptionLength - 2
 };
 
-const char* kFormatString = "  %-34s %s \n";
-const char* kFormatContinueString = "%36c %s \n";
+#define FORMAT_STRING "  %-34s %s\n"
+#define FORMAT_CONTINUE_STRING "%36c %s\n"
 
 static void PrintArgHelp(
     const char* arg_option,
-    const char* description
-) {
-  assert(strlen(arg_option) < ARG_OPTION_LEN);
-  assert(strlen(description) < DESCRIPTION_LEN);
+    const char* description) {
+  assert(strlen(arg_option) < kArgOptionLength);
+  assert(strlen(description) < kDescriptionLength);
 
-  printf(kFormatString, arg_option, description);
+  printf(FORMAT_STRING, arg_option, description);
 }
 
-static void PrintContinuedLine(
-    const char* description
-) {
-  assert(strlen(description) < DESCRIPTION_LEN);
+static void PrintContinuedLine(const char* description) {
+  assert(strlen(description) < kDescriptionLength);
 
-  printf(kFormatContinueString, ' ', description);
+  printf(FORMAT_CONTINUE_STRING, ' ', description);
 }
 
 /**
@@ -73,25 +72,21 @@ void Help_PrintText(const wchar_t* program_path) {
 
   PrintArgHelp(
       "-a, --gameargs <args>",
-      "Command line arguments to pass to"
-  );
+      "Command line arguments to pass to");
   PrintContinuedLine("the game");
 
   PrintArgHelp(
       "-k, --knowledge <library>",
-      "Path of Knowledge extension"
-  );
+      "Path of Knowledge extension");
   PrintContinuedLine("library");
 
   PrintArgHelp(
       "-l, --library <library>",
-      "Path of library to inject (this"
-  );
+      "Path of library to inject (this");
   PrintContinuedLine("option can be repeated for");
   PrintContinuedLine("multiple libraries)");
 
   PrintArgHelp(
       "-n, --num-instances <count>",
-      "Number of instances to open"
-  );
+      "Number of instances to open");
 }
