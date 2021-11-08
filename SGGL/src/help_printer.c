@@ -42,22 +42,22 @@ enum {
   kDescriptionLength = 72 - kArgOptionLength - 2
 };
 
-#define FORMAT_STRING "  %-34s %s\n"
-#define FORMAT_CONTINUE_STRING "%36c %s\n"
+#define FORMAT_STRING L"  %-34s %s\n"
+#define FORMAT_CONTINUE_STRING L"%36c %s\n"
 
 static void PrintArgHelp(
-    const char* arg_option,
-    const char* description) {
-  assert(strlen(arg_option) < kArgOptionLength);
-  assert(strlen(description) < kDescriptionLength);
+    const wchar_t* arg_option,
+    const wchar_t* description) {
+  assert(wcslen(arg_option) < kArgOptionLength);
+  assert(wcslen(description) < kDescriptionLength);
 
-  printf(FORMAT_STRING, arg_option, description);
+  wprintf(FORMAT_STRING, arg_option, description);
 }
 
-static void PrintContinuedLine(const char* description) {
-  assert(strlen(description) < kDescriptionLength);
+static void PrintContinuedLine(const wchar_t* description) {
+  assert(wcslen(description) < kDescriptionLength);
 
-  printf(FORMAT_CONTINUE_STRING, ' ', description);
+  wprintf(FORMAT_CONTINUE_STRING, L' ', description);
 }
 
 /**
@@ -66,27 +66,27 @@ static void PrintContinuedLine(const char* description) {
 
 void Help_PrintText(const wchar_t* program_path) {
   wprintf(L"Usage: %ls [options]\n", PathFindFileNameW(program_path));
-  printf("Options:\n");
+  wprintf(L"Options:\n");
 
-  PrintArgHelp("-g, --game <program>", "Game to execute");
-
-  PrintArgHelp(
-      "-a, --gameargs <args>",
-      "Command line arguments to pass to");
-  PrintContinuedLine("the game");
+  PrintArgHelp(L"-g, --game <program>", L"Game to execute");
 
   PrintArgHelp(
-      "-k, --knowledge <library>",
-      "Path of Knowledge extension");
-  PrintContinuedLine("library");
+      L"-a, --gameargs <args>",
+      L"Command line arguments to pass to");
+  PrintContinuedLine(L"the game");
 
   PrintArgHelp(
-      "-l, --library <library>",
-      "Path of library to inject (this");
-  PrintContinuedLine("option can be repeated for");
-  PrintContinuedLine("multiple libraries)");
+      L"-k, --knowledge <library>",
+      L"Path of Knowledge extension");
+  PrintContinuedLine(L"library");
 
   PrintArgHelp(
-      "-n, --num-instances <count>",
-      "Number of instances to open");
+      L"-l, --library <library>",
+      L"Path of library to inject (this");
+  PrintContinuedLine(L"option can be repeated for");
+  PrintContinuedLine(L"multiple libraries)");
+
+  PrintArgHelp(
+      L"-n, --num-instances <count>",
+      L"Number of instances to open");
 }
