@@ -32,8 +32,13 @@
 
 #include <limits.h>
 #include <stddef.h>
-#include <wchar.h>
 #include <windows.h>
+
+#include <mdc/std/wchar.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 struct Args {
   const wchar_t* game_path;
@@ -51,8 +56,16 @@ struct Args {
   const wchar_t* knowledge_library_path;
 };
 
-int ValidateArgs(int argc, const wchar_t* const* argv);
-void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv);
-void DestructArgs(struct Args* args);
+int Args_IsValid(int argc, const wchar_t* const* argv);
+
+void Args_InitFromArgv(
+    struct Args* args,
+    int argc,
+    const wchar_t* const* argv);
+void Args_Deinit(struct Args* args);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 
 #endif /* SGGL_ARGS_PARSER_H_ */

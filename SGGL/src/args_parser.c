@@ -68,9 +68,15 @@ static void AddLibrary(struct Args* args, const wchar_t* arg) {
   args->num_libraries += 1;
 }
 
-int ValidateArgs(int argc, const wchar_t* const* argv) {
-  int arg_i;
-  size_t str_i;
+/**
+ * External
+ */
+
+int Args_IsValid(
+    int argc,
+    const wchar_t* const* argv) {
+  int i_arg;
+  size_t i_str;
   size_t arg_value_len;
   int is_game_path_found = 0;
   int is_game_args_found = 0;
@@ -81,14 +87,14 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
     return 0;
   }
 
-  for (arg_i = 1; arg_i < argc; arg_i += 1) {
-    if (wcscmp(argv[arg_i], L"--game") == 0
-        || wcscmp(argv[arg_i], L"-g") == 0) {
-      if (arg_i >= argc - 1) {
+  for (i_arg = 1; i_arg < argc; ++i_arg) {
+    if (wcscmp(argv[i_arg], L"--game") == 0
+        || wcscmp(argv[i_arg], L"-g") == 0) {
+      if (i_arg >= argc - 1) {
         return 0;
       }
 
-      arg_value_len = wcslen(argv[arg_i + 1]);
+      arg_value_len = wcslen(argv[i_arg + 1]);
 
       if (arg_value_len <= 0) {
         return 0;
@@ -99,14 +105,14 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
       }
 
       is_game_path_found = 1;
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--gameargs") == 0
-        || wcscmp(argv[arg_i], L"-a") == 0) {
-      if (arg_i >= argc - 1) {
+      ++i_arg;
+    } else if (wcscmp(argv[i_arg], L"--gameargs") == 0
+        || wcscmp(argv[i_arg], L"-a") == 0) {
+      if (i_arg >= argc - 1) {
         return 0;
       }
 
-      arg_value_len = wcslen(argv[arg_i + 1]);
+      arg_value_len = wcslen(argv[i_arg + 1]);
 
       if (arg_value_len <= 0) {
         return 0;
@@ -117,23 +123,23 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
       }
 
       is_game_args_found = 1;
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--library") == 0
-        || wcscmp(argv[arg_i], L"-l") == 0) {
-      if (arg_i >= argc - 1) {
+      ++i_arg;
+    } else if (wcscmp(argv[i_arg], L"--library") == 0
+        || wcscmp(argv[i_arg], L"-l") == 0) {
+      if (i_arg >= argc - 1) {
         return 0;
       }
 
-      arg_value_len = wcslen(argv[arg_i + 1]);
+      arg_value_len = wcslen(argv[i_arg + 1]);
 
       if (arg_value_len <= 0) {
         return 0;
       }
 
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--num-instances") == 0
-        || wcscmp(argv[arg_i], L"-n") == 0) {
-      if (arg_i >= argc - 1) {
+      ++i_arg;
+    } else if (wcscmp(argv[i_arg], L"--num-instances") == 0
+        || wcscmp(argv[i_arg], L"-n") == 0) {
+      if (i_arg >= argc - 1) {
         return 0;
       }
 
@@ -141,20 +147,20 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
         return 0;
       }
 
-      for (str_i = 0; argv[arg_i + 1][str_i] != L'\0'; str_i += 1) {
-        if (!iswdigit(argv[arg_i + 1][str_i])) {
+      for (i_str = 0; argv[i_arg + 1][i_str] != L'\0'; ++i_str) {
+        if (!iswdigit(argv[i_arg + 1][i_str])) {
           return 0;
         }
       }
 
       is_num_instances_found = 1;
-    } else if (wcscmp(argv[arg_i], L"--knowledge") == 0
-        || wcscmp(argv[arg_i], L"-k") == 0) {
-      if (arg_i >= argc - 1) {
+    } else if (wcscmp(argv[i_arg], L"--knowledge") == 0
+        || wcscmp(argv[i_arg], L"-k") == 0) {
+      if (i_arg >= argc - 1) {
         return 0;
       }
 
-      arg_value_len = wcslen(argv[arg_i + 1]);
+      arg_value_len = wcslen(argv[i_arg + 1]);
 
       if (arg_value_len <= 0) {
         return 0;
@@ -165,15 +171,18 @@ int ValidateArgs(int argc, const wchar_t* const* argv) {
       }
 
       is_knowledge_library_path_found = 1;
-      arg_i += 1;
+      ++i_arg;
     }
   }
 
   return is_game_path_found;
 }
 
-void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
-  int arg_i;
+void Args_InitFromArgv(
+    struct Args* args,
+    int argc,
+    const wchar_t* const* argv) {
+  int i_arg;
 
   assert(argc >= 3);
 
@@ -189,31 +198,31 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
 
   args->num_instances = 1;
 
-  for (arg_i = 1; arg_i < argc; arg_i += 1) {
-    if (wcscmp(argv[arg_i], L"--game") == 0
-        || wcscmp(argv[arg_i], L"-g") == 0) {
+  for (i_arg = 1; i_arg < argc; ++i_arg) {
+    if (wcscmp(argv[i_arg], L"--game") == 0
+        || wcscmp(argv[i_arg], L"-g") == 0) {
       /* Point to the game path of the game executable. */
-      args->game_path = argv[arg_i + 1];
+      args->game_path = argv[i_arg + 1];
       args->game_path_len = wcslen(args->game_path);
 
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--gameargs") == 0
-        || wcscmp(argv[arg_i], L"-a") == 0) {
+      ++i_arg;
+    } else if (wcscmp(argv[i_arg], L"--gameargs") == 0
+        || wcscmp(argv[i_arg], L"-a") == 0) {
       /* Point to the game args */
-      args->game_args = argv[arg_i + 1];
+      args->game_args = argv[i_arg + 1];
       args->game_args_len = wcslen(args->game_args);
 
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--library") == 0
-        || wcscmp(argv[arg_i], L"-l") == 0) {
+      ++i_arg;
+    } else if (wcscmp(argv[i_arg], L"--library") == 0
+        || wcscmp(argv[i_arg], L"-l") == 0) {
       /* Manage all points to libraries that will be injected. */
-      AddLibrary(args, argv[arg_i + 1]);
+      AddLibrary(args, argv[i_arg + 1]);
 
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--num-instances") == 0
-        || wcscmp(argv[arg_i], L"-n") == 0) {
+      ++i_arg;
+    } else if (wcscmp(argv[i_arg], L"--num-instances") == 0
+        || wcscmp(argv[i_arg], L"-n") == 0) {
       /* Determine number of instances to open. */
-      args->num_instances = wcstoul(argv[arg_i + 1], NULL, 10);
+      args->num_instances = wcstoul(argv[i_arg + 1], NULL, 10);
 
       /*
       * Check that the number of instances to open is at least 1.
@@ -230,18 +239,18 @@ void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
           ? args->num_instances
           : 8;
 
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--knowledge") == 0
-        || wcscmp(argv[arg_i], L"-k") == 0) {
+      ++i_arg;
+    } else if (wcscmp(argv[i_arg], L"--knowledge") == 0
+        || wcscmp(argv[i_arg], L"-k") == 0) {
       /* Point to the Knowledge library path */
-      args->knowledge_library_path = argv[arg_i + 1];
+      args->knowledge_library_path = argv[i_arg + 1];
 
-      arg_i += 1;
+      ++i_arg;
     }
   }
 }
 
-void DestructArgs(struct Args* args) {
+void Args_Deinit(struct Args* args) {
   args->game_path = NULL;
   args->game_path_len = 0;
 
