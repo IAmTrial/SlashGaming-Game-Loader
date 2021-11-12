@@ -58,6 +58,7 @@ set(SOURCE_FILES
     ${RESOURCE_FILES}
 
     "src/args_parser.c"
+    "src/args_validator.c"
     "src/encoding.c"
     "src/error_handling.c"
     "src/game_loader.c"
@@ -68,6 +69,7 @@ set(SOURCE_FILES
     "src/main.c"
 
     "src/args_parser.h"
+    "src/args_validator.h"
     "src/asm_x86_macro.h"
     "src/encoding.h"
     "src/error_handling.h"

@@ -27,12 +27,10 @@
  *  to convey the resulting work.
  */
 
-#ifndef SGGL_ARGS_PARSER_H_
-#define SGGL_ARGS_PARSER_H_
+#ifndef SGGL_ARGS_VALIDATOR_H_
+#define SGGL_ARGS_VALIDATOR_H_
 
-#include <limits.h>
 #include <stddef.h>
-#include <windows.h>
 
 #include <mdc/std/wchar.h>
 
@@ -40,30 +38,13 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct Args {
-  const wchar_t* game_path;
-  size_t game_path_len;
-
-  const wchar_t* game_args;
-  size_t game_args_len;
-
-  const wchar_t** inject_library_paths;
-  size_t inject_library_paths_count;
-
-  size_t num_instances;
-
-  const wchar_t* knowledge_library_path;
-};
-
-void Args_InitFromArgv(
-    struct Args* args,
+int ArgsValidator_IsValid(
     int argc,
     const wchar_t* const* argv,
-    size_t num_libraries);
-void Args_Deinit(struct Args* args);
+    size_t* num_libraries);
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif /* __cplusplus */
 
-#endif /* SGGL_ARGS_PARSER_H_ */
+#endif /* SGGL_ARGS_VALIDATOR_H_ */

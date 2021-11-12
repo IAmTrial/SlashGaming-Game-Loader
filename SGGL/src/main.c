@@ -33,6 +33,7 @@
 #include <windows.h>
 
 #include "args_parser.h"
+#include "args_validator.h"
 #include "error_handling.h"
 #include "game_loader.h"
 #include "help_printer.h"
@@ -62,7 +63,7 @@ int wmain(int argc, const wchar_t** argv) {
   printf("\n");
 
   /* Validate args. */
-  if (!Args_IsValid(argc, argv, &num_libraries)) {
+  if (!ArgsValidator_IsValid(argc, argv, &num_libraries)) {
     Help_PrintText(argv[0]);
     printf("\nPress enter to exit... \n");
     getc(stdin);
