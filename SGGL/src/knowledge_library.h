@@ -36,14 +36,11 @@
 
 void Knowledge_Init(
     const wchar_t* knowledge_library_path,
-    const wchar_t* game_path,
-    size_t game_path_len
-);
+    const wchar_t* game_path);
 
 void Knowledge_Deinit(
     const PROCESS_INFORMATION* processes_infos,
-    size_t num_instances
-);
+    size_t num_instances);
 
 void Knowledge_PrintGameInfo(void);
 
@@ -51,7 +48,6 @@ int Knowledge_InjectLibrariesToProcesses(
     const wchar_t** libraries_to_inject,
     size_t num_libraries,
     const PROCESS_INFORMATION* processes_infos,
-    size_t num_instances
-);
+    size_t num_instances);
 
 #endif /* SGGL_KNOWLEDGE_LIBRARY_H_ */

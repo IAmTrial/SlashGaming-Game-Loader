@@ -36,12 +36,10 @@
 
 void StartGame(
     PROCESS_INFORMATION* processes_infos,
-    const struct Args* args
-);
+    const struct ParsedArgs* args);
 
 void StartGameSuspended(
     PROCESS_INFORMATION* processes_infos,
-    const struct Args* args
-);
+    const struct ParsedArgs* args);
 
 #endif /* SGGL_GAME_LOADER_H_ */

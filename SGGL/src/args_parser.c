@@ -29,230 +29,251 @@
 
 #include "args_parser.h"
 
-#include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <wchar.h>
 #include <wctype.h>
 #include <windows.h>
 
-#include "error_handling.h"
+#include <mdc/error/exit_on_error.h>
+#include <mdc/malloc/malloc.h>
+#include <mdc/std/assert.h>
+#include <mdc/std/wchar.h>
+#include <mdc/wchar_t/filew.h>
 
-static void ResizeLibraries(struct Args* args) {
-  const wchar_t** realloc_libraries_to_inject;
+typedef void ArgParseFunc(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
 
-  args->libraries_capacity = (args->libraries_capacity > 0)
-      ? args->libraries_capacity * 2
-      : 4;
+/**
+ * Parse table
+ */
 
-  realloc_libraries_to_inject = realloc(
-      args->libraries_to_inject,
-      args->libraries_capacity * sizeof(args->libraries_to_inject[0])
-  );
+static void ParseGamePath(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
 
-  if (realloc_libraries_to_inject == NULL) {
-    ExitOnAllocationFailure();
-  }
+static void ParseGameArg(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
 
-  args->libraries_to_inject = realloc_libraries_to_inject;
+static void ParseInjectLibraryPath(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
+
+static void ParseKnowledgeLibraryPath(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
+
+static void ParseNumInstances(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
+
+struct ArgParseFuncTableEntry {
+  const wchar_t* key;
+  ArgParseFunc* value;
+};
+
+static int ArgParseFuncTableEntry_CompareKeyAsVoid(
+    const struct ArgParseFuncTableEntry* entry1,
+    const struct ArgParseFuncTableEntry* entry2) {
+  return wcscmp(entry1->key, entry2->key);
 }
 
-static void AddLibrary(struct Args* args, const wchar_t* arg) {
-  /* Resize if needed. */
-  if (args->num_libraries == args->libraries_capacity) {
-    ResizeLibraries(args);
-  }
+static const struct ArgParseFuncTableEntry kArgParseFuncSortedTable[] = {
+    { L"--game", &ParseGamePath },
+    { L"--gameargs", &ParseGameArg },
+    { L"--knowledge", &ParseKnowledgeLibraryPath },
+    { L"--library", &ParseInjectLibraryPath },
+    { L"--num-instances", &ParseNumInstances },
 
-  /* Add the library to the list of libraries. */
-  args->libraries_to_inject[args->num_libraries] = arg;
-  args->num_libraries += 1;
+    { L"-a", &ParseGameArg },
+    { L"-g", &ParseGamePath },
+    { L"-k", &ParseKnowledgeLibraryPath },
+    { L"-l", &ParseInjectLibraryPath },
+    { L"-n", &ParseNumInstances },
+};
+
+enum {
+  kArgParseFuncSortedTableCount = sizeof(kArgParseFuncSortedTable)
+      / sizeof(kArgParseFuncSortedTable[0]),
+};
+
+/**
+ * Validation function
+ */
+
+static void ParseGamePath(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv) {
+  /* Point to the game path of the game executable. */
+  args->game_path = argv[*i_arg + 1];
+
+  ++(*i_arg);
 }
 
-int ValidateArgs(int argc, const wchar_t* const* argv) {
-  int arg_i;
-  size_t str_i;
-  size_t arg_value_len;
-  int is_game_path_found = 0;
-  int is_game_args_found = 0;
-  int is_num_instances_found = 0;
-  int is_knowledge_library_path_found = 0;
+static void ParseGameArg(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv) {
+  /* Point to the game args */
+  args->game_args = argv[*i_arg + 1];
 
-  if (argc < 3) {
-    return 0;
-  }
-
-  for (arg_i = 1; arg_i < argc; arg_i += 1) {
-    if (wcscmp(argv[arg_i], L"--game") == 0
-        || wcscmp(argv[arg_i], L"-g") == 0) {
-      if (arg_i >= argc - 1) {
-        return 0;
-      }
-
-      arg_value_len = wcslen(argv[arg_i + 1]);
-
-      if (arg_value_len <= 0) {
-        return 0;
-      }
-
-      if (is_game_path_found) {
-        return 0;
-      }
-
-      is_game_path_found = 1;
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--gameargs") == 0
-        || wcscmp(argv[arg_i], L"-a") == 0) {
-      if (arg_i >= argc - 1) {
-        return 0;
-      }
-
-      arg_value_len = wcslen(argv[arg_i + 1]);
-
-      if (arg_value_len <= 0) {
-        return 0;
-      }
-
-      if (is_game_args_found) {
-        return 0;
-      }
-
-      is_game_args_found = 1;
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--library") == 0
-        || wcscmp(argv[arg_i], L"-l") == 0) {
-      if (arg_i >= argc - 1) {
-        return 0;
-      }
-
-      arg_value_len = wcslen(argv[arg_i + 1]);
-
-      if (arg_value_len <= 0) {
-        return 0;
-      }
-
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--num-instances") == 0
-        || wcscmp(argv[arg_i], L"-n") == 0) {
-      if (arg_i >= argc - 1) {
-        return 0;
-      }
-
-      if (is_num_instances_found) {
-        return 0;
-      }
-
-      for (str_i = 0; argv[arg_i + 1][str_i] != L'\0'; str_i += 1) {
-        if (!iswdigit(argv[arg_i + 1][str_i])) {
-          return 0;
-        }
-      }
-
-      is_num_instances_found = 1;
-    } else if (wcscmp(argv[arg_i], L"--knowledge") == 0
-        || wcscmp(argv[arg_i], L"-k") == 0) {
-      if (arg_i >= argc - 1) {
-        return 0;
-      }
-
-      arg_value_len = wcslen(argv[arg_i + 1]);
-
-      if (arg_value_len <= 0) {
-        return 0;
-      }
-
-      if (is_knowledge_library_path_found) {
-        return 0;
-      }
-
-      is_knowledge_library_path_found = 1;
-      arg_i += 1;
-    }
-  }
-
-  return is_game_path_found;
+  ++(*i_arg);
 }
 
-void ParseArgs(struct Args* args, int argc, const wchar_t* const* argv) {
-  int arg_i;
+static void ParseInjectLibraryPath(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv) {
+  /* Manage all points to libraries that will be injected. */
+  if (args->inject_library_paths_capacity
+      <= args->inject_library_paths_count) {
+    Mdc_Error_ExitOnGeneralError(
+        L"Error",
+        L"Library count changed during execution. Please rerun the program "
+            L"again.",
+        __FILEW__,
+        __LINE__);
+    goto bad_return;
+  }
+
+  args->inject_library_paths[args->inject_library_paths_count] =
+      argv[*i_arg + 1];
+
+  args->inject_library_paths_count += 1;
+
+  ++(*i_arg);
+
+  return;
+
+bad_return:
+  return;
+}
+
+static void ParseKnowledgeLibraryPath(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv) {
+  /* Point to the Knowledge library path */
+  args->knowledge_library_path = argv[*i_arg + 1];
+
+  ++(*i_arg);
+}
+
+static void ParseNumInstances(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv) {
+  /* Determine number of instances to open. */
+  args->num_instances = wcstoul(argv[*i_arg + 1], NULL, 10);
+
+  /*
+   * Check that the number of instances to open is at least 1.
+   */
+  args->num_instances = (args->num_instances >= 1)
+      ? args->num_instances
+      : 1;
+
+  /*
+   * Prevent opening more than 8 instances at once. Doing so
+   * prevents the user from accidental resource hogging.
+   */
+  args->num_instances = (args->num_instances <= 8)
+      ? args->num_instances
+      : 8;
+
+  ++(*i_arg);
+}
+
+static void ParseArg(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv) {
+  const struct ArgParseFuncTableEntry* search_result;
+
+  search_result = bsearch(
+      &argv[*i_arg],
+      kArgParseFuncSortedTable,
+      kArgParseFuncSortedTableCount,
+      sizeof(kArgParseFuncSortedTable[0]),
+      &ArgParseFuncTableEntry_CompareKeyAsVoid);
+
+  if (search_result == NULL) {
+    return;
+  }
+
+  assert(search_result->value != NULL);
+
+  search_result->value(args, i_arg, argc, argv);
+}
+
+/**
+ * External
+ */
+
+const struct ParsedArgs ParsedArgs_kUninit = PARSED_ARGS_UNINIT;
+
+struct ParsedArgs* ParsedArgs_InitFromArgv(
+    struct ParsedArgs* args,
+    int argc,
+    const wchar_t* const* argv,
+    size_t num_libraries) {
+  int i_arg;
 
   assert(argc >= 3);
 
-  args->libraries_capacity = 4;
-  args->num_libraries = 0;
-  args->libraries_to_inject = malloc(
-      args->libraries_capacity * sizeof(args->libraries_to_inject[0])
-  );
-
-  if (args->libraries_to_inject == NULL) {
-    ExitOnAllocationFailure();
+  args->inject_library_paths_count = 0;
+  args->inject_library_paths = Mdc_malloc(
+      num_libraries * sizeof(args->inject_library_paths[0]));
+  if (args->inject_library_paths == NULL) {
+    Mdc_Error_ExitOnMemoryAllocError(__FILEW__, __LINE__);
+    goto bad_return;
   }
 
+  args->inject_library_paths_capacity = num_libraries;
   args->num_instances = 1;
 
-  for (arg_i = 1; arg_i < argc; arg_i += 1) {
-    if (wcscmp(argv[arg_i], L"--game") == 0
-        || wcscmp(argv[arg_i], L"-g") == 0) {
-      /* Point to the game path of the game executable. */
-      args->game_path = argv[arg_i + 1];
-      args->game_path_len = wcslen(args->game_path);
-
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--gameargs") == 0
-        || wcscmp(argv[arg_i], L"-a") == 0) {
-      /* Point to the game args */
-      args->game_args = argv[arg_i + 1];
-      args->game_args_len = wcslen(args->game_args);
-
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--library") == 0
-        || wcscmp(argv[arg_i], L"-l") == 0) {
-      /* Manage all points to libraries that will be injected. */
-      AddLibrary(args, argv[arg_i + 1]);
-
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--num-instances") == 0
-        || wcscmp(argv[arg_i], L"-n") == 0) {
-      /* Determine number of instances to open. */
-      args->num_instances = wcstoul(argv[arg_i + 1], NULL, 10);
-
-      /*
-      * Check that the number of instances to open is at least 1.
-      */
-      args->num_instances = (args->num_instances >= 1)
-          ? args->num_instances
-          : 1;
-
-      /*
-      * Prevent opening more than 8 instances at once. Doing so
-      * prevents the user from accidental resource hogging.
-      */
-      args->num_instances = (args->num_instances <= 8)
-          ? args->num_instances
-          : 8;
-
-      arg_i += 1;
-    } else if (wcscmp(argv[arg_i], L"--knowledge") == 0
-        || wcscmp(argv[arg_i], L"-k") == 0) {
-      /* Point to the Knowledge library path */
-      args->knowledge_library_path = argv[arg_i + 1];
-
-      arg_i += 1;
-    }
+  for (i_arg = 1; i_arg < argc; ++i_arg) {
+    ParseArg(args, &i_arg, argc, argv);
   }
+
+  return args;
+
+bad_return:
+  return NULL;
 }
 
-void DestructArgs(struct Args* args) {
+void ParsedArgs_Deinit(struct ParsedArgs* args) {
   args->game_path = NULL;
-  args->game_path_len = 0;
-
   args->game_args = NULL;
-  args->game_args_len = 0;
 
-  free(args->libraries_to_inject);
-  args->num_libraries = 0;
-  args->libraries_capacity = 0;
+  Mdc_free(args->inject_library_paths);
+  args->inject_library_paths = NULL;
+  args->inject_library_paths_capacity = 0;
+  args->inject_library_paths_count = 0;
 
   args->num_instances = 0;
 
   args->knowledge_library_path = NULL;
+
+  *args = ParsedArgs_kUninit;
 }

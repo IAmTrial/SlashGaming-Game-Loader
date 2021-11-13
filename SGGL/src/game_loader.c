@@ -36,7 +36,9 @@
 static const wchar_t* kCreateProcessErrorFormat =
     L"%ls could not be started, with error code %x.";
 
-static void InitCommandLine(wchar_t* cmd_line, const struct Args* args) {
+static void InitCommandLine(
+    wchar_t* cmd_line,
+    const struct ParsedArgs* args) {
   /* Surround the game path in quotes to handle paths with whitespace. */
   wcscpy(cmd_line, L"\"");
   wcscat(cmd_line, args->game_path);
@@ -48,16 +50,16 @@ static void InitCommandLine(wchar_t* cmd_line, const struct Args* args) {
   }
 }
 
-static wchar_t* AllocateCommandLine(const struct Args* args) {
+static wchar_t* AllocateCommandLine(const struct ParsedArgs* args) {
   wchar_t* full_cmd_line;
   size_t full_cmd_line_len;
 
   /* Add 2 due to surrounding quotes. */
-  full_cmd_line_len = args->game_path_len + 2;
+  full_cmd_line_len = MAX_PATH + 2;
 
   if (args->game_args != NULL) {
     /* Add 1 due to space. */
-    full_cmd_line_len += args->game_args_len + 1;
+    full_cmd_line_len += wcslen(args->game_args) + 1;
   }
 
   full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
@@ -70,9 +72,8 @@ static wchar_t* AllocateCommandLine(const struct Args* args) {
 }
 
 static void ShowMessageCreateProcessError(
-    const struct Args* args,
-    DWORD last_error
-) {
+    const struct ParsedArgs* args,
+    DWORD last_error) {
   switch (last_error) {
     case 0x2: {
       ExitOnGeneralFailure(
@@ -95,8 +96,7 @@ static void ShowMessageCreateProcessError(
 
 void StartGame(
     PROCESS_INFORMATION* processes_infos,
-    const struct Args* args
-) {
+    const struct ParsedArgs* args) {
   size_t i;
   wchar_t* full_cmd_line;
   HANDLE open_process_result;
@@ -154,8 +154,7 @@ free_full_cmd_line:
 
 void StartGameSuspended(
     PROCESS_INFORMATION* processes_infos,
-    const struct Args* args
-) {
+    const struct ParsedArgs* args) {
   size_t i;
   wchar_t* full_cmd_line;
   BOOL is_create_process_success;

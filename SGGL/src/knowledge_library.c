@@ -35,7 +35,7 @@
 
 static HMODULE knowledge_library;
 
-typedef void (*InitFunctionType)(const wchar_t*, size_t);
+typedef void (*InitFunctionType)(const wchar_t* game_path);
 static InitFunctionType init_func_ptr;
 
 typedef void (*DeinitFunctionType)(const PROCESS_INFORMATION*, size_t);
@@ -55,9 +55,7 @@ inject_libraries_to_processes_func_ptr;
 
 void Knowledge_Init(
     const wchar_t* knowledge_library_path,
-    const wchar_t* game_path,
-    size_t game_path_len
-) {
+    const wchar_t* game_path) {
   DWORD last_error;
 
   if (knowledge_library_path == NULL) {
@@ -119,7 +117,7 @@ void Knowledge_Init(
 
   /* Call Knowledge's init function if it exists. */
   if (init_func_ptr != NULL) {
-    init_func_ptr(game_path, game_path_len);
+    init_func_ptr(game_path);
   }
 }
 
