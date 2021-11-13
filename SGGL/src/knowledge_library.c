@@ -29,29 +29,38 @@
 
 #include "knowledge_library.h"
 
+#include <stddef.h>
 #include <stdio.h>
+#include <windows.h>
 
-#include "error_handling.h"
+#include <mdc/error/exit_on_error.h>
+#include <mdc/std/wchar.h>
+#include <mdc/wchar_t/filew.h>
 
 static HMODULE knowledge_library;
 
-typedef void (*InitFunctionType)(const wchar_t* game_path);
-static InitFunctionType init_func_ptr;
+typedef void InitFuncType(const wchar_t* game_path);
+static InitFuncType* init_func_ptr;
 
-typedef void (*DeinitFunctionType)(const PROCESS_INFORMATION*, size_t);
-static DeinitFunctionType deinit_func_ptr;
+typedef void DeinitFuncType(
+    const PROCESS_INFORMATION* processes_infos,
+    size_t num_instances);
+static DeinitFuncType* deinit_func_ptr;
 
-typedef void (*PrintGameInfoFunctionType)(void);
-static PrintGameInfoFunctionType print_game_info_func_ptr;
+typedef void PrintGameInfoFuncType(void);
+static PrintGameInfoFuncType* print_game_info_func_ptr;
 
-typedef int (*InjectLibrariesToProcessesFunctionType)(
-    const wchar_t**,
-    size_t,
-    const PROCESS_INFORMATION*,
-    size_t
-);
-static InjectLibrariesToProcessesFunctionType
+typedef int InjectLibrariesToProcessesFuncType(
+    const wchar_t** libraries_to_inject,
+    size_t num_libraries,
+    const PROCESS_INFORMATION* processes_infos,
+    size_t num_instances);
+static InjectLibrariesToProcessesFuncType*
 inject_libraries_to_processes_func_ptr;
+
+/**
+ * External
+ */
 
 void Knowledge_Init(
     const wchar_t* knowledge_library_path,
@@ -63,7 +72,6 @@ void Knowledge_Init(
   }
 
   knowledge_library = LoadLibraryW(knowledge_library_path);
-
   if (knowledge_library == NULL) {
     last_error = GetLastError();
 
@@ -71,60 +79,62 @@ void Knowledge_Init(
       return;
     }
 
-    ExitOnWindowsFunctionFailureWithLastError(
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
         L"LoadLibraryW",
-        last_error
-    );
+        last_error);
+    goto bad_return;
   }
 
   /* Load all of the Knowledge functions. */
-  init_func_ptr = (InitFunctionType) GetProcAddress(
+  init_func_ptr = (InitFuncType*)GetProcAddress(
       knowledge_library,
-      "Knowledge_Init"
-  );
+      "Knowledge_Init");
 
   if (init_func_ptr == NULL) {
-    printf("Unable to load Knowledge_Init. \n");
+    wprintf(L"Unable to load Knowledge_Init.\n");
   }
 
-  deinit_func_ptr = (DeinitFunctionType) GetProcAddress(
+  deinit_func_ptr = (DeinitFuncType*)GetProcAddress(
       knowledge_library,
-      "Knowledge_Deinit"
-  );
+      "Knowledge_Deinit");
 
   if (deinit_func_ptr == NULL) {
-    printf("Unable to load Knowledge_Deinit. \n");
+    wprintf(L"Unable to load Knowledge_Deinit.\n");
   }
 
-  print_game_info_func_ptr = (PrintGameInfoFunctionType) GetProcAddress(
+  print_game_info_func_ptr = (PrintGameInfoFuncType*)GetProcAddress(
       knowledge_library,
-      "Knowledge_PrintGameInfo"
-  );
+      "Knowledge_PrintGameInfo");
 
   if (print_game_info_func_ptr == NULL) {
-    printf("Unable to load Knowledge_PrintGameInfo. \n");
+    wprintf(L"Unable to load Knowledge_PrintGameInfo.\n");
   }
 
   inject_libraries_to_processes_func_ptr =
-      (InjectLibrariesToProcessesFunctionType) GetProcAddress(
+      (InjectLibrariesToProcessesFuncType*)GetProcAddress(
           knowledge_library,
-          "Knowledge_InjectLibrariesToProcesses"
-      );
+          "Knowledge_InjectLibrariesToProcesses");
 
   if (inject_libraries_to_processes_func_ptr == NULL) {
-    printf("Unable to load Knowledge_InjectLibrariesToProcesses. \n");
+    wprintf(L"Unable to load Knowledge_InjectLibrariesToProcesses.\n");
   }
 
   /* Call Knowledge's init function if it exists. */
   if (init_func_ptr != NULL) {
     init_func_ptr(game_path);
   }
+
+  return;
+
+bad_return:
+  return;
 }
 
 void Knowledge_Deinit(
     const PROCESS_INFORMATION* processes_infos,
-    size_t num_instances
-) {
+    size_t num_instances) {
   BOOL free_library_result;
 
   /* Call Knowledge's deinit function if it exists. */
@@ -143,13 +153,19 @@ void Knowledge_Deinit(
   }
 
   free_library_result = FreeLibrary(knowledge_library);
-
   if (!free_library_result) {
-    ExitOnWindowsFunctionFailureWithLastError(
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
         L"FreeLibrary",
-        GetLastError()
-    );
+        GetLastError());
+    goto bad_return;
   }
+
+  return;
+
+bad_return:
+  return;
 }
 
 void Knowledge_PrintGameInfo(void) {
@@ -164,8 +180,7 @@ int Knowledge_InjectLibrariesToProcesses(
     const wchar_t** libraries_to_inject,
     size_t num_libraries,
     const PROCESS_INFORMATION* processes_infos,
-    size_t num_instances
-) {
+    size_t num_instances) {
   if (inject_libraries_to_processes_func_ptr == NULL) {
     return 0;
   }
@@ -174,6 +189,5 @@ int Knowledge_InjectLibrariesToProcesses(
       libraries_to_inject,
       num_libraries,
       processes_infos,
-      num_instances
-  );
+      num_instances);
 }

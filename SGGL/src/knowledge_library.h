@@ -31,8 +31,13 @@
 #define SGGL_KNOWLEDGE_LIBRARY_H_
 
 #include <stddef.h>
-#include <wchar.h>
 #include <windows.h>
+
+#include <mdc/std/wchar.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 void Knowledge_Init(
     const wchar_t* knowledge_library_path,
@@ -49,5 +54,9 @@ int Knowledge_InjectLibrariesToProcesses(
     size_t num_libraries,
     const PROCESS_INFORMATION* processes_infos,
     size_t num_instances);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 
 #endif /* SGGL_KNOWLEDGE_LIBRARY_H_ */
