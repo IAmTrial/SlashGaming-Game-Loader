@@ -30,7 +30,6 @@
 #ifndef SGGL_ARGS_PARSER_H_
 #define SGGL_ARGS_PARSER_H_
 
-#include <limits.h>
 #include <stddef.h>
 #include <windows.h>
 
@@ -40,14 +39,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct Args {
+struct ParsedArgs {
   const wchar_t* game_path;
-  size_t game_path_len;
-
   const wchar_t* game_args;
-  size_t game_args_len;
 
   const wchar_t** inject_library_paths;
+  size_t inject_library_paths_capacity;
   size_t inject_library_paths_count;
 
   size_t num_instances;
@@ -55,12 +52,16 @@ struct Args {
   const wchar_t* knowledge_library_path;
 };
 
-void Args_InitFromArgv(
-    struct Args* args,
+#define PARSED_ARGS_UNINIT { 0 }
+
+extern const struct ParsedArgs ParsedArgs_kUninit;
+
+struct ParsedArgs* ParsedArgs_InitFromArgv(
+    struct ParsedArgs* args,
     int argc,
     const wchar_t* const* argv,
     size_t num_libraries);
-void Args_Deinit(struct Args* args);
+void ParsedArgs_Deinit(struct ParsedArgs* args);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -45,7 +45,7 @@ int wmain(int argc, const wchar_t** argv) {
   size_t i;
 
   size_t num_libraries;
-  struct Args args;
+  struct ParsedArgs args;
   PROCESS_INFORMATION* processes_infos;
   int is_inject_libraries_success;
   BOOL is_close_handle_success;
@@ -72,7 +72,7 @@ int wmain(int argc, const wchar_t** argv) {
   }
 
   /* Parse args. */
-  Args_InitFromArgv(&args, argc, argv, num_libraries);
+  ParsedArgs_InitFromArgv(&args, argc, argv, num_libraries);
 
   /* Initialize Knowledge library, if specified. */
   if (args.knowledge_library_path != NULL) {
@@ -80,11 +80,7 @@ int wmain(int argc, const wchar_t** argv) {
         L"Loading Knowledge library from %ls \n",
         args.knowledge_library_path
     );
-    Knowledge_Init(
-        args.knowledge_library_path,
-        args.game_path,
-        args.game_path_len
-    );
+    Knowledge_Init(args.knowledge_library_path, args.game_path);
     printf("\n");
   }
 
@@ -182,7 +178,7 @@ knowledge_deinit:
   }
 
 free_args:
-  Args_Deinit(&args);
+  ParsedArgs_Deinit(&args);
 
   printf("Done. \n\n");
 
