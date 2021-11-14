@@ -65,17 +65,16 @@ inject_libraries_to_processes_func_ptr;
 void Knowledge_Init(
     const wchar_t* knowledge_library_path,
     const wchar_t* game_path) {
-  DWORD last_error;
-
   if (knowledge_library_path == NULL) {
     return;
   }
 
   knowledge_library = LoadLibraryW(knowledge_library_path);
   if (knowledge_library == NULL) {
-    last_error = GetLastError();
+    DWORD last_error;
 
-    if (last_error == 0x7E) {
+    last_error = GetLastError();
+    if (last_error == ERROR_MOD_NOT_FOUND) {
       return;
     }
 
