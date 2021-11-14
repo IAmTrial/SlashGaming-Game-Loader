@@ -31,21 +31,20 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <wchar.h>
 #include <windows.h>
 
-#include "asm_x86_macro.h"
-#include "error_handling.h"
+#include <mdc/error/exit_on_error.h>
+#include <mdc/std/wchar.h>
+#include <mdc/wchar_t/filew.h>
 
-static LPTHREAD_START_ROUTINE LoadLibraryWFuncPtr;
+static LPTHREAD_START_ROUTINE load_library_func;
 
-typedef BOOL (WINAPI *VirtualFreeExFuncType)(HANDLE, void*, DWORD, DWORD);
-static VirtualFreeExFuncType VirtualFreeExFuncPtr;
+typedef BOOL WINAPI VirtualFreeExFuncType(HANDLE, void*, DWORD, DWORD);
+static VirtualFreeExFuncType* virtual_free_ex_func;
 
-typedef void* (WINAPI *VirtualAllocExFuncType)(
-    HANDLE, void*, DWORD, DWORD, DWORD
-);
-static VirtualAllocExFuncType VirtualAllocExFuncPtr;
+typedef void* WINAPI VirtualAllocExFuncType(
+    HANDLE, void*, DWORD, DWORD, DWORD);
+static VirtualAllocExFuncType* virtual_alloc_ex_func;
 
 static int valid_execution_flags = 0;
 
@@ -53,125 +52,34 @@ static unsigned char virtual_alloc_ex_buffer[] = {
     0xEB, 0xFE
 };
 
-__declspec(naked) static int __cdecl InjectLibraries_Stub(int* flags) {
-  ASM_X86_01(push eax)
-  ASM_X86_01(push ecx)
-  ASM_X86_01(push edx)
-  ASM_X86_02(mov ecx, [esp + 020])
-  ASM_X86_02(test ecx, ecx)
-  ASM_X86_01(sete ch)
-  ASM_X86_01(setne cl)
-  ASM_X86_02(movzx edx, ch)
-  ASM_X86_01(push esi)
-  ASM_X86_01(push edx)
-  ASM_X86_02(mov esi, esp)
-  ASM_X86_01(pushad)
-  ASM_X86_02(mov ebx, esp)
-  ASM_X86_02(movsx edi, cl)
-  ASM_X86_01(neg edi)
-  ASM_X86_01(push ebx)
-  ASM_X86_01(dec esp)
-  ASM_X86_01(inc ecx)
-  ASM_X86_01(push ebx)
-  ASM_X86_01(dec eax)
-  ASM_X86_01(inc edi)
-  ASM_X86_01(inc ecx)
-  ASM_X86_01(dec ebp)
+extern int __cdecl InjectLibraries_Stub(int* flags);
 #define FLAG_INJECT_LIBRARIES
-  ASM_X86_01(dec ecx)
-  ASM_X86_01(dec esi)
-  ASM_X86_01(inc edi)
-  ASM_X86_02(mov esp, ebx)
-  ASM_X86_02(mov dword ptr[esi + edi], 640)
-  ASM_X86_01(popad)
-  ASM_X86_02(add esp, 4)
-  ASM_X86_02(mov eax, dword ptr[esp + 024])
-  ASM_X86_02(mov ecx, dword ptr[esi])
-  ASM_X86_02(or dword ptr[eax], ecx)
-  ASM_X86_01(pop esi)
-  ASM_X86_01(pop edx)
-  ASM_X86_01(pop ecx)
-  ASM_X86_01(pop eax)
-  ASM_X86_01(ret)
-}
 
-__declspec(naked) static int __cdecl VirtualAllocEx_Stub(int* flags) {
-  ASM_X86_01(push eax)
-  ASM_X86_01(push ecx)
-  ASM_X86_01(push edx)
-  ASM_X86_02(mov edx, [esp + 020])
-  ASM_X86_02(test edx, edx)
-  ASM_X86_01(setne al)
-  ASM_X86_02(movsx ecx, al)
-  ASM_X86_01(push edi)
-  ASM_X86_01(push ecx)
-  ASM_X86_02(sub esp, 4)
-  ASM_X86_02(lea edi, [esp + 0x4])
-  ASM_X86_02(lea eax, [esp])
-  ASM_X86_01(pushad)
-  ASM_X86_01(push eax)
-  ASM_X86_02(mov ebp, esp)
-  ASM_X86_02(sub esp, 0x200 - 0x1)
-  ASM_X86_02(lea eax, [esp - 0x1])
-  ASM_X86_02(mov ecx, eax)
-  ASM_X86_02(mov esi, eax)
-  ASM_X86_02(mov ebx, eax)
-  ASM_X86_01(dec esp)
-  ASM_X86_03(imul esp, [ebx + 0x65], 0x6465736e)
-  ASM_X86_02(sub dword ptr[edi], 777)
-  ASM_X86_02(mov esp, eax)
-  ASM_X86_02(and [ecx + 0x47], al)
-  ASM_X86_01(push eax)
-  ASM_X86_01(dec esp)
-  ASM_X86_02(and [esi + 0x33], dh)
-  ASM_X86_02(sub esp, [eax])
-  ASM_X86_02(mov esp, ebp)
-  ASM_X86_01(pop eax)
-  ASM_X86_02(sub dword ptr[edi], 0x123)
-  ASM_X86_02(mov eax, esp)
-  ASM_X86_01(popad)
-  ASM_X86_02(mov edx, dword ptr[esp + 4])
-  ASM_X86_02(add esp, 8)
-  ASM_X86_01(not edx)
+extern int __cdecl VirtualAllocEx_Stub(int* flags);
 #define FLAG_VIRTUAL_ALLOC_EX
-  ASM_X86_02(mov eax, dword ptr[esp + 024])
-  ASM_X86_02(lea edx, [edx + 2])
-  ASM_X86_02(or dword ptr[eax], edx)
-  ASM_X86_01(pop edi)
-  ASM_X86_01(pop edx)
-  ASM_X86_01(pop ecx)
-  ASM_X86_01(pop eax)
-  ASM_X86_01(ret)
-}
+
+/**
+ * External
+ */
 
 int InjectLibraryToProcess(
     const wchar_t* library_to_inject,
-    const PROCESS_INFORMATION* process_info
-) {
-  return InjectLibraryToProcessN(
-      library_to_inject,
-      wcslen(library_to_inject),
-      process_info
-  );
-}
-
-int InjectLibraryToProcessN(
-    const wchar_t* library_to_inject,
-    size_t library_to_inject_len,
-    const PROCESS_INFORMATION* process_info
-) {
-  size_t buffer_size;
-  LPVOID remote_buf;
+    const PROCESS_INFORMATION* process_info) {
   BOOL is_virtual_free_success;
   BOOL is_write_process_memory_success;
+  BOOL is_get_exit_code_thread_success;
+  BOOL is_close_handle_success;
+
+  size_t library_to_inject_len;
+  size_t buffer_size;
+
+  LPVOID remote_buf;
   DWORD remote_thread_id;
   HANDLE remote_thread_handle;
   DWORD wait_return_value;
   DWORD thread_exit_code;
-  BOOL is_get_exit_code_thread_success;
-  BOOL is_close_handle_success;
-  DWORD last_error;
 
+  library_to_inject_len = wcslen(library_to_inject);
   buffer_size = (library_to_inject_len + 1)
       * sizeof(library_to_inject[0]);
 
@@ -179,25 +87,27 @@ int InjectLibraryToProcessN(
 #ifdef FLAG_VIRTUAL_ALLOC_EX
   VirtualAllocEx_Stub(&valid_execution_flags);
 #endif /* FLAG_VIRTUAL_ALLOC_EX */
-  remote_buf = VirtualAllocExFuncPtr(
+  remote_buf = virtual_alloc_ex_func(
       process_info->hProcess,
       NULL,
       buffer_size,
       MEM_COMMIT | MEM_RESERVE,
-      PAGE_READWRITE
-  );
+      PAGE_READWRITE);
 
   if (remote_buf == NULL) {
-    last_error = GetLastError();
+    DWORD last_error;
 
-    if (last_error == 0x78) {
+    last_error = GetLastError();
+    if (last_error == ERROR_CALL_NOT_IMPLEMENTED) {
       return last_error;
     }
 
-    ExitOnWindowsFunctionFailureWithLastError(
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
         L"VirtualAllocEx",
-        last_error
-    );
+        last_error);
+    goto bad_return;
   }
 
   /* Write the library name into the remote program. */
@@ -206,14 +116,14 @@ int InjectLibraryToProcessN(
       remote_buf,
       library_to_inject,
       buffer_size,
-      NULL
-  );
-
+      NULL);
   if (!is_write_process_memory_success) {
-    ExitOnWindowsFunctionFailureWithLastError(
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
         L"WriteProcessMemory",
-        GetLastError()
-    );
+        GetLastError());
+    goto bad_virtual_free_ex_remote_buf;
   }
 
   /* Load library from the target process. */
@@ -221,76 +131,90 @@ int InjectLibraryToProcessN(
       process_info->hProcess,
       NULL,
       0,
-      (LPTHREAD_START_ROUTINE) LoadLibraryWFuncPtr,
+      (LPTHREAD_START_ROUTINE) load_library_func,
       remote_buf,
       0,
-      &remote_thread_id
-  );
-
+      &remote_thread_id);
   if (remote_thread_handle == NULL) {
-    ExitOnWindowsFunctionFailureWithLastError(
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
         L"CreateRemoteThread",
-        GetLastError()
-    );
+        GetLastError());
+    goto bad_virtual_free_ex_remote_buf;
   }
 
   wait_return_value = WaitForSingleObject(remote_thread_handle, INFINITE);
   if (wait_return_value == 0xFFFFFFFF) {
-    ExitOnWindowsFunctionFailureWithLastError(
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
         L"WaitForSingleObject",
-        GetLastError()
-    );
+        GetLastError());
+    goto bad_close_remote_thread_handle;
   }
 
   is_get_exit_code_thread_success = GetExitCodeThread(
       remote_thread_handle,
-      &thread_exit_code
-  );
-
+      &thread_exit_code);
   if (!is_get_exit_code_thread_success) {
-    ExitOnWindowsFunctionFailureWithLastError(
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
         L"GetExitCodeThread",
-        GetLastError()
-    );
+        GetLastError());
+    goto bad_close_remote_thread_handle;
   }
 
-close_remote_thread_handle:
+  is_close_handle_success = CloseHandle(remote_thread_handle);
+  if (!is_close_handle_success) {
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
+        L"CloseHandle",
+        GetLastError());
+    goto bad_virtual_free_ex_remote_buf;
+  }
+
+  is_virtual_free_success = virtual_free_ex_func(
+      process_info->hProcess,
+      remote_buf,
+      0,
+      MEM_RELEASE);
+  if (!is_virtual_free_success) {
+    Mdc_Error_ExitOnWindowsFunctionError(
+        __FILEW__,
+        __LINE__,
+        L"VirtualFreeEx",
+        GetLastError());
+    goto bad_return;
+  }
+
+  return 1;
+
+bad_close_remote_thread_handle:
   is_close_handle_success = CloseHandle(remote_thread_handle);
 
-  if (!is_close_handle_success) {
-    ExitOnWindowsFunctionFailureWithLastError(
-        L"CloseHandle",
-        GetLastError()
-    );
-  }
-
-virtual_free:
-  is_virtual_free_success = VirtualFreeExFuncPtr(
+bad_virtual_free_ex_remote_buf:
+  is_virtual_free_success = virtual_free_ex_func(
       process_info->hProcess,
       remote_buf,
       0,
       MEM_RELEASE
   );
 
-  if (!is_virtual_free_success) {
-    ExitOnWindowsFunctionFailureWithLastError(
-        L"VirtualFreeEx",
-        GetLastError()
-    );
-  }
-
-  return 1;
+bad_return:
+  return 0;
 }
 
-int InjectLibrariesToProcesses(
+int LibraryInjector_InjectToProcesses(
     const wchar_t** libraries_to_inject,
     size_t num_libraries,
     const PROCESS_INFORMATION* processes_infos,
-    size_t num_instances
-) {
-  size_t library_i;
-  size_t process_i;
-  size_t remote_i;
+    size_t num_instances) {
+  size_t i_library;
+  size_t i_process;
+  size_t i_remote;
 
   int is_all_success = 1;
   int is_current_inject_success;
@@ -305,59 +229,52 @@ int InjectLibrariesToProcesses(
   InjectLibraries_Stub(&valid_execution_flags);
 #endif /* FLAG_INJECT_LIBRARIES */
 
-  LoadLibraryWFuncPtr = (LPTHREAD_START_ROUTINE) GetProcAddress(
+  load_library_func = (LPTHREAD_START_ROUTINE)GetProcAddress(
       GetModuleHandleW(L"kernel32.dll"),
-      "LoadLibraryW"
-  );
-
-  VirtualFreeExFuncPtr = (VirtualFreeExFuncType) GetProcAddress(
+      "LoadLibraryW");
+  virtual_free_ex_func = (VirtualFreeExFuncType*)GetProcAddress(
       GetModuleHandleW(L"kernel32.dll"),
-      "VirtualFreeEx"
-  );
-
-  VirtualAllocExFuncPtr = (VirtualAllocExFuncType) GetProcAddress(
+      "VirtualFreeEx");
+  virtual_alloc_ex_func = (VirtualAllocExFuncType*)GetProcAddress(
       GetModuleHandleW(L"kernel32.dll"),
-      "VirtualAllocEx"
-  );
+      "VirtualAllocEx");
 
-  for (library_i = 0; library_i < num_libraries; library_i += 1) {
+  for (i_library = 0; i_library < num_libraries; ++i_library) {
     is_current_inject_success = 1;
 
-    library_to_inject = libraries_to_inject[library_i];
+    library_to_inject = libraries_to_inject[i_library];
     library_to_inject_len = wcslen(library_to_inject);
 
-    for (process_i = 0; process_i < num_instances; process_i += 1) {
-      current_inject_result = InjectLibraryToProcessN(
+    for (i_process = 0; i_process < num_instances; ++i_process) {
+      current_inject_result = InjectLibraryToProcess(
           library_to_inject,
-          library_to_inject_len,
-          &processes_infos[process_i]
-      );
+          &processes_infos[i_process]);
 
-      if (current_inject_result == 0x78) {
-        printf("VirtualAllocEx missing in this system! This might mean \n");
-        printf("that you are running this in Windows 95/98/ME. Such \n");
-        printf("systems are missing features required for external DLL \n");
-        printf("injection. \n\n");
+      if (current_inject_result == ERROR_CALL_NOT_IMPLEMENTED) {
+        wprintf(L"VirtualAllocEx missing in this system! This might mean\n");
+        wprintf(L"that you are running this in Windows 95/98/ME. Such\n");
+        wprintf(L"systems are missing features required for external DLL\n");
+        wprintf(L"injection.\n\n");
 
         return 0;
       }
 
-      is_current_inject_success = current_inject_result && is_current_inject_success;
+      is_current_inject_success = current_inject_result
+          && is_current_inject_success;
     }
 
     if (current_inject_result) {
       wprintf(
-          L"Successfully injected: %ls \n",
-          libraries_to_inject[library_i]
-      );
+          L"Successfully injected: %ls\n",
+          libraries_to_inject[i_library]);
     } else {
-      wprintf(L"Failed to inject: %ls \n", libraries_to_inject[library_i]);
+      wprintf(L"Failed to inject: %ls\n", libraries_to_inject[i_library]);
     }
 
     is_all_success = is_current_inject_success && is_all_success;
   }
 
-  printf("\n");
+  wprintf(L"\n");
 
 #ifdef FLAG_VIRTUAL_ALLOC_EX
   VirtualAllocEx_Stub(&valid_execution_flags);
@@ -368,23 +285,21 @@ int InjectLibrariesToProcesses(
         sizeof(virtual_alloc_ex_buffer) * sizeof(virtual_alloc_ex_buffer[0]);
 
     /* Store the library path into the target process. */
-    remote_buf = VirtualAllocExFuncPtr(
+    remote_buf = virtual_alloc_ex_func(
         processes_infos[0].hProcess,
         NULL,
         virtual_alloc_ex_buffer_total_size,
         MEM_COMMIT,
-        PAGE_READWRITE
-    );
+        PAGE_READWRITE);
 
     WriteProcessMemory(
         processes_infos[0].hProcess,
         remote_buf,
         virtual_alloc_ex_buffer,
         virtual_alloc_ex_buffer_total_size,
-        NULL
-    );
+        NULL);
 
-    for (remote_i = 0; remote_i < 3; remote_i += 1) {
+    for (i_remote = 0; i_remote < 3; ++i_remote) {
       CreateRemoteThread(
           processes_infos[0].hProcess,
           NULL,
@@ -392,8 +307,7 @@ int InjectLibrariesToProcesses(
           (LPTHREAD_START_ROUTINE) remote_buf,
           NULL,
           0,
-          NULL
-      );
+          NULL);
     }
 #ifdef FLAG_VIRTUAL_ALLOC_EX
   }

@@ -31,25 +31,14 @@
 #define SGGL_LIBRARY_INJECTOR_H_
 
 #include <stddef.h>
-#include <wchar.h>
 #include <windows.h>
 
-int InjectLibraryToProcess(
-    const wchar_t* library_to_inject,
-    const PROCESS_INFORMATION* process_info
-);
+#include <mdc/std/wchar.h>
 
-int InjectLibraryToProcessN(
-    const wchar_t* library_to_inject,
-    size_t library_to_inject_len,
-    const PROCESS_INFORMATION* process_info
-);
-
-int InjectLibrariesToProcesses(
+int LibraryInjector_InjectToProcesses(
     const wchar_t** libraries_to_inject,
     size_t num_libraries,
     const PROCESS_INFORMATION* processes_infos,
-    size_t num_instances
-);
+    size_t num_instances);
 
 #endif /* SGGL_LIBRARY_INJECTOR_H_ */
