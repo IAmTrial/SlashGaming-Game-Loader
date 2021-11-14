@@ -150,10 +150,16 @@ struct ArgParseFuncTableEntry {
   ArgParseFunc* value;
 };
 
-static int ArgParseFuncTableEntry_CompareKeyAsVoid(
+static int ArgParseFuncTableEntry_CompareKey(
     const struct ArgParseFuncTableEntry* entry1,
     const struct ArgParseFuncTableEntry* entry2) {
   return wcscmp(entry1->key, entry2->key);
+}
+
+static int ArgParseFuncTableEntry_CompareKeyAsVoid(
+    const void* entry1,
+    const void* entry2) {
+  return wcscmp(entry1, entry2);
 }
 
 static const struct ArgParseFuncTableEntry kArgParseFuncSortedTable[] = {
