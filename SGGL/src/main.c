@@ -129,20 +129,19 @@ int wmain(int argc, const wchar_t** argv) {
   );
 
   if (!is_knowledge_override_inject) {
-    is_inject_libraries_success = InjectLibrariesToProcesses(
+    is_inject_libraries_success = LibraryInjector_InjectToProcesses(
         args.inject_library_paths,
         args.inject_library_paths_count,
         processes_infos,
-        args.num_instances
-    );
+        args.num_instances);
   } else {
     is_inject_libraries_success = is_knowledge_override_inject;
   }
 
   if (is_inject_libraries_success) {
-    printf("All libraries have been successfully injected. \n\n");
+    wprintf(L"All libraries have been successfully injected.\n\n");
   } else {
-    printf("Some or all libraries failed to inject. \n\n");
+    wprintf(L"Some or all libraries failed to inject.\n\n");
   }
 
   /* Resume processes. */

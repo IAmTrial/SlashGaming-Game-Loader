@@ -57,6 +57,8 @@ set(RESOURCE_FILES
 set(SOURCE_FILES
     ${RESOURCE_FILES}
 
+    "src/library_injector_shim.asm"
+
     "src/args_parser.c"
     "src/args_validator.c"
     "src/encoding.c"
