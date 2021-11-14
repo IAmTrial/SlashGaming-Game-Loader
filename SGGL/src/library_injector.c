@@ -200,8 +200,7 @@ bad_virtual_free_ex_remote_buf:
       process_info->hProcess,
       remote_buf,
       0,
-      MEM_RELEASE
-  );
+      MEM_RELEASE);
 
 bad_return:
   return 0;

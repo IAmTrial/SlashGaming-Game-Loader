@@ -45,6 +45,7 @@ if (MINGW)
     set(CMAKE_IMPORT_LIBRARY_PREFIX "")
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
     set(CMAKE_STATIC_LIBRARY_PREFIX "")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -municode")
 endif (MINGW)
 
 # List all of the source files here
