@@ -91,6 +91,10 @@ LINK32=link.exe
 
 SOURCE=.\resource\resource.rc
 # End Source File
+# Begin Source File
+
+SOURCE=.\resource\slashgaming_game_loader.ico
+# End Source File
 # End Group
 # Begin Group "src"
 
