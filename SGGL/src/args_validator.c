@@ -31,11 +31,8 @@
 
 #include <stddef.h>
 
-#include <mdc/error/exit_on_error.h>
-#include <mdc/malloc/malloc.h>
 #include <mdc/std/assert.h>
 #include <mdc/std/wchar.h>
-#include <mdc/wchar_t/filew.h>
 
 typedef int ArgValidationFunc(
     struct ArgsValidationResults* results,
@@ -52,71 +49,6 @@ struct ArgsValidationResults {
 };
 
 #define ARGS_VALIDATION_RESULTS_UNINIT { 0 }
-
-/**
- * Validation table
- */
-
-static int IsGamePathValid(
-    struct ArgsValidationResults* results,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static int IsGameArgValid(
-    struct ArgsValidationResults* results,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static int IsInjectLibraryPathValid(
-    struct ArgsValidationResults* results,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static int IsKnowledgeLibraryPathValid(
-    struct ArgsValidationResults* results,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static int IsNumInstancesValid(
-    struct ArgsValidationResults* results,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-struct ArgsValidationFuncTableEntry {
-  const wchar_t* key;
-  ArgValidationFunc* value;
-};
-
-static int ArgsValidationFuncTableEntry_CompareKeyAsVoid(
-    const struct ArgsValidationFuncTableEntry* entry1,
-    const struct ArgsValidationFuncTableEntry* entry2) {
-  return wcscmp(entry1->key, entry2->key);
-}
-
-static const struct ArgsValidationFuncTableEntry
-kArgsValidationFuncSortedTable[] = {
-    { L"--game", &IsGamePathValid },
-    { L"--gameargs", &IsGameArgValid },
-    { L"--knowledge", &IsKnowledgeLibraryPathValid },
-    { L"--library", &IsInjectLibraryPathValid },
-    { L"--num-instances", &IsNumInstancesValid },
-
-    { L"-a", &IsGameArgValid },
-    { L"-g", &IsGamePathValid },
-    { L"-k", &IsKnowledgeLibraryPathValid },
-    { L"-l", &IsInjectLibraryPathValid },
-    { L"-n", &IsNumInstancesValid },
-};
-
-enum {
-  kArgsValidationFuncSortedTableCount = sizeof(kArgsValidationFuncSortedTable)
-      / sizeof(kArgsValidationFuncSortedTable[0])
-};
 
 /**
  * Validation function
@@ -248,6 +180,41 @@ static int IsNumInstancesValid(
 
   return 1;
 }
+
+/**
+ * Validation table
+ */
+
+struct ArgsValidationFuncTableEntry {
+  const wchar_t* key;
+  ArgValidationFunc* value;
+};
+
+static int ArgsValidationFuncTableEntry_CompareKeyAsVoid(
+    const struct ArgsValidationFuncTableEntry* entry1,
+    const struct ArgsValidationFuncTableEntry* entry2) {
+  return wcscmp(entry1->key, entry2->key);
+}
+
+static const struct ArgsValidationFuncTableEntry
+kArgsValidationFuncSortedTable[] = {
+    { L"--game", &IsGamePathValid },
+    { L"--gameargs", &IsGameArgValid },
+    { L"--knowledge", &IsKnowledgeLibraryPathValid },
+    { L"--library", &IsInjectLibraryPathValid },
+    { L"--num-instances", &IsNumInstancesValid },
+
+    { L"-a", &IsGameArgValid },
+    { L"-g", &IsGamePathValid },
+    { L"-k", &IsKnowledgeLibraryPathValid },
+    { L"-l", &IsInjectLibraryPathValid },
+    { L"-n", &IsNumInstancesValid },
+};
+
+enum {
+  kArgsValidationFuncSortedTableCount = sizeof(kArgsValidationFuncSortedTable)
+      / sizeof(kArgsValidationFuncSortedTable[0])
+};
 
 static int IsArgValid(
     struct ArgsValidationResults* results,
