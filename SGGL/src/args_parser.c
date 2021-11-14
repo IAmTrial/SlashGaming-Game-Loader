@@ -78,7 +78,7 @@ static void ParseInjectLibraryPath(
       <= args->inject_library_paths_count) {
     Mdc_Error_ExitOnGeneralError(
         L"Error",
-        L"Library count changed during execution. Please rerun the program "
+        L"Library count changed during execution. Please run the program "
             L"again.",
         __FILEW__,
         __LINE__);
@@ -159,7 +159,7 @@ static int ArgParseFuncTableEntry_CompareKey(
 static int ArgParseFuncTableEntry_CompareKeyAsVoid(
     const void* entry1,
     const void* entry2) {
-  return wcscmp(entry1, entry2);
+  return ArgParseFuncTableEntry_CompareKey(entry1, entry2);
 }
 
 static const struct ArgParseFuncTableEntry kArgParseFuncSortedTable[] = {
