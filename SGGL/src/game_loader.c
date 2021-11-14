@@ -134,7 +134,7 @@ bad_return:
  * External
  */
 
-void StartGame(
+void GameLoader_StartGame(
     PROCESS_INFORMATION* processes_infos,
     const struct ParsedArgs* args) {
   size_t i;
@@ -163,7 +163,7 @@ void StartGame(
   }
 }
 
-void StartGameSuspended(
+void GameLoader_StartGameSuspended(
     PROCESS_INFORMATION* processes_infos,
     const struct ParsedArgs* args) {
   StartGameWithParams(
