@@ -40,75 +40,7 @@
 #include <mdc/std/wchar.h>
 #include <mdc/wchar_t/filew.h>
 
-typedef void ArgParseFunc(
-    struct ParsedArgs* args,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-/**
- * Parse table
- */
-
-static void ParseGamePath(
-    struct ParsedArgs* args,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static void ParseGameArg(
-    struct ParsedArgs* args,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static void ParseInjectLibraryPath(
-    struct ParsedArgs* args,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static void ParseKnowledgeLibraryPath(
-    struct ParsedArgs* args,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-static void ParseNumInstances(
-    struct ParsedArgs* args,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
-struct ArgParseFuncTableEntry {
-  const wchar_t* key;
-  ArgParseFunc* value;
-};
-
-static int ArgParseFuncTableEntry_CompareKeyAsVoid(
-    const struct ArgParseFuncTableEntry* entry1,
-    const struct ArgParseFuncTableEntry* entry2) {
-  return wcscmp(entry1->key, entry2->key);
-}
-
-static const struct ArgParseFuncTableEntry kArgParseFuncSortedTable[] = {
-    { L"--game", &ParseGamePath },
-    { L"--gameargs", &ParseGameArg },
-    { L"--knowledge", &ParseKnowledgeLibraryPath },
-    { L"--library", &ParseInjectLibraryPath },
-    { L"--num-instances", &ParseNumInstances },
-
-    { L"-a", &ParseGameArg },
-    { L"-g", &ParseGamePath },
-    { L"-k", &ParseKnowledgeLibraryPath },
-    { L"-l", &ParseInjectLibraryPath },
-    { L"-n", &ParseNumInstances },
-};
-
-enum {
-  kArgParseFuncSortedTableCount = sizeof(kArgParseFuncSortedTable)
-      / sizeof(kArgParseFuncSortedTable[0]),
-};
+#include "game_loader.h"
 
 /**
  * Validation function
@@ -196,12 +128,52 @@ static void ParseNumInstances(
    * Prevent opening more than 8 instances at once. Doing so
    * prevents the user from accidental resource hogging.
    */
-  args->num_instances = (args->num_instances <= 8)
+  args->num_instances = (args->num_instances <= GameLoader_kMaxInstances)
       ? args->num_instances
-      : 8;
+      : GameLoader_kMaxInstances;
 
   ++(*i_arg);
 }
+
+/**
+ * Parse table
+ */
+
+typedef void ArgParseFunc(
+    struct ParsedArgs* args,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
+
+struct ArgParseFuncTableEntry {
+  const wchar_t* key;
+  ArgParseFunc* value;
+};
+
+static int ArgParseFuncTableEntry_CompareKeyAsVoid(
+    const struct ArgParseFuncTableEntry* entry1,
+    const struct ArgParseFuncTableEntry* entry2) {
+  return wcscmp(entry1->key, entry2->key);
+}
+
+static const struct ArgParseFuncTableEntry kArgParseFuncSortedTable[] = {
+    { L"--game", &ParseGamePath },
+    { L"--gameargs", &ParseGameArg },
+    { L"--knowledge", &ParseKnowledgeLibraryPath },
+    { L"--library", &ParseInjectLibraryPath },
+    { L"--num-instances", &ParseNumInstances },
+
+    { L"-a", &ParseGameArg },
+    { L"-g", &ParseGamePath },
+    { L"-k", &ParseKnowledgeLibraryPath },
+    { L"-l", &ParseInjectLibraryPath },
+    { L"-n", &ParseNumInstances },
+};
+
+enum {
+  kArgParseFuncSortedTableCount = sizeof(kArgParseFuncSortedTable)
+      / sizeof(kArgParseFuncSortedTable[0]),
+};
 
 static void ParseArg(
     struct ParsedArgs* args,
