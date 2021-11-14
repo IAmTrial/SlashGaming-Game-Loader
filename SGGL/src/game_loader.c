@@ -29,12 +29,13 @@
 
 #include "game_loader.h"
 
-#include <wchar.h>
+#include <windows.h>
 
-#include "error_handling.h"
+#include <mdc/error/exit_on_error.h>
+#include <mdc/std/wchar.h>
+#include <mdc/wchar_t/filew.h>
 
-static const wchar_t* kCreateProcessErrorFormat =
-    L"%ls could not be started, with error code %x.";
+#include "args_parser.h"
 
 static void InitCommandLine(
     wchar_t* cmd_line,
@@ -50,69 +51,55 @@ static void InitCommandLine(
   }
 }
 
-static wchar_t* AllocateCommandLine(const struct ParsedArgs* args) {
-  wchar_t* full_cmd_line;
-  size_t full_cmd_line_len;
-
-  /* Add 2 due to surrounding quotes. */
-  full_cmd_line_len = MAX_PATH + 2;
-
-  if (args->game_args != NULL) {
-    /* Add 1 due to space. */
-    full_cmd_line_len += wcslen(args->game_args) + 1;
-  }
-
-  full_cmd_line = malloc((full_cmd_line_len + 1) * sizeof(full_cmd_line[0]));
-
-  if (full_cmd_line == NULL) {
-    ExitOnAllocationFailure();
-  }
-
-  return full_cmd_line;
-}
-
-static void ShowMessageCreateProcessError(
+static void ExitOnCreateProcessError(
+    const wchar_t* file_path,
+    unsigned int line,
     const struct ParsedArgs* args,
     DWORD last_error) {
   switch (last_error) {
     case 0x2: {
-      ExitOnGeneralFailure(
-          L"Game executable could not be found.",
-          L"Could Not Start Game"
-      );
+      Mdc_Error_ExitOnGeneralError(
+          L"Error",
+          L"Game executable %ls could not be found.",
+          file_path,
+          line,
+          args->game_path);
       break;
     }
 
     default: {
-      ExitOnWindowsFunctionFailureWithLastError(
-          L"CreateProcess",
-          last_error
-      );
+      Mdc_Error_ExitOnWindowsFunctionError(
+          file_path,
+          line,
+          L"CreateProcessW",
+          last_error);
+      break;
     }
   }
-
-  exit(0);
 }
 
-void StartGame(
+static void StartGameWithParams(
     PROCESS_INFORMATION* processes_infos,
-    const struct ParsedArgs* args) {
+    const struct ParsedArgs* args,
+    DWORD creation_flags,
+    LPVOID environment,
+    const wchar_t* current_directory_path) {
   size_t i;
-  wchar_t* full_cmd_line;
-  HANDLE open_process_result;
-  BOOL is_create_process_success;
 
+  /* CreateProcessW's lpCommandLine char limit is 32,767. */
+  wchar_t full_cmd_line[32767];
   STARTUPINFOW startup_info = { 0 };
+
   startup_info.cb = sizeof(startup_info);
 
-  full_cmd_line = AllocateCommandLine(args);
-
   /* Create the desired processes. */
-  for (i = 0; i < args->num_instances; i += 1) {
+  for (i = 0; i < args->num_instances; ++i) {
+    BOOL is_create_process_success;
+
     /*
-    * CreateProcessW can modify the cmd line string, so a copy must be
-    * made every time an instance needs to be made.
-    */
+     * CreateProcessW can modify the cmd line string, so a copy must be
+     * made every time an instance needs to be made.
+     */
     InitCommandLine(full_cmd_line, args);
 
     is_create_process_success = CreateProcessW(
@@ -121,75 +108,68 @@ void StartGame(
         NULL,
         NULL,
         TRUE,
-        0,
-        NULL,
-        NULL,
+        creation_flags,
+        environment,
+        current_directory_path,
         &startup_info,
-        &processes_infos[i]
-    );
+        &processes_infos[i]);
 
     if (!is_create_process_success) {
-      ShowMessageCreateProcessError(args, GetLastError());
+      ExitOnCreateProcessError(
+          __FILEW__,
+          __LINE__,
+          args,
+          GetLastError());
+      goto bad_return;
     }
   }
 
+  return;
+
+bad_return:
+  return;
+}
+
+/**
+ * External
+ */
+
+void StartGame(
+    PROCESS_INFORMATION* processes_infos,
+    const struct ParsedArgs* args) {
+  size_t i;
+
+  StartGameWithParams(
+      processes_infos,
+      args,
+      0,
+      NULL,
+      NULL);
+
   /* Wait until the processes are started. */
-  for (i = 0; i < args->num_instances; i += 1) {
+  for (i = 0; i < args->num_instances; ++i) {
+    HANDLE open_process_result;
+
     do {
       open_process_result = OpenProcess(
           PROCESS_QUERY_INFORMATION,
           FALSE,
-          processes_infos[i].dwProcessId
-      );
+          processes_infos[i].dwProcessId);
 
       Sleep(100);
     } while (open_process_result == NULL);
 
     CloseHandle(open_process_result);
   }
-
-free_full_cmd_line:
-  free(full_cmd_line);
 }
 
 void StartGameSuspended(
     PROCESS_INFORMATION* processes_infos,
     const struct ParsedArgs* args) {
-  size_t i;
-  wchar_t* full_cmd_line;
-  BOOL is_create_process_success;
-
-  STARTUPINFOW startup_info = { 0 };
-  startup_info.cb = sizeof(startup_info);
-
-  full_cmd_line = AllocateCommandLine(args);
-
-  /* Create the desired processes. */
-  for (i = 0; i < args->num_instances; i += 1) {
-    /*
-    * CreateProcessW can modify the cmd line string, so a copy must be
-    * made every time an instance needs to be made.
-    */
-    InitCommandLine(full_cmd_line, args);
-
-    is_create_process_success = CreateProcessW(
-        args->game_path,
-        full_cmd_line,
-        NULL,
-        NULL,
-        TRUE,
-        CREATE_SUSPENDED,
-        NULL,
-        NULL,
-        &startup_info,
-        &processes_infos[i]
-    );
-
-    if (!is_create_process_success) {
-      ShowMessageCreateProcessError(args, GetLastError());
-    }
-  }
-
-free_full_cmd_line:
-  free(full_cmd_line);
+  StartGameWithParams(
+      processes_infos,
+      args,
+      CREATE_SUSPENDED,
+      NULL,
+      NULL);
 }

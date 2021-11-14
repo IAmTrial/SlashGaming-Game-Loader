@@ -34,6 +34,10 @@
 
 #include "args_parser.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 void StartGame(
     PROCESS_INFORMATION* processes_infos,
     const struct ParsedArgs* args);
@@ -41,5 +45,9 @@ void StartGame(
 void StartGameSuspended(
     PROCESS_INFORMATION* processes_infos,
     const struct ParsedArgs* args);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 
 #endif /* SGGL_GAME_LOADER_H_ */
