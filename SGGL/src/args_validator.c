@@ -34,12 +34,6 @@
 #include <mdc/std/assert.h>
 #include <mdc/std/wchar.h>
 
-typedef int ArgValidationFunc(
-    struct ArgsValidationResults* results,
-    int* i_arg,
-    int argc,
-    const wchar_t* const* argv);
-
 struct ArgsValidationResults {
   int is_game_path_found;
   int is_game_args_found;
@@ -53,6 +47,12 @@ struct ArgsValidationResults {
 /**
  * Validation function
  */
+
+typedef int ArgValidationFunc(
+    struct ArgsValidationResults* results,
+    int* i_arg,
+    int argc,
+    const wchar_t* const* argv);
 
 static int IsGamePathValid(
     struct ArgsValidationResults* results,
@@ -190,10 +190,16 @@ struct ArgsValidationFuncTableEntry {
   ArgValidationFunc* value;
 };
 
-static int ArgsValidationFuncTableEntry_CompareKeyAsVoid(
+static int ArgsValidationFuncTableEntry_CompareKey(
     const struct ArgsValidationFuncTableEntry* entry1,
     const struct ArgsValidationFuncTableEntry* entry2) {
   return wcscmp(entry1->key, entry2->key);
+}
+
+static int ArgsValidationFuncTableEntry_CompareKeyAsVoid(
+    const void* entry1,
+    const void* entry2) {
+  return ArgsValidationFuncTableEntry_CompareKey(entry1, entry2);
 }
 
 static const struct ArgsValidationFuncTableEntry
