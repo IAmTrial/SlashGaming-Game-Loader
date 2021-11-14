@@ -38,11 +38,15 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void StartGame(
+enum {
+  GameLoader_kMaxInstances = 8,
+};
+
+void GameLoader_StartGame(
     PROCESS_INFORMATION* processes_infos,
     const struct ParsedArgs* args);
 
-void StartGameSuspended(
+void GameLoader_StartGameSuspended(
     PROCESS_INFORMATION* processes_infos,
     const struct ParsedArgs* args);
 

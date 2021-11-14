@@ -62,8 +62,6 @@ set(SOURCE_FILES
 
     "src/args_parser.c"
     "src/args_validator.c"
-    "src/encoding.c"
-    "src/error_handling.c"
     "src/game_loader.c"
     "src/help_printer.c"
     "src/knowledge_library.c"
@@ -73,9 +71,6 @@ set(SOURCE_FILES
 
     "src/args_parser.h"
     "src/args_validator.h"
-    "src/asm_x86_macro.h"
-    "src/encoding.h"
-    "src/error_handling.h"
     "src/game_loader.h"
     "src/help_printer.h"
     "src/knowledge_library.h"

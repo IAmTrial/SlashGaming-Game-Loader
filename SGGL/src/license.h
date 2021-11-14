@@ -30,6 +30,8 @@
 #ifndef SGGL_LICENSE_H_
 #define SGGL_LICENSE_H_
 
+#include <mdc/std/wchar.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -38,7 +40,7 @@ enum {
   License_kTextCount = 19,
 };
 
-extern const char* const License_kText[License_kTextCount];
+extern const wchar_t* const License_kText[License_kTextCount];
 
 void License_PrintText(void);
 
