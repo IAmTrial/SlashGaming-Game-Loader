@@ -145,7 +145,7 @@ int InjectLibraryToProcess(
   }
 
   wait_return_value = WaitForSingleObject(remote_thread_handle, INFINITE);
-  if (wait_return_value == 0xFFFFFFFF) {
+  if (wait_return_value == WAIT_FAILED) {
     Mdc_Error_ExitOnWindowsFunctionError(
         __FILEW__,
         __LINE__,

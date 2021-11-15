@@ -57,7 +57,7 @@ static void ExitOnCreateProcessError(
     const struct ParsedArgs* args,
     DWORD last_error) {
   switch (last_error) {
-    case 0x2: {
+    case ERROR_FILE_NOT_FOUND: {
       Mdc_Error_ExitOnGeneralError(
           L"Error",
           L"Game executable %ls could not be found.",
